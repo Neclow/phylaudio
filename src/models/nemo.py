@@ -1,7 +1,10 @@
-from .base import BaseFeatureExtractor
+import os
+import urllib
 
 import nemo.collections.asr as nemo_asr
 import torch
+
+from .base import BaseFeatureExtractor
 
 
 class NeMoFeatureExtractor(BaseFeatureExtractor):
@@ -20,6 +23,7 @@ class NeMoFeatureExtractor(BaseFeatureExtractor):
 
         if cache_dir is not None:
             cache_dir = f"{cache_dir}/NeMo"
+            os.makedirs(cache_dir, exist_ok=True)
 
         self.load(cache_dir)
 
@@ -27,17 +31,22 @@ class NeMoFeatureExtractor(BaseFeatureExtractor):
         if self.model_id == "NeMo_ambernet":
             model_name = self.model_id.split("_")[-1]
 
-            if cache_dir is None:
-                feature_extractor = (
-                    nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained(
-                        model_name="langid_ambernet"
+            if cache_dir is not None:
+                try:
+                    feature_extractor = (
+                        nemo_asr.models.EncDecSpeakerLabelModel.restore_from(
+                            restore_path=f"{cache_dir}/{model_name}.nemo"
+                        )
                     )
-                )
+                except FileNotFoundError:
+                    url = "https://api.ngc.nvidia.com/v2/models/org/nvidia/team/nemo/langid_ambernet/1.12.0/files?redirect=true&path=ambernet.nemo"
+                    save_path = f"{cache_dir}/{model_name}.nemo"
+                    urllib.request.urlretrieve(url, save_path)
 
             else:
                 feature_extractor = (
-                    nemo_asr.models.EncDecSpeakerLabelModel.restore_from(
-                        restore_path=f"{cache_dir}/{model_name}.nemo"
+                    nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained(
+                        model_name="langid_ambernet"
                     )
                 )
 
@@ -79,4 +88,5 @@ class NeMoFeatureExtractor(BaseFeatureExtractor):
         # B x n_layers X n_chunks x emb_dim
         hidden_states = torch.stack(all_hidden_states, dim=1).transpose(2, 3)
 
+        return hidden_states
         return hidden_states

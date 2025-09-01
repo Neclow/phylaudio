@@ -10,8 +10,9 @@ cuda = "12.6"
 
 [tasks]
 postinstall = "uv pip install fairseq --no-deps && uv pip install bitarray sacrebleu omegaconf hydra-core"
-download_fleurs = "python -m pipeline.download_fleurs"
-download_glottolog = "python -m pipeline.download_glottolog"
+download_fleurs = "python -m pipeline.download_fleurs data/datasets"
+download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
+download_models = "python -m pipeline.download_models data/models"
 language_identification = "python -m pipeline.language_identification"
 discrete_phylo = "python -m pipeline.sentence_trees_discrete"
 distance_phylo = "python -m pipeline.sentence_trees_distance"

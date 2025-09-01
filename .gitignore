@@ -165,6 +165,9 @@ cython_debug/
 # Datasets
 data/datasets/
 
+# Models
+data/models/
+
 # Tree data
 data/trees
 

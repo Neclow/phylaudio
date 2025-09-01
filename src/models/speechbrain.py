@@ -48,7 +48,8 @@ class SpeechbrainFeatureExtractor(BaseFeatureExtractor):
         super().__init__(model_id)
 
         if cache_dir is not None:
-            cache_dir = f"{cache_dir}/huggingface"
+            author, model_name = model_id.split("/")
+            cache_dir = f"{cache_dir}/huggingface/models--{author}--{model_name}"
 
         self.load(cache_dir, device)
 
