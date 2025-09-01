@@ -1,0 +1,22 @@
+from typing import Final
+
+import torch
+
+RANDOM_STATE: Final = 42
+
+SAMPLE_RATE: Final = 16000
+
+NONE_TENSOR: Final = torch.tensor([-1])
+
+DEFAULT_ROOT_DIR: Final = "data"
+
+DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
+
+# Default number of threads for phylogenetic tree inference (iqtree/raxml)
+DEFAULT_THREADS_TREE: Final = 4
+
+# Default number for discrete to nexus
+DEFAULT_THREADS_NEXUS: Final = 16
+
+# Minimum number of different languages (leaves) to infer a tree
+MIN_LANGUAGES: Final = 4

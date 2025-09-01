@@ -22,7 +22,7 @@
         "sonar": "asm_Beng",
         "glottolog": "assa1263",
         "speakers": 13.0,
-        "heggarty2024": "Assamese",
+        "heggarty2023": "Assamese",
         "taxonset": "indoaryan"
     },
     "ast_es": {
@@ -42,7 +42,7 @@
         "sonar": "bel_Cyrl",
         "glottolog": "bela1254",
         "speakers": 3.0,
-        "heggarty2024": "Belarusian",
+        "heggarty2023": "Belarusian",
         "taxonset": "slavic"
     },
     "bg_bg": {
@@ -50,7 +50,7 @@
         "sonar": "bul_Cyrl",
         "glottolog": "bulg1262",
         "speakers": 7.0,
-        "heggarty2024": "Bulgarian",
+        "heggarty2023": "Bulgarian",
         "taxonset": "slavic"
     },
     "bn_in": {
@@ -58,7 +58,7 @@
         "sonar": "ben_Beng",
         "glottolog": "beng1280",
         "speakers": 260.0,
-        "heggarty2024": "Bengali",
+        "heggarty2023": "Bengali",
         "taxonset": "indoaryan"
     },
     "bs_ba": {
@@ -72,7 +72,7 @@
         "sonar": "cat_Latn",
         "glottolog": "stan1289",
         "speakers": 4.0,
-        "heggarty2024": "Catalan",
+        "heggarty2023": "Catalan",
         "taxonset": "latinofaliscan"
     },
     "ceb_ph": {
@@ -86,7 +86,7 @@
         "sonar": "ckb_Arab",
         "glottolog": "cent1972",
         "speakers": 5.3,
-        "heggarty2024": "KurdishCJafi",
+        "heggarty2023": "KurdishCJafi",
         "taxonset": "iranian"
     },
     "cmn_hans_cn": {
@@ -100,7 +100,7 @@
         "sonar": "ces_Latn",
         "glottolog": "czec1258",
         "speakers": 10.0,
-        "heggarty2024": "Czech",
+        "heggarty2023": "Czech",
         "taxonset": "slavic"
     },
     "cy_gb": {
@@ -108,14 +108,14 @@
         "sonar": "cym_Latn",
         "glottolog": "wels1247",
         "speakers": 0.7,
-        "heggarty2024": "WelshNorth"
+        "heggarty2023": "WelshNorth"
     },
     "da_dk": {
         "full": "Danish",
         "sonar": "dan_Latn",
         "glottolog": "dani1285",
         "speakers": 5.0,
-        "heggarty2024": "Danish",
+        "heggarty2023": "Danish",
         "taxonset": "germanic"
     },
     "de_de": {
@@ -123,7 +123,7 @@
         "sonar": "deu_Latn",
         "glottolog": "stan1295",
         "speakers": 83.0,
-        "heggarty2024": "German",
+        "heggarty2023": "German",
         "taxonset": "germanic"
     },
     "el_gr": {
@@ -131,7 +131,7 @@
         "sonar": "ell_Grek",
         "glottolog": "mode1248",
         "speakers": 13.0,
-        "heggarty2024": "Greek",
+        "heggarty2023": "Greek",
         "taxonset": "Greek"
     },
     "en_us": {
@@ -139,7 +139,7 @@
         "sonar": "eng_Latn",
         "glottolog": "stan1293",
         "speakers": 550.0,
-        "heggarty2024": "English",
+        "heggarty2023": "English",
         "taxonset": "germanic"
     },
     "es_419": {
@@ -147,7 +147,7 @@
         "sonar": "spa_Latn",
         "glottolog": "stan1288",
         "speakers": 490.0,
-        "heggarty2024": "Spanish",
+        "heggarty2023": "Spanish",
         "taxonset": "latinofaliscan"
     },
     "et_ee": {
@@ -161,7 +161,7 @@
         "sonar": "pes_Arab",
         "glottolog": "west2369",
         "speakers": 40.0,
-        "heggarty2024": "PersianTehran",
+        "heggarty2023": "PersianTehran",
         "taxonset": "iranian"
     },
     "fi_fi": {
@@ -187,7 +187,7 @@
         "sonar": "fra_Latn",
         "glottolog": "stan1290",
         "speakers": 280.0,
-        "heggarty2024": "French",
+        "heggarty2023": "French",
         "taxonset": "latinofaliscan"
     },
     "ga_ie": {
@@ -195,7 +195,7 @@
         "sonar": "gle_Latn",
         "glottolog": "iris1253",
         "speakers": 0.2,
-        "heggarty2024": "GaelicIrish"
+        "heggarty2023": "GaelicIrish"
     },
     "gl_es": {
         "full": "Galician",
@@ -226,7 +226,7 @@
         "sonar": "hin_Deva",
         "glottolog": "hind1269",
         "speakers": 320.0,
-        "heggarty2024": "Hindi",
+        "heggarty2023": "Hindi",
         "taxonset": "indoaryan"
     },
     "hr_hr": {
@@ -234,7 +234,7 @@
         "sonar": "hrv_Latn",
         "glottolog": "croa1245",
         "speakers": 4.0,
-        "heggarty2024": "SerboCroatian",
+        "heggarty2023": "SerboCroatian",
         "taxonset": "slavic"
     },
     "hu_hu": {
@@ -248,7 +248,7 @@
         "sonar": "hye_Armn",
         "glottolog": "nucl1235",
         "speakers": 6.0,
-        "heggarty2024": "ArmenianEastern",
+        "heggarty2023": "ArmenianEastern",
         "taxonset": "armenian"
     },
     "id_id": {
@@ -268,14 +268,14 @@
         "sonar": "isl_Latn",
         "glottolog": "icel1247",
         "speakers": 0.3,
-        "heggarty2024": "Icelandic"
+        "heggarty2023": "Icelandic"
     },
     "it_it": {
         "full": "Italian",
         "sonar": "ita_Latn",
         "glottolog": "ital1282",
         "speakers": 61.0,
-        "heggarty2024": "Italian",
+        "heggarty2023": "Italian",
         "taxonset": "latinofaliscan"
     },
     "ja_jp": {
@@ -343,7 +343,7 @@
         "sonar": "ltz_Latn",
         "glottolog": "luxe1243",
         "speakers": 0.4,
-        "heggarty2024": "Luxembourgish"
+        "heggarty2023": "Luxembourgish"
     },
     "lg_ug": {
         "full": "Luganda",
@@ -368,7 +368,7 @@
         "sonar": "lit_Latn",
         "glottolog": "lith1251",
         "speakers": 2.0,
-        "heggarty2024": "Lithuanian",
+        "heggarty2023": "Lithuanian",
         "taxonset": "baltic"
     },
     "luo_ke": {
@@ -382,7 +382,7 @@
         "sonar": "lvs_Latn",
         "glottolog": "stan1325",
         "speakers": 2.0,
-        "heggarty2024": "Latvian",
+        "heggarty2023": "Latvian",
         "taxonset": "baltic"
     },
     "mi_nz": {
@@ -396,7 +396,7 @@
         "sonar": "mkd_Cyrl",
         "glottolog": "mace1250",
         "speakers": 1.0,
-        "heggarty2024": "Macedonian",
+        "heggarty2023": "Macedonian",
         "taxonset": "slavic"
     },
     "ml_in": {
@@ -416,7 +416,7 @@
         "sonar": "mar_Deva",
         "glottolog": "mara1378",
         "speakers": 83.0,
-        "heggarty2024": "Marathi",
+        "heggarty2023": "Marathi",
         "taxonset": "indoaryan"
     },
     "ms_my": {
@@ -442,7 +442,7 @@
         "sonar": "nob_Latn",
         "glottolog": "norw1258",
         "speakers": 5,
-        "heggarty2024": "NorwegianBokmal",
+        "heggarty2023": "NorwegianBokmal",
         "taxonset": "germanic"
     },
     "ne_np": {
@@ -450,7 +450,7 @@
         "sonar": "npi_Deva",
         "glottolog": "nepa1254",
         "speakers": 16.0,
-        "heggarty2024": "Nepali",
+        "heggarty2023": "Nepali",
         "taxonset": "indoaryan"
     },
     "nl_nl": {
@@ -458,7 +458,7 @@
         "sonar": "nld_Latn",
         "glottolog": "dutc1256",
         "speakers": 21.0,
-        "heggarty2024": "Dutch",
+        "heggarty2023": "Dutch",
         "taxonset": "germanic"
     },
     "nso_za": {
@@ -496,7 +496,7 @@
         "sonar": "pan_Guru",
         "glottolog": "panj1256",
         "speakers": 113.0,
-        "heggarty2024": "Punjabi",
+        "heggarty2023": "Punjabi",
         "taxonset": "indoaryan"
     },
     "pl_pl": {
@@ -504,7 +504,7 @@
         "sonar": "pol_Latn",
         "glottolog": "poli1260",
         "speakers": 38.0,
-        "heggarty2024": "Polish",
+        "heggarty2023": "Polish",
         "taxonset": "slavic"
     },
     "ps_af": {
@@ -512,7 +512,7 @@
         "sonar": "pbt_Arab",
         "glottolog": "pash1269",
         "speakers": 44.0,
-        "heggarty2024": "Pashto",
+        "heggarty2023": "Pashto",
         "taxonset": "iranian"
     },
     "pt_br": {
@@ -520,7 +520,7 @@
         "sonar": "por_Latn",
         "glottolog": "port1283",
         "speakers": 220.0,
-        "heggarty2024": "Portuguese",
+        "heggarty2023": "Portuguese",
         "taxonset": "latinofaliscan"
     },
     "ro_ro": {
@@ -528,7 +528,7 @@
         "sonar": "ron_Latn",
         "glottolog": "roma1327",
         "speakers": 19.0,
-        "heggarty2024": "Romanian",
+        "heggarty2023": "Romanian",
         "taxonset": "latinofaliscan"
     },
     "ru_ru": {
@@ -536,7 +536,7 @@
         "sonar": "rus_Cyrl",
         "glottolog": "russ1263",
         "speakers": 150.0,
-        "heggarty2024": "Russian",
+        "heggarty2023": "Russian",
         "taxonset": "slavic"
     },
     "sd_in": {
@@ -550,7 +550,7 @@
         "sonar": "slk_Latn",
         "glottolog": "slov1269",
         "speakers": 4.0,
-        "heggarty2024": "Slovak",
+        "heggarty2023": "Slovak",
         "taxonset": "slavic"
     },
     "sl_si": {
@@ -558,7 +558,7 @@
         "sonar": "slv_Latn",
         "glottolog": "slov1268",
         "speakers": 2.0,
-        "heggarty2024": "Slovene",
+        "heggarty2023": "Slovene",
         "taxonset": "slavic"
     },
     "sn_zw": {
@@ -578,7 +578,7 @@
         "sonar": "srp_Cyrl",
         "glottolog": "sout1528",
         "speakers": 6.0,
-        "heggarty2024": "SerboCroatian",
+        "heggarty2023": "SerboCroatian",
         "taxonset": "slavic"
     },
     "sv_se": {
@@ -586,7 +586,7 @@
         "sonar": "swe_Latn",
         "glottolog": "swed1254",
         "speakers": 8.0,
-        "heggarty2024": "Swedish",
+        "heggarty2023": "Swedish",
         "taxonset": "germanic"
     },
     "sw_ke": {
@@ -630,7 +630,7 @@
         "sonar": "ukr_Cyrl",
         "glottolog": "ukra1253",
         "speakers": 32.0,
-        "heggarty2024": "Ukrainian",
+        "heggarty2023": "Ukrainian",
         "taxonset": "slavic"
     },
     "umb_ao": {
@@ -644,7 +644,7 @@
         "sonar": "urd_Arab",
         "glottolog": "urdu1245",
         "speakers": 120.0,
-        "heggarty2024": "Urdu",
+        "heggarty2023": "Urdu",
         "taxonset": "indoaryan"
     },
     "uz_uz": {

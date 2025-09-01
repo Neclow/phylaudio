@@ -151,9 +151,16 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
 # pixi environments
 .pixi
 *.egg-info
+
+# Ruff stuff:
+.ruff_cache/
+
+# vscode
+.vscode/
 
 # Datasets
 data/datasets/
@@ -163,3 +170,4 @@ data/trees
 
 # My drafts
 tmp/
+notes.txt
