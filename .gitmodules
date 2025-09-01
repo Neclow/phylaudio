@@ -1,0 +1,6 @@
+[submodule "extern/glottolog"]
+	path = extern/glottolog
+	url = https://github.com/glottolog/glottolog
+[submodule "extern/pysdtw"]
+	path = extern/pysdtw
+	url = https://github.com/Maghoumi/pytorch-softdtw-cuda

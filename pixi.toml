@@ -1,0 +1,42 @@
+[workspace]
+authors = ["Neclow <neilclow24@gmail.com>"]
+channels = ["conda-forge", "bioconda"]
+name = "public"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[system-requirements]
+cuda = "12.6"
+
+[tasks]
+download_fleurs = "python pipeline/download_fleurs.py"
+download_glottolog = "python pipeline/download_glottolog.py"
+language_identification = "python pipeline/language_identification.py"
+discrete_phylo = "python pipeline/sentence_trees_discrete.py"
+distance_phylo = "python pipeline/sentence_trees_distance.py"
+
+[dependencies]
+python = "3.10.12.*"
+pandas = ">=2.3.2,<3"
+requests = ">=2.32.5,<3"
+tqdm = ">=4.67.1,<5"
+iqtree = ">=3.0.1,<4"
+pytorch = ">=2.7.1,<3"
+torchaudio = ">=2.7.1,<3"
+huggingface_hub = ">=0.34.4,<0.35"
+fasttext = ">=0.9.2,<0.10"
+black = ">=25.1.0,<26"
+lightning = ">=2.5.4,<3"
+ete3 = ">=3.1.3,<4"
+rpy2 = ">=3.6.2,<4"
+aster = { version = ">=1.23,<2", channel = "bioconda" }
+
+[pypi-dependencies]
+pyglottolog = ">=3.16.0, <4"
+nemo-toolkit = { version = ">=2.0.0, <3", extras = ["asr"] }
+opensmile = ">=2.6.0, <3"
+whisper = ">=1.1.10, <2"
+speechbrain = ">=1.0.3, <2"
+openai-whisper = ">=20250625, <20250626"
+torch-pca = ">=1.1.0, <2"
+ruff = ">=0.12.11, <0.13"
