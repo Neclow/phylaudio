@@ -2,9 +2,19 @@
 
 ## Installation
 
+### Dependencies
+
 ```bash
 pixi install
 pixi run post_install
+```
+
+### Data
+
+```bash
+pixi run download_models # download all pre-trained models
+pixi run download_fleurs # download FLEURS-R
+pixi run run download_glottolog # extract lineages from FLEURS-R
 ```
 
 ## Language identification

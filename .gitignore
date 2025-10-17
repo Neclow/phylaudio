@@ -171,8 +171,9 @@ data/models/
 # Evaluation
 data/eval/
 
-# Tree data
-data/trees
+# Tree data (except README)
+data/trees/*
+!data/trees/README.md
 
 # My drafts
 tmp/
