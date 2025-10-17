@@ -82,11 +82,11 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    output_folder = f"data/pdist/{inputs.run_id}"
+    output_folder = f"data/trees/per_sentence/pdist/{inputs.run_id}"
     save_state(inputs, output_folder)
 
     # Feature extraction loop (applied sentence-wise)
-    print("Entering sentence loop..")
+    print("(sentence_trees_distance) Entering sentence loop..")
     sentence_loop(
         args,
         inputs,

@@ -258,7 +258,7 @@ def _load_finetuned_xlsr(
     model_ : Wav2Vec2Model
         The loaded Wav2Vec2Model for speech feature extraction.
     """
-    state_dict = torch.load(file)
+    state_dict = torch.load(file, weights_only=False)
 
     tmp = {
         k.replace("w2v_encoder.w2v_model.", "")

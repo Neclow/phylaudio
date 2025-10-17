@@ -126,7 +126,7 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    output_folder = f"data/discrete/{inputs.run_id}"
+    output_folder = f"data/trees/per_sentence/discrete/{inputs.run_id}"
     save_state(inputs, output_folder)
 
     # Feature extraction loop (applied sentence-wise)
