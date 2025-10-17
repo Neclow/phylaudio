@@ -50,18 +50,18 @@ class BaseDataset(Dataset):
         self.root_dir = root_dir
 
         self.data_dir = f"{self.root_dir}/datasets/{self.dataset}"
+        self.meta_dir = f"{self.root_dir}/metadata/{self.dataset}"
 
-        with open(
-            f"{self.root_dir}/languages/{self.dataset}.json", "r", encoding="utf-8"
-        ) as f:
+        with open(f"{self.meta_dir}/languages.json", "r", encoding="utf-8") as f:
             self.languages = json.load(f)
 
         self.label_encoder = CategoricalEncoder()
         self.label_encoder.load_or_create(
-            path=f"data/labels/{self.dataset}.txt",
+            path=f"{self.meta_dir}/labels.txt",
             from_iterables=[list(self.languages.keys())],
             output_key="lang_id",
         )
+        self.label_encoder.expect_len(len(self.languages))
 
         self.transform = transform
         self.target_transform = target_transform
@@ -232,9 +232,9 @@ class FleursParallelDataset(BaseDataset):
                 glottocode=glottocode,
                 min_speakers=min_speakers,
             )
-            labels_to_keep = self.label_encoder.encode_sequence(
+            labels_to_keep = self.label_encoder.encode_sequence(  # noqa: F841
                 languages_to_keep
-            )  # noqa: F841
+            )
             print(
                 f"(datasets) Using {self.glottocode} to select {len(languages_to_keep)} languages."
             )

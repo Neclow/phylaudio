@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument(
         "output_dir",
         type=str,
+        default="data/datasets",
         help="Output dataset folder. Example: data/datasets",
     )
     return parser.parse_args()
@@ -74,8 +75,8 @@ def download(output_dir):
 
 def unzip(output_dir):
     """Decompress all the downloaded tar.gz files"""
-    tar_files = glob(f"{output_dir}/fleurs-r/*/*/audio/*/*.tar.gz")
-    for tf in tqdm(tar_files):
+    tar_files = sorted(glob(f"{output_dir}/fleurs-r/*/*/audio/*/*.tar.gz"))
+    for tf in tqdm(tar_files, desc="Unzipping .tar.gz files"):
         tf_parent = str(Path(tf).parent)
         commands = (
             f"cd {tf_parent} && tar -xzf {os.path.basename(tf)} --strip-components=1"

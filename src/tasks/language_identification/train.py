@@ -20,7 +20,7 @@ def parse_lid_args(with_common_args=True):
     else:
         parser = ArgumentParser()
 
-    parser.add_argument("--project", type=str, help="WandB project name")
+    parser.add_argument("--project", type=str, required=True, help="Wandb project name")
     parser.add_argument("--ext", type=str, default="wav", help="Audio file extension")
     parser.add_argument(
         "--lr",

@@ -37,16 +37,16 @@ class TransformersAudioProcessor(AudioProcessor):
 
     def __init__(
         self,
-        model_id,
         sr,
-        max_length=None,
+        max_length,
+        model_id,
         cache_dir=None,
         truncation=True,
         padding="max_length",
         padding_side="right",
         **kwargs,
     ):
-        super().__init__(sr)
+        super().__init__(sr, max_length)
 
         self.model_id = model_id
 
@@ -56,16 +56,6 @@ class TransformersAudioProcessor(AudioProcessor):
         self.processor = AutoFeatureExtractor.from_pretrained(
             self.model_id, cache_dir=cache_dir, padding_side=padding_side, **kwargs
         )
-
-        # the_max_length = max_length that we want to force
-        # max_length = max_length desired by the model (esp. whisper)
-        # self.the_max_length = max_length
-        self.max_length = max_length
-
-        # if "whisper" in model_id:
-        #     self.max_length = self.processor.n_samples
-        # else:
-        #     self.max_length = self.the_max_length
 
         self.truncation = truncation
         self.padding = padding

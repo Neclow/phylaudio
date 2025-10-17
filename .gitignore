@@ -168,6 +168,9 @@ data/datasets/
 # Models
 data/models/
 
+# Evaluation
+data/eval/
+
 # Tree data
 data/trees
 

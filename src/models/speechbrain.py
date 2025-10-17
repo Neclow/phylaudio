@@ -18,8 +18,8 @@ class SpeechbrainProcessor(AudioProcessor):
         Sample rate
     """
 
-    def __init__(self, sr, **kwargs):
-        super().__init__(sr)
+    def __init__(self, sr, max_length, **kwargs):
+        super().__init__(sr, max_length)
 
         self.audio_normalizer = AudioNormalizer(sample_rate=self.sr)
 
