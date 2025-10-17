@@ -9,7 +9,6 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src._config import DEFAULT_THREADS_NEXUS
 from src.tasks.feature_extraction._discretization import (
     DISCRETIZATION_METHODS,
     discretize,
@@ -60,14 +59,6 @@ def parse_args(with_base_args=True):
         "--iqtree-bootstrap",
         action="store_true",
         help="If True, run IQTree with bootstrapping",
-    )
-
-    parser.add_argument(
-        "-nt",
-        "--n-threads",
-        type=int,
-        default=DEFAULT_THREADS_NEXUS,
-        help="Number of threads to use for parallel processing of iqtree",
     )
 
     return parser.parse_args()

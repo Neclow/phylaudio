@@ -18,7 +18,7 @@ pixi run language_identification --dataset fleurs-r --model_id NeMo_ambernet --p
 ## Sentence-wise distance trees
 
 ```bash
-pixi run distance_phylo --dataset fleurs-r --model_id NeMo_ambernet
+pixi run distance_phylo --dataset fleurs-r --model_id NeMo_ambernet --ebs 1
 ```
 
 ## Sentence-wise discrete trees

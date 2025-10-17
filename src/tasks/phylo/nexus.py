@@ -51,12 +51,14 @@ class PhyloWriter(ABC):
 
         self.data_ext = data_ext
 
-        run_dir = f"data/{dtype}/{run_id}"
+        run_dir = f"data/trees/per_sentence/{dtype}/{run_id}"
 
         with open(f"{run_dir}/cfg.json", "r", encoding="utf-8") as f:
             cfg = json.load(f)
 
-        with open(f"data/languages/{cfg['dataset']}.json", "r", encoding="utf-8") as f:
+        with open(
+            f"data/metadata/{cfg['dataset']}/languages.json", "r", encoding="utf-8"
+        ) as f:
             self.languages = json.load(f)
 
         self.input_files = glob(f"{run_dir}/*.{data_ext}")

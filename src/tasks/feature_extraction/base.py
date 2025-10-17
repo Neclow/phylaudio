@@ -14,7 +14,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from ..._config import MIN_LANGUAGES, NONE_TENSOR
+from ..._config import DEFAULT_THREADS_NEXUS, MIN_LANGUAGES, NONE_TENSOR
 from ..common import get_common_args, prepare_dataset, prepare_model
 from ..language_identification.classifier import MLP
 from ._decomposition import decompose, fit_decomposer
@@ -91,6 +91,13 @@ def get_fleurs_parallel_args(with_common_args=True):
         "--n-components",
         type=int,
         help="Number of components to keep after decomposition",
+    )
+    parser.add_argument(
+        "-nt",
+        "--n-threads",
+        type=int,
+        default=DEFAULT_THREADS_NEXUS,
+        help="Number of threads to use for parallel processing of iqtree",
     )
 
     return parser
