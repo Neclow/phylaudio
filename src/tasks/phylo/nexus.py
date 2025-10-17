@@ -206,13 +206,6 @@ class DistancePhyloWriter(PhyloWriter):
             PDIST_METHODS
         ), f"(pdist) Unknown inference method: `{self.tree_method}`."
 
-        warnings.warn(
-            "DistancePhyloWriter currently does not support tree_threads (not tested). "
-            " Setting tree_threads to 1.",
-            RuntimeWarning,
-        )
-        self.tree_threads = 1
-
         self.layer = layer
 
         self.label2language = dict(
