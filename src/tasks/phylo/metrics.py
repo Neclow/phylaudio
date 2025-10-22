@@ -41,26 +41,26 @@ def generalized_robinson_foulds(ftry, ftrue):
     return rf_generalized[0]
 
 
-def quartet_similarity(ftry, ftrue):
+def quartet_similarity(ftry, fref):
     with localconverter(ro.default_converter + numpy2ri.converter):
         importr("ape")
         importr("Quartet")
 
-        ro.globalenv["newick_pred"] = ftry
-        ro.globalenv["newick_true"] = ftrue
+        ro.globalenv["ftry"] = ftry
+        ro.globalenv["fref"] = fref
 
         s2r = ro.r(
             """
-            tree_try <- read.tree(newick_try)
-            tree_ref <- read.tree(newick_ref)
+            tree_try <- read.tree(ftry)
+            tree_ref <- read.tree(fref)
 
             # Make sure tips match
-            s2r <- -1
+            s2r <- NA
 
-            tip_diffs <- setdiff(tree_ref$tip.label, tree_try$tip.label)
+            tip_diffs <- setdiff(tree_try$tip.label, tree_ref$tip.label)
 
             if (length(tip_diffs) > 0) {
-                tree_ref <- drop.tip(tree_ref, tip_diffs)
+                tree_try <- drop.tip(tree_try, tip_diffs)
             }
 
             if (length(setdiff(tree_try$tip.label, tree_ref$tip.label)) == 0) {

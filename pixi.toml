@@ -12,7 +12,8 @@ cuda = "12.6"
 post_install = """
     uv pip install fairseq --no-deps && \
     uv pip install bitarray sacrebleu omegaconf hydra-core && \
-    uv pip install flash-attn --no-build-isolation
+    uv pip install flash-attn --no-build-isolation && \
+    Rscript -e 'install.packages("Quartet", repos="https://cloud.r-project.org")'
 """
 download_fleurs = "python -m pipeline.download_fleurs data/datasets"
 download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
@@ -22,7 +23,7 @@ language_identification = "python -m pipeline.language_identification"
 discrete_phylo = "python -m pipeline.sentence_trees_discrete"
 distance_phylo = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
-summary = "python -m pipeline.summarise_results"
+sentence_summary = "python -m pipeline.sentence_trees_summary"
 
 [dependencies]
 python = "3.10.12.*"
@@ -46,6 +47,7 @@ torchmetrics = ">=1.8.1,<2"
 regex = ">=2025.7.34,<2026"
 r-phangorn = ">=2.12.1,<3"
 biopython = ">=1.85,<2"
+r-treedist = ">=2.11.1,<3"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"
