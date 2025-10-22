@@ -15,6 +15,7 @@ pixi run post_install
 pixi run download_models # download all pre-trained models
 pixi run download_fleurs # download FLEURS-R
 pixi run run download_glottolog # extract lineages from FLEURS-R
+pixi run run download_reference_trees # extract and process reference trees
 ```
 
 ## Language identification

@@ -6,6 +6,7 @@ The `trees` directory should contain the following subdirectories:
 * `per_sentence`: sentence_wise trees
   * `discrete`: trees obtained via `pipeline/sentence_discrete_trees`
   * `pdist`: trees obtained via `pipeline/sentence_distance_trees`
+* `references`: reference trees obtained via `pipeline/download_reference_trees`
 
 Each of these tree directories should be formatted as follows:
 
