@@ -482,7 +482,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/0a/ec/ef8bf895f0628dd0a59e54d81caed6891663cb9c54a0f4bb7da918cb88cf/rpds_py-0.27.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/d1/e5/f2a0621f1781b76a38194acae72f01e37b1941470407345b6e8653ad7640/ruamel.yaml-0.18.15-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/35/6d/ae05a87a3ad540259c3ad88d71275cbd1c0f2d30ae04c65dcbfb6dcd4b9f/ruamel.yaml.clib-0.2.12-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/80/22/3c6cef96627f89b344c933781ed38329bfb87737aa438f15da95907cbfd5/ruff-0.12.11-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/0b/f0/89ee2bc9da434bd78464f288fdb346bc2932f2ee80a90b2a4bbbac262c74/sacremoses-0.1.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fb/a4/e488acdece6d413f370a9589a7193dac79cd486b2e418d3276d6ea0b9305/scikit_learn-1.7.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/11/18/cb614939ccd46d336013cab705f1e11540ec9c68b08ecbb854ab893fc480/segments-2.3.0-py2.py3-none-any.whl
@@ -6728,11 +6727,6 @@ packages:
   version: 0.2.12
   sha256: fd5415dded15c3822597455bc02bcd66e81ef8b7a48cb71a33628fc9fdde39df
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/80/22/3c6cef96627f89b344c933781ed38329bfb87737aa438f15da95907cbfd5/ruff-0.12.11-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-  name: ruff
-  version: 0.12.11
-  sha256: 4fc58f9266d62c6eccc75261a665f26b4ef64840887fc6cbc552ce5b29f96cc8
-  requires_python: '>=3.7'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/s2n-1.5.23-h8e187f5_0.conda
   sha256: 016fe83763bc837beb205732411583179e2aac1cdef40225d4ad5eeb1bc7b837
   md5: edd15d7a5914dc1d87617a2b7c582d23

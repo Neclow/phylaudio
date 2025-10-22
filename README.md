@@ -37,3 +37,9 @@ pixi run distance_phylo --dataset fleurs-r --model_id NeMo_ambernet --ebs 1
 ```bash
 pixi run discrete_phylo --dataset fleurs-r --model_id NeMo_ambernet
 ```
+
+## Generating single language-tree estimates from sentence-wise runs
+
+```bash
+pixi run sentence_astral pdist
+```

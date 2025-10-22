@@ -21,6 +21,7 @@ download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r
 language_identification = "python -m pipeline.language_identification"
 discrete_phylo = "python -m pipeline.sentence_trees_discrete"
 distance_phylo = "python -m pipeline.sentence_trees_distance"
+sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 summary = "python -m pipeline.summarise_results"
 
 [dependencies]
@@ -54,4 +55,3 @@ whisper = ">=1.1.10, <2"
 speechbrain = ">=1.0.3, <2"
 openai-whisper = ">=20250625, <20250626"
 torch-pca = ">=1.1.0, <2"
-ruff = ">=0.12.11, <0.13"
