@@ -171,6 +171,10 @@ data/models
 # Evaluation
 data/eval
 
+# BEAST2
+extern/beast2
+.beast
+
 # Tree data (except README)
 data/trees/*
 !data/trees/README.md

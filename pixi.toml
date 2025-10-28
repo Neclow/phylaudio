@@ -20,6 +20,15 @@ distance_phylo = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 
+[tasks.beast2]
+cmd = "extern/beast2/bin/beast"
+
+[tasks.packagemanager]
+cmd = "extern/beast2/bin/packagemanager"
+
+[tasks.treeannotator]
+cmd = "extern/beast2/bin/treeannotator"
+
 [dependencies]
 python = "3.10.12.*"
 pandas = ">=2.3.2,<3"
