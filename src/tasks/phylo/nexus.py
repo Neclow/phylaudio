@@ -166,8 +166,8 @@ class PhyloWriter(ABC):
 
 
 class DiscretePhyloWriter(PhyloWriter):
-    def __init__(self, run_id, **kwargs):
-        super().__init__(run_id, dtype="discrete", data_ext="fa")
+    def __init__(self, run_id, dtype="discrete", **kwargs):
+        super().__init__(run_id, dtype=dtype, data_ext="fa")
 
         if self.tree_method in DISCRETE_METHODS:
             self.tree_ext = DISCRETE_METHODS[self.tree_method]["tree_ext"]

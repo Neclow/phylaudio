@@ -5,6 +5,8 @@ Maximum likelihood-based phylogenetic tree construction
 from the FLEURS dataset after embedding discretization
 """
 
+import os
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -117,7 +119,14 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    output_folder = f"data/trees/per_sentence/discrete/{inputs.run_id}"
+    dtype = (
+        "discrete"
+        if args.n_components is None
+        else f"discrete+{args.decomposition}{args.n_components}"
+    )
+    discrete_dir = f"data/trees/per_sentence/{dtype}"
+    os.makedirs(discrete_dir, exist_ok=True)
+    output_folder = f"{discrete_dir}/{inputs.run_id}"
     save_state(inputs, output_folder)
 
     # Feature extraction loop (applied sentence-wise)
@@ -132,6 +141,7 @@ def main():
     # Tree inference
     writer = DiscretePhyloWriter(
         inputs.run_id,
+        dtype=dtype,
         iqtree_method=args.iqtree_model,
         iqtree_bootstrap=args.iqtree_bootstrap,
     )
