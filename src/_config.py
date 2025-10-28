@@ -14,7 +14,9 @@ DEFAULT_AUDIO_DIR: Final = f"{DEFAULT_ROOT_DIR}/datasets"
 DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
 DEFAULT_EVAL_DIR: Final = f"{DEFAULT_ROOT_DIR}/eval"
 DEFAULT_METADATA_DIR: Final = f"{DEFAULT_ROOT_DIR}/metadata"
-DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees/per_sentence"
+DEFAULT_TREE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees"
+DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
+DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
 
 # Default number of threads for phylogenetic tree inference (iqtree/raxml)
 DEFAULT_THREADS_TREE: Final = 4
