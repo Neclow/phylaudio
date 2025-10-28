@@ -163,13 +163,13 @@ cython_debug/
 .vscode/
 
 # Datasets
-data/datasets/
+data/datasets
 
 # Models
-data/models/
+data/models
 
 # Evaluation
-data/eval/
+data/eval
 
 # Tree data (except README)
 data/trees/*
@@ -178,3 +178,4 @@ data/trees/*
 # My drafts
 tmp/
 notes.txt
+drafts*.ipynb

@@ -1,7 +1,7 @@
 [workspace]
 authors = ["Neclow <neilclow24@gmail.com>"]
 channels = ["conda-forge", "bioconda"]
-name = "public"
+name = "phylaudio"
 platforms = ["linux-64"]
 version = "0.1.0"
 
