@@ -15,7 +15,7 @@ def parse_args():
         "output_dir",
         type=str,
         default=DEFAULT_CACHE_DIR,
-        help="Output dataset folder. Example: data/models",
+        help=f"Output dataset folder. Example: {DEFAULT_CACHE_DIR}",
     )
     return parser.parse_args()
 

@@ -12,6 +12,7 @@ import requests
 from Bio.Phylo import NewickIO, NexusIO
 from ete3 import Tree
 
+from src._config import DEFAULT_METADATA_DIR
 from src.data.glottolog import filter_languages_from_glottocode
 
 RAW_DIR = "data/trees/references/raw"
@@ -359,7 +360,7 @@ def parse_args():
         type=str,
         help=(
             "Dataset. Example: `fleurs`. "
-            "Has to have a folder in `data/metadata` with a `languages.json` file."
+            f"Has to have a folder in `{DEFAULT_METADATA_DIR}` with a `languages.json` file."
         ),
     )
     parser.add_argument(
@@ -394,7 +395,7 @@ def parse_args():
 
 
 def prepare_language_metadata(dataset, languoid, min_speakers):
-    meta_dir = f"data/metadata/{dataset}"
+    meta_dir = f"{DEFAULT_METADATA_DIR}/{dataset}"
     with open(f"{meta_dir}/languages.json", "r", encoding="utf-8") as f:
         languages = json.load(f)
 

@@ -11,6 +11,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from src._config import DEFAULT_PER_SENTENCE_DIR
 from src.tasks.feature_extraction._discretization import (
     DISCRETIZATION_METHODS,
     discretize,
@@ -124,7 +125,7 @@ def main():
         if args.n_components is None
         else f"discrete+{args.decomposition}{args.n_components}"
     )
-    discrete_dir = f"data/trees/per_sentence/{dtype}"
+    discrete_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"
     os.makedirs(discrete_dir, exist_ok=True)
     output_folder = f"{discrete_dir}/{inputs.run_id}"
     save_state(inputs, output_folder)

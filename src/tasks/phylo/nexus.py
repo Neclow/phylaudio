@@ -16,7 +16,7 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import importr
 from tqdm import tqdm
 
-from ..._config import MIN_LANGUAGES
+from ..._config import DEFAULT_METADATA_DIR, DEFAULT_PER_SENTENCE_DIR, MIN_LANGUAGES
 from ...utils import _count_file_lines
 from .newick import apply_language_mapping_to_newick
 from .tree import (
@@ -51,13 +51,15 @@ class PhyloWriter(ABC):
 
         self.data_ext = data_ext
 
-        run_dir = f"data/trees/per_sentence/{dtype}/{run_id}"
+        run_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}/{run_id}"
 
         with open(f"{run_dir}/cfg.json", "r", encoding="utf-8") as f:
             cfg = json.load(f)
 
         with open(
-            f"data/metadata/{cfg['dataset']}/languages.json", "r", encoding="utf-8"
+            f"{DEFAULT_METADATA_DIR}/{cfg['dataset']}/languages.json",
+            "r",
+            encoding="utf-8",
         ) as f:
             self.languages = json.load(f)
 

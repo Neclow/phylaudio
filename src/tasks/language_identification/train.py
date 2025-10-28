@@ -8,6 +8,7 @@ from lightning.pytorch.loggers import WandbLogger
 from torch import nn
 from torch.utils.data import DataLoader
 
+from ..._config import DEFAULT_EVAL_DIR
 from ..common import get_common_args
 from .classifier import LightningMLP
 
@@ -72,8 +73,7 @@ def fit_predict(
     torch.compile(lit_mlp)
 
     print("Preparing model tracking...")
-    eval_dir = "data/eval"
-    os.makedirs(eval_dir, exist_ok=True)
+    os.makedirs(DEFAULT_EVAL_DIR, exist_ok=True)
 
     # TODO: make it more flexible for multi-GPU
     if "cuda" in args.device:
@@ -84,7 +84,7 @@ def fit_predict(
         devices = "auto"
 
     # Logging
-    wandb_logger = WandbLogger(project=args.project, save_dir=eval_dir)
+    wandb_logger = WandbLogger(project=args.project, save_dir=DEFAULT_EVAL_DIR)
 
     wandb_logger.experiment.config.update(
         {

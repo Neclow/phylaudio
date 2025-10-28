@@ -15,6 +15,7 @@ import pandas as pd
 import rpy2
 from tqdm import tqdm
 
+from src._config import DEFAULT_PER_SENTENCE_DIR
 from src.models._model_zoo import MODEL_ZOO
 from src.tasks.phylo.metrics import (
     generalized_robinson_foulds,
@@ -29,7 +30,6 @@ METRICS = {
     "s2r": quartet_similarity,
 }
 OUTPUT_FILES = {"none": "_trees.txt", "astral4": "_trees_astral4.txt"}
-PER_SENTENCE_DIR = "data/trees/per_sentence"
 REFERENCE_DIR = "data/trees/references/processed"
 
 
@@ -39,7 +39,7 @@ def parse_args():
     )
     parser.add_argument(
         "indir",
-        help=f"Sentence tree directory in {PER_SENTENCE_DIR}",
+        help=f"Sentence tree directory in {DEFAULT_PER_SENTENCE_DIR}",
     )
     parser.add_argument(
         "--by",
@@ -111,13 +111,13 @@ if __name__ == "__main__":
     args = parse_args()
 
     # Parse cfg args of all runs (cfg.json)
-    cfg_files = glob(f"{PER_SENTENCE_DIR}/{args.indir}/*/cfg.json")
+    cfg_files = glob(f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/*/cfg.json")
     n_files = len(cfg_files)
-    assert n_files > 0, f"No runs found in {PER_SENTENCE_DIR}/{args.indir}"
+    assert n_files > 0, f"No runs found in {DEFAULT_PER_SENTENCE_DIR}/{args.indir}"
     print(f"Found {n_files} runs.")
     output_tree_name = OUTPUT_FILES[args.output_type]
     # Output file
-    output_file = f"{PER_SENTENCE_DIR}/{args.indir}/summary.csv"
+    output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary.csv"
 
     extract_fn = partial(
         extract_metrics_single,

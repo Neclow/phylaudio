@@ -7,6 +7,8 @@ import pandas as pd
 from pyglottolog import Glottolog
 from tqdm import tqdm
 
+from src._config import DEFAULT_METADATA_DIR
+
 
 def parse_args():
     parser = ArgumentParser(
@@ -16,7 +18,10 @@ def parse_args():
     parser.add_argument(
         "dataset",
         type=str,
-        help="Dataset. Example: `fleurs`. Has to have a folder in `data/metadata` with a `languages.json` file.",
+        help=(
+            "Dataset. Example: `fleurs`. "
+            f"Has to have a folder in `{DEFAULT_METADATA_DIR}` with a `languages.json` file.",
+        ),
     )
     parser.add_argument(
         "-g",
@@ -30,13 +35,13 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    dataset_meta_dir = f"{DEFAULT_METADATA_DIR}/{args.dataset}"
+
     g = Glottolog(args.glottolog_dir)
 
     glottolog_data = {}
 
-    with open(
-        f"data/metadata/{args.dataset}/languages.json", "r", encoding="utf-8"
-    ) as f:
+    with open(f"{dataset_meta_dir}/languages.json", "r", encoding="utf-8") as f:
         languages = json.load(f)
 
     print(f"Found {len(languages)} languages")
@@ -67,6 +72,6 @@ if __name__ == "__main__":
         .reset_index(names="code")
     )
 
-    output_file = f"data/metadata/{args.dataset}/glottolog.csv"
+    output_file = f"{dataset_meta_dir}/glottolog.csv"
 
     df.to_csv(output_file, index=False)

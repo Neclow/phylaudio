@@ -4,6 +4,7 @@
 
 import torch
 
+from src._config import DEFAULT_PER_SENTENCE_DIR
 from src.tasks.feature_extraction._distance import pairwise_batched
 from src.tasks.feature_extraction.base import (
     get_fleurs_parallel_args,
@@ -82,7 +83,7 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    output_folder = f"data/trees/per_sentence/pdist/{inputs.run_id}"
+    output_folder = f"{DEFAULT_PER_SENTENCE_DIR}/pdist/{inputs.run_id}"
     save_state(inputs, output_folder)
 
     # Feature extraction loop (applied sentence-wise)

@@ -11,8 +11,10 @@ from pathlib import Path
 import requests
 from tqdm import tqdm
 
+from src._config import DEFAULT_AUDIO_DIR, DEFAULT_METADATA_DIR
+
 DOWNLOAD_URL = "https://huggingface.co/datasets/google/fleurs-r/resolve/main/data"
-FLEURS_R_LANGUAGES = "data/metadata/fleurs-r/languages.json"
+FLEURS_R_LANGUAGES = f"{DEFAULT_METADATA_DIR}/fleurs-r/languages.json"
 TIMEOUT = 10
 
 
@@ -25,8 +27,8 @@ def parse_args():
     parser.add_argument(
         "output_dir",
         type=str,
-        default="data/datasets",
-        help="Output dataset folder. Example: data/datasets",
+        default=DEFAULT_AUDIO_DIR,
+        help="Output dataset folder.",
     )
     return parser.parse_args()
 
