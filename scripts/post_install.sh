@@ -21,3 +21,6 @@ pixi run packagemanager -add BEASTLabs -version 2.0.2 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add BDSKY -version 1.5.1 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add SA -version 2.1.1 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add CCD -version 1.0.2 -dir $BEAST_PKG_DIR
+
+# Install DensiTree
+wget -O extern/DensiTree.jar https://github.com/rbouckaert/DensiTree/releases/download/v3.0.0/DensiTree.v3.1.0.jar
