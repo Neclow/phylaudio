@@ -3,7 +3,8 @@
         "full": "Afrikaans",
         "sonar": "afr_Latn",
         "glottolog": "afri1274",
-        "speakers": 17.0
+        "speakers": 17.0,
+        "taxonset": "germanic"
     },
     "am_et": {
         "full": "Amharic",
@@ -65,7 +66,8 @@
         "full": "Bosnian",
         "sonar": "bos_Latn",
         "glottolog": "bosn1245",
-        "speakers": 9.0
+        "speakers": 9.0,
+        "taxonset": "slavic"
     },
     "ca_es": {
         "full": "Catalan",
@@ -201,13 +203,15 @@
         "full": "Galician",
         "sonar": "glg_Latn",
         "glottolog": "gali1258",
-        "speakers": 2.0
+        "speakers": 2.0,
+        "taxonset": "latinofaliscan"
     },
     "gu_in": {
         "full": "Gujarati",
         "sonar": "grn_Latn",
         "glottolog": "guja1252",
-        "speakers": 56.0
+        "speakers": 56.0,
+        "taxonset": "indoaryan"
     },
     "ha_ng": {
         "full": "Hausa",
@@ -268,7 +272,8 @@
         "sonar": "isl_Latn",
         "glottolog": "icel1247",
         "speakers": 0.3,
-        "heggarty2023": "Icelandic"
+        "heggarty2023": "Icelandic",
+        "taxonset": "germanic"
     },
     "it_it": {
         "full": "Italian",
@@ -343,7 +348,8 @@
         "sonar": "ltz_Latn",
         "glottolog": "luxe1243",
         "speakers": 0.4,
-        "heggarty2023": "Luxembourgish"
+        "heggarty2023": "Luxembourgish",
+        "taxonset": "germanic"
     },
     "lg_ug": {
         "full": "Luganda",
@@ -489,7 +495,8 @@
         "full": "Oriya",
         "sonar": "ory_Orya",
         "glottolog": "adiv1239",
-        "speakers": 35.0
+        "speakers": 35.0,
+        "taxonset": "indoaryan"
     },
     "pa_in": {
         "full": "Punjabi",
@@ -543,7 +550,8 @@
         "full": "Sindhi",
         "sonar": "snd_Arab",
         "glottolog": "sind1272",
-        "speakers": 68.0
+        "speakers": 68.0,
+        "taxonset": "indoaryan"
     },
     "sk_sk": {
         "full": "Slovak",
@@ -611,7 +619,8 @@
         "full": "Tajik",
         "sonar": "tgk_Cyrl",
         "glottolog": "taji1245",
-        "speakers": 8.0
+        "speakers": 8.0,
+        "taxonset": "iranian"
     },
     "th_th": {
         "full": "Thai",
