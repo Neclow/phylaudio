@@ -4,7 +4,7 @@
 import json
 import os
 import uuid
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -55,26 +55,31 @@ def get_fleurs_parallel_args(with_common_args=True):
     parser : argparse.ArgumentParser
         Object for parsing command line strings into Python objects
     """
+
+    def int_or_float(value):
+        """
+        Custom type function for argparse to accept either an int or a float.
+        """
+        try:
+            # Try converting to an integer first
+            return int(value)
+        except ValueError:
+            try:
+                # If int conversion fails, try converting to a float
+                value = float(value)
+                if 0 < value < 1:
+                    return value
+                raise ValueError("Float value must be between 0 and 1.")
+            except ValueError as err:
+                raise ArgumentTypeError(
+                    f"'{value}' is not a valid integer or float."
+                ) from err
+
     if with_common_args:
         parser = get_common_args()
     else:
         parser = ArgumentParser()
 
-    parser.add_argument(
-        "--glottocode",
-        type=str,
-        default="indo1319",
-        help="Glottocode of a language family to select a language subset",
-    )
-    parser.add_argument(
-        "--min-speakers",
-        type=float,
-        default=1.0,
-        help=(
-            "(In millions) minimum number of speakers to select a language subset.\n"
-            "Only used if glottocode is not None."
-        ),
-    )
     parser.add_argument(
         "--ebs",
         type=int,
@@ -89,8 +94,13 @@ def get_fleurs_parallel_args(with_common_args=True):
     parser.add_argument(
         "-nc",
         "--n-components",
-        type=int,
+        type=int_or_float,
         help="Number of components to keep after decomposition",
+    )
+    parser.add_argument(
+        "--standardize",
+        action="store_true",
+        help="Whether to standardize the data before decomposition",
     )
     parser.add_argument(
         "-nt",
@@ -313,6 +323,7 @@ def prepare_decomposer(args, fleurs_parallel_input, sentence_loop_fn):
         X_emb_cat,
         method=args.decomposition,
         n_components=args.n_components,
+        standardize=args.standardize,
         device=device,
         seed=args.seed,
     )

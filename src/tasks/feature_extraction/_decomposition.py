@@ -32,28 +32,38 @@ def load_decomposer(method, device):
     return decomposer
 
 
-def fit_decomposer(X, method, n_components, device, seed):
+def fit_decomposer(X, method, n_components, standardize, device, seed=None):
     decomposer = load_decomposer(method, device)(
         n_components=n_components, random_state=seed
     )
 
-    decomposer.mean = X.mean(dim=0, keepdim=True)
-    decomposer.std = X.std(
-        dim=0,
-        keepdim=True,
-        unbiased=True,
-    )
+    if standardize:
+        decomposer.mean = X.mean(dim=0, keepdim=True)
+        decomposer.std = X.std(
+            dim=0,
+            keepdim=True,
+            unbiased=True,
+        )
 
-    decomposer.fit(X.sub(decomposer.mean).div(decomposer.std).to(decomposer.device))
+        Z = X.sub(decomposer.mean).div(decomposer.std).to(decomposer.device)
+    else:
+        decomposer.mean = None
+        decomposer.std = None
+        Z = X.to(decomposer.device)
+
+    decomposer.fit(Z)
 
     return decomposer
 
 
 def decompose(decomposer, X):
+    if decomposer.mean is not None and decomposer.std is not None:
+        Z = X.sub(decomposer.mean).div(decomposer.std).to(decomposer.device)
+    else:
+        Z = X.to(decomposer.device)
+
     return torch.as_tensor(
-        decomposer.transform(
-            X.sub(decomposer.mean).div(decomposer.std).to(decomposer.device)
-        ),
+        decomposer.transform(Z),
         dtype=X.dtype,
         device=X.device,
     )
