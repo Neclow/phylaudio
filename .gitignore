@@ -183,3 +183,9 @@ data/trees/*
 tmp/
 notes.txt
 drafts*.ipynb
+
+# Lightning
+lightning_logs/
+
+# DensiTree
+DensiTree.jar
