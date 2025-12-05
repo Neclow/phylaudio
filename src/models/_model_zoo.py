@@ -1,6 +1,7 @@
 from typing import Final
 
 from .audio import AudioProcessor, LogMelSpectrogramFeatureExtractor
+from .baseline import BaselineFeatureExtractor
 from .nemo import NeMoFeatureExtractor
 from .opensmile import openSmileFeatureExtractor
 from .speechbrain import SpeechbrainFeatureExtractor, SpeechbrainProcessor
@@ -28,6 +29,8 @@ TRANSFORMERS_AUDIO_MODELS: Final = {
         "facebook/mms-lid-126",
         "facebook/mms-lid-256",
         "facebook/mms-lid-4017",
+        "facebook/mms-1b-all",
+        "mms-meta/mms-zeroshot-300m",
     )
 }
 
@@ -39,6 +42,14 @@ WHISPER_MODELS: Final = {
         "openai/whisper-small",
         "openai/whisper-medium",
         "openai/whisper-large-v3-turbo",
+    )
+}
+
+BASELINE_MODELS: Final = {
+    k: {"extractor": BaselineFeatureExtractor, "processor": AudioProcessor}
+    for k in (
+        "baseline/CNN6",
+        "baseline/CNN10",
     )
 }
 
@@ -55,6 +66,7 @@ AUDIO_MODELS: Final = {
         "extractor": SpeechbrainFeatureExtractor,
         "processor": SpeechbrainProcessor,
     },
+    **BASELINE_MODELS,
     **OPENSMILE_MODELS,
     **TRANSFORMERS_AUDIO_MODELS,
     **WHISPER_MODELS,
