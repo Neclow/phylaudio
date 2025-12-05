@@ -1,10 +1,5 @@
 import torch
-from transformers import (
-    AutoFeatureExtractor,
-    T5EncoderModel,
-    Wav2Vec2Model,
-    XLMRobertaModel,
-)
+from transformers import AutoFeatureExtractor, Wav2Vec2Model
 
 from .audio import AudioProcessor
 from .base import BaseFeatureExtractor
@@ -137,7 +132,7 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
                 ),
             )
 
-            if "mms" in self.model_id:
+            if "facebook/mms" in self.model_id:
                 emb_dim = 1280
             else:
                 if self.finetuned:
@@ -145,19 +140,6 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
                 emb_dim = 1024
 
             feature_extractor.freeze_feature_encoder()
-        elif "aya" in self.model_id:
-            feature_extractor = T5EncoderModel.from_pretrained(
-                self.model_id, cache_dir=cache_dir, torch_dtype=self.dtype
-            )
-            emb_dim = 4096
-        elif "xlm" in self.model_id:
-            feature_extractor = XLMRobertaModel.from_pretrained(
-                self.model_id,
-                cache_dir=cache_dir,
-                torch_dtype=self.dtype,
-                add_pooling_layer=False,
-            )
-            emb_dim = 768
         else:
             raise ValueError(f"Unknown model ID: {self.model_id}")
 

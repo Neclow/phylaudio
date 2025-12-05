@@ -92,4 +92,3 @@ class NeMoFeatureExtractor(BaseFeatureExtractor):
         hidden_states = torch.stack(all_hidden_states, dim=1).transpose(2, 3)
 
         return hidden_states
-        return hidden_states
