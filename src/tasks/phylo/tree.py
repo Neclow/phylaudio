@@ -121,7 +121,10 @@ def make_iqtree_tree(
     command = f"{iqtree_alias} -s {fasta_path} -m {model} -T {n_threads} --seed {RANDOM_STATE}"
 
     if bootstrap:
-        command += " -bb 1000 -redo"
+        command += " -B 1000 -bnni"
+
+    if kwargs.get("redo", False):
+        command += " --redo"
 
     if "ORDERED" in model:
         command += " -safe"

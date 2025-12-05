@@ -59,6 +59,7 @@ def parse_args(with_base_args=True):
     )
 
     parser.add_argument(
+        "-B",
         "--iqtree-bootstrap",
         action="store_true",
         help="If True, run IQTree with bootstrapping",
@@ -122,7 +123,7 @@ def main():
     # Save metadata
     dtype = (
         "discrete"
-        if args.n_components is None
+        if args.decomposition is None
         else f"discrete+{args.decomposition}{args.n_components}"
     )
     discrete_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"
@@ -143,8 +144,8 @@ def main():
     writer = DiscretePhyloWriter(
         inputs.run_id,
         dtype=dtype,
-        iqtree_method=args.iqtree_model,
-        iqtree_bootstrap=args.iqtree_bootstrap,
+        model=args.iqtree_model,
+        bootstrap=args.iqtree_bootstrap,
     )
     writer.write(export_trees=True)
 
