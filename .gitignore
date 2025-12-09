@@ -162,6 +162,21 @@ cython_debug/
 # vscode
 .vscode/
 
+# BEAST2
+extern/beast2
+.beast
+
+# DensiTree
+DensiTree.jar
+
+# SplitsTree
+SplitsTree*.sh
+SplitsTree*.txt
+extern/splitstree
+
+# Lightning
+lightning_logs/
+
 # Datasets
 data/datasets
 
@@ -170,10 +185,6 @@ data/models
 
 # Evaluation
 data/eval
-
-# BEAST2
-extern/beast2
-.beast
 
 # Tree data (except README)
 data/trees/*
@@ -184,8 +195,6 @@ tmp/
 notes.txt
 drafts*.ipynb
 
-# Lightning
-lightning_logs/
-
-# DensiTree
-DensiTree.jar
+# Plots (temporary)
+.matplotlib/
+img/

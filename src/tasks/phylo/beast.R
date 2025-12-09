@@ -11,45 +11,6 @@ library(dplyr)
 library(tidyr)
 library(TreeDist)
 
-#' which.node
-#'
-#' Finds the a node given a vector of tip labels or
-#' tip indices.
-#'
-#' @param phy a \code{phylo} object
-#' @param tips a \code{vector} corresponding to a set tips.
-#'             It can be either type \code{character} or \code{numeric}
-#' @return \code{numeric} object with a node number
-#' @export
-#' @examples
-#' file <- system.file("data/mcc.tre", package = "rBt")
-#' tr <- read.nexus(file)
-#' # find the root node:
-#' rnode <- which.node(tr, tr$tip.label)
-which.node <- function(phy, tips) {
-  if (is.character(tips) == TRUE) {
-    tips_n <- vector("numeric", length(tips))
-    for (i in 1:length(tips)) {
-      tips_n[i] <- which(phy$tip.label == tips[i])
-    }
-    rows <- vector("numeric", length(tips_n))
-    for (i in 1:length(tips_n)) {
-      rows[i] <- which(phy$edge[, 2] == tips_n[i])
-    }
-    nodes <- sort(phy$edge[rows[which.min(rows)]:rows[which.max(rows)], 1])
-    return(nodes[1])
-  } else if (is.numeric(tips) == TRUE) {
-    rows <- vector("numeric", length(tips))
-    for (i in 1:length(tips)) {
-      rows[i] <- which(phy$edge[, 2] == tips[i])
-    }
-    nodes <- sort(phy$edge[rows[which.min(rows)]:rows[which.max(rows)], 1])
-    return(nodes[1])
-  } else if (is.null(tips) == TRUE) {
-    stop("tips vector is empty")
-  }
-}
-
 cldws <- function(b, lst) {
   if (b == "(") {
     lst$currnode <- lst$currnode + 1
@@ -133,25 +94,6 @@ process_annot <- function(an) {
   }
 }
 
-# for genealogical sorting index
-get_ancestors <- function(phy, tips) {
-  if (is.character(tips) == TRUE) {
-    tips <- sapply(tips, function(x) which(phy$tip.label == x))
-  }
-  nodes <- vector()
-  mrca <- which.node(phy, tips)
-  for (tip in tips) {
-    x <- 0
-    e <- tip
-    while (x != mrca) {
-      x <- phy$edge[which(phy$edge[, 2] == e), 1]
-      nodes <- append(nodes, x)
-      e <- x
-    }
-  }
-  nodes <- unique(nodes)
-  return(nodes)
-}
 
 #' read.annot.beast
 #'
