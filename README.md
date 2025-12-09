@@ -20,7 +20,9 @@ pixi run run download_reference_trees # extract and process reference trees
 
 ## Language identification
 
-You will need to setup a user and project in [Weights & Biases](https://wandb.ai). See the [Quickstart](https://docs.wandb.ai/quickstart/) for more information.
+You will need to setup a user and project in
+[Weights & Biases](https://wandb.ai). See the
+[Quickstart](https://docs.wandb.ai/quickstart/) for more information.
 
 ```bash
 pixi run lid --dataset fleurs-r --model_id NeMo_ambernet --project phylaudio
