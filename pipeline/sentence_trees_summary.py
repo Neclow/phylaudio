@@ -50,8 +50,8 @@ def parse_args():
     parser.add_argument(
         "-r",
         "--ref",
-        default="heggarty2023",
-        choices=("heggarty2023", "gled", "glottolog", "jager2018"),
+        default="iecor",
+        choices=("iecor", "gled", "glottolog", "asjp"),
         type=str,
         help="Reference tree.",
     )

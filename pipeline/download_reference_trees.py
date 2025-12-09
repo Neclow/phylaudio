@@ -228,9 +228,9 @@ class GledTreeProcessor(URLTreeProcessor):
         self.write(tree, process_args)
 
 
-class Heggarty2023TreeProcessor(URLTreeProcessor):
+class IecorTreeProcessor(URLTreeProcessor):
     def __init__(self, url, ext):
-        super().__init__(name="heggarty2023", url=url, ext=ext)
+        super().__init__(name="iecor", url=url, ext=ext)
 
     def process(
         self,
@@ -265,9 +265,9 @@ class Heggarty2023TreeProcessor(URLTreeProcessor):
         self.write(tree, process_args)
 
 
-class Jager2018TreeProcessor(URLTreeProcessor):
+class AsjpTreeProcessor(URLTreeProcessor):
     def __init__(self, url, ext, asjp_url):
-        super().__init__(name="jager2018", url=url, ext=ext)
+        super().__init__(name="asjp", url=url, ext=ext)
 
         self.asjp_url = asjp_url
 
@@ -318,7 +318,7 @@ class Jager2018TreeProcessor(URLTreeProcessor):
             leaf.name = matches[leaf.name]
 
         # Print stats
-        # NOTE: Should have 1 mismatch: Sindhi absent in Jager2018 tree
+        # NOTE: Should have 1 mismatch: Sindhi absent in Asjp tree
         diff = set(glottocodes_to_prune) - set(matches.values())
         absent_full_languages = [
             v["full"] for v in languages_to_prune.values() if v["glottolog"] in diff
@@ -337,15 +337,15 @@ REFERENCE_TREES = {
         "downloader": GledTreeProcessor,
     },
     "glottolog": {"ext": "nwk", "downloader": GlottologTreeProcessor},
-    "heggarty2023": {
+    "iecor": {
         "url": "https://share.eva.mpg.de/index.php/s/E4Am2bbBA3qLngC/download?path=%2F01_Main_Analysis_M3%2FIECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin&files=IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_mcc.tree",
         "ext": "nex",
-        "downloader": Heggarty2023TreeProcessor,
+        "downloader": IecorTreeProcessor,
     },
-    "jager2018": {
+    "asjp": {
         "url": "https://osf.io/hgru8/download",
         "ext": "nwk",
-        "downloader": Jager2018TreeProcessor,
+        "downloader": AsjpTreeProcessor,
     },
 }
 
@@ -433,7 +433,7 @@ if __name__ == "__main__":
         if key == "glottolog":
             extra_args["glottolog_dir"] = args.glottolog_dir
             extra_args["languoid"] = args.languoid
-        elif key == "jager2018":
+        elif key == "asjp":
             extra_args["asjp_url"] = processor_utils["asjp_url"]
         tree_processor = ProcessorCls(
             url=processor_utils.get("url", None),

@@ -63,12 +63,12 @@ def merge_fastas(input_files, sequence_ids, filler="?", output_file=None):
         return seqs
 
 
-def to_beast(input_file, output_file, template_beast_file, languages):
+def to_beast(input_file, output_file, template_beast_file, languages, ref="iecor"):
     skipped = []
 
-    # Gather all sequences where the language is in heggarty2023
+    # Gather all sequences where the language is in IECOR
     sequences = {
-        languages[sequence.id].get("heggarty2023", None): str(sequence.seq)
+        languages[sequence.id].get(ref, None): str(sequence.seq)
         for sequence in SeqIO.parse(input_file, "fasta")
     }
 
