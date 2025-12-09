@@ -15,9 +15,10 @@ download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
 download_models = "python -m pipeline.download_models data/models"
 download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r --preserve-branch-length"
 generate_beast_xml = "python -m pipeline.generate_beast_xml"
-language_identification = "python -m pipeline.language_identification"
-discrete_phylo = "python -m pipeline.sentence_trees_discrete"
-distance_phylo = "python -m pipeline.sentence_trees_distance"
+lid = "python -m pipeline.language_identification"
+lid_summary = "python -m pipeline.language_identification_summary"
+sentence_discrete = "python -m pipeline.sentence_trees_discrete"
+sentence_distance = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
@@ -31,32 +32,43 @@ cmd = "extern/beast2/bin/packagemanager"
 [tasks.treeannotator]
 cmd = "extern/beast2/bin/treeannotator"
 
+[tasks.splitstree]
+cmd = "extern/splitstree/SplitsTree"
+
 [dependencies]
+# Python deps
 python = "3.10.12.*"
 pandas = ">=2.3.2,<3"
 requests = ">=2.32.5,<3"
 tqdm = ">=4.67.1,<5"
-iqtree = ">=3.0.1,<4"
 pytorch = ">=2.7.1,<3"
 torchaudio = ">=2.7.1,<3"
 huggingface_hub = ">=0.34.4,<0.35"
-black = ">=25.1.0,<26"
 lightning = ">=2.5.4,<3"
 ete3 = ">=3.1.3,<4"
 rpy2 = ">=3.6.2,<4"
-aster = { version = ">=1.23,<2", channel = "bioconda" }
 scipy = ">=1.15.2,<2"
 datasets = "==3.2.0"
 transformers = "==4.45.2"
-uv = ">=0.8.13,<0.9"
-torchmetrics = ">=1.8.1,<2"
 regex = ">=2025.7.34,<2026"
 biopython = ">=1.85,<2"
-r-codetools = ">=0.2_20,<0.3"
+torchinfo = ">=1.8.0,<2"
+torchmetrics = ">=1.8.1,<2"
+# R deps
 r-dplyr = ">=1.1.4,<2"
 r-phangorn = ">=2.12.1,<3"
 r-treedist = ">=2.11.1,<3"
+r-base = ">=4.4.3,<4.5"
+r-doparallel = ">=1.0.17,<2"
+r-tidyr = ">=1.3.1,<2"
+# Phylogenetics
+iqtree = ">=3.0.1,<4"
+aster = { version = ">=1.23,<2", channel = "bioconda" }
 beagle-lib = { version = ">=4.0.1,<5", channel = "bioconda" }
+# Dev tools
+black = ">=25.1.0,<26"
+uv = ">=0.8.13,<0.9"
+pre-commit = ">=4.5.0,<5"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"

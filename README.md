@@ -23,19 +23,19 @@ pixi run run download_reference_trees # extract and process reference trees
 You will need to setup a user and project in [Weights & Biases](https://wandb.ai). See the [Quickstart](https://docs.wandb.ai/quickstart/) for more information.
 
 ```bash
-pixi run language_identification --dataset fleurs-r --model_id NeMo_ambernet --project phylaudio
+pixi run lid --dataset fleurs-r --model_id NeMo_ambernet --project phylaudio
 ```
 
 ## Sentence-wise distance trees
 
 ```bash
-pixi run distance_phylo --dataset fleurs-r --model_id NeMo_ambernet --ebs 1
+pixi run sentence_distance --dataset fleurs-r --model_id NeMo_ambernet --ebs 1
 ```
 
 ## Sentence-wise discrete trees
 
 ```bash
-pixi run discrete_phylo --dataset fleurs-r --model_id NeMo_ambernet
+pixi run sentence_discrete --dataset fleurs-r --model_id NeMo_ambernet
 ```
 
 ## Generating single language-tree estimates from sentence-wise runs (using ASTRAL-IV)

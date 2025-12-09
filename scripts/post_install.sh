@@ -25,3 +25,17 @@ rm $BEAST_TARGET
 
 # Install DensiTree
 wget -O extern/DensiTree.jar https://github.com/rbouckaert/DensiTree/releases/download/v3.0.0/DensiTree.v3.1.0.jar
+
+# Install SplitsTree6
+wget -O extern/SplitsTree_unix_6_6_5.sh https://software-ab.cs.uni-tuebingen.de/download/splitstree6/SplitsTree_unix_6_6_5.sh
+wget -O extern/SplitsTree_md5sums.txt https://software-ab.cs.uni-tuebingen.de/download/splitstree6/md5sums.txt
+
+# Check md5sum
+(cd extern && grep SplitsTree_unix_6_6_5.sh SplitsTree_md5sums.txt | md5sum -c -) || exit
+
+# Make SplitsTree executable
+chmod +x extern/SplitsTree_unix_6_6_5.sh
+
+# Install SplitsTree to extern/splitstree
+./extern/SplitsTree_unix_6_6_5.sh -d splitstree
+
