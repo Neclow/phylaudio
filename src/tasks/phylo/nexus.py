@@ -10,7 +10,6 @@ from pathlib import Path
 import pandas as pd
 import rpy2.robjects as ro
 import torch
-from ete3 import Tree
 from rpy2.rinterface_lib.embedded import RRuntimeError
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import importr
@@ -260,105 +259,5 @@ def nexus_to_txt(nexus_file):
             """
             tr <- read.nexus(nexus_file)
             write.tree(tr, file=txt_file)
-            """
-        )
-
-
-def nexus_to_densitree(nexus_file, root=None):
-    """Produce a densitree plot from a nexus file"""
-    stem = os.path.splitext(nexus_file)[0]
-
-    def _prepare_trees(stem):
-        # Densitree works best with rooted trees
-        output_file = f"{stem}_rooted.nex"
-
-        add_line = False
-
-        lines_to_write = []
-
-        max_leaves = 0
-
-        index = 0
-
-        with open(nexus_file, "r", encoding="utf-8") as f_in:
-            for i, line in enumerate(f_in.readlines()):
-                if line.strip() == "END;" and add_line:
-                    lines_to_write.append(line)
-                elif add_line:
-                    meta, newick = line.split(" = ")
-
-                    tree = Tree(newick.strip())
-
-                    leaves = tree.get_leaf_names()
-
-                    # Making the tree rooted and ultrametric
-                    if root is not None and root in leaves:
-                        outgroup = root
-                    else:
-                        outgroup = tree.get_midpoint_outgroup()
-
-                    tree.set_outgroup(outgroup)
-                    tree.convert_to_ultrametric()
-
-                    line_clean = f"{meta} = {tree.write(format=1)}\n"
-
-                    n_leaves = len(leaves)
-
-                    if n_leaves > max_leaves:
-                        max_leaves = n_leaves
-                        lines_to_write.insert(index, line_clean)
-                    else:
-                        lines_to_write.append(line_clean)
-                else:
-                    lines_to_write.append(line)
-
-                if line.strip() == "BEGIN TREES;":
-                    add_line = True
-                    index = i + 1
-
-        with open(output_file, "w", encoding="utf-8") as f_out:
-            for line in lines_to_write:
-                f_out.write(line)
-
-        consensus_file = f"{stem}_astral4.txt"
-
-        consensus_tree = Tree(consensus_file)
-
-        consensus_tree.set_outgroup(root)
-        consensus_tree.convert_to_ultrametric()
-
-        consensus_tree.write(
-            format=1, outfile=f"{os.path.splitext(consensus_file[0])}_rooted.txt"
-        )
-
-        return output_file
-
-    clean_nexus_file = _prepare_trees(stem)
-
-    with localconverter(ro.default_converter):
-        importr("phangorn")
-
-        ro.globalenv["nexus_file"] = clean_nexus_file
-        ro.globalenv["consensus"] = f"{stem}_astral4_rooted.txt"
-        ro.globalenv["output_file"] = f"{stem}_densitree.pdf"
-        ro.globalenv["root_"] = root
-
-        ro.r(
-            """
-            trees <- read.nexus(nexus_file)
-            c_tree <- read.tree(consensus)
-
-            pdf(output_file)
-            densiTree(
-                trees,
-                consensus = root(c_tree, root_),
-                alpha = 0.01,
-                width = 0.1,
-                cex = 0.5,
-                jitter = list(amount=0.1, random=TRUE),
-                col = "#12711c",
-                font = 2
-            )
-            dev.off()
             """
         )
