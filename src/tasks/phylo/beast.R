@@ -1,5 +1,9 @@
-# Adapted from Sánchez-Ramírez, S. (2018) rBt: Handy functions for dealing with BEAST trees in R
-# https://github.com/santiagosnchez/rBt
+# -----------------------------------------------------------------------------
+# Portions of this code are adapted from rBt
+# Original repository: https://github.com/santiagosnchez/rBt
+# Copyright (c) Heinrich Dinkel, 2018
+# Licensed under the GPL-3 license
+# -----------------------------------------------------------------------------
 
 library(ape)
 library(doParallel)
