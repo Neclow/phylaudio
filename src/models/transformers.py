@@ -15,8 +15,10 @@ class TransformersAudioProcessor(AudioProcessor):
         Model ID (see model_ids)
     sr : int
         Sample rate
-    max_length : int, optional
-        Max. number of samples/frames to keep, by default None
+    max_length : int
+        Max. number of samples/frames to keep
+    model_id : str
+        Model name
     cache_dir : str, optional
         Path to the folder where cached files are stored, by default None
     truncation : bool, optional
@@ -58,8 +60,8 @@ class TransformersAudioProcessor(AudioProcessor):
     def process(self, file_path):
         x, _ = super().process(file_path)
 
-        # # This ensures that the same data is fed in the model
-        # # Needed because max_length is not the same for whisper
+        # This ensures that the same data is fed in the model
+        # Needed because max_length is not the same for whisper
         x = x[: self.max_length]
 
         xp = self.processor(
@@ -223,7 +225,7 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
 
 def _load_finetuned_xlsr(
     model,
-    file="/home/common/speech_phylo/models/xlsr_300m_voxlingua107_ft.pt",
+    file="data/models/xlsr_300m_voxlingua107_ft.pt",
 ):
     """Load a finetuned Wav2Vec2Model for speech feature extraction.
 
