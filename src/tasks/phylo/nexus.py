@@ -200,8 +200,8 @@ class DiscretePhyloWriter(PhyloWriter):
 
 
 class DistancePhyloWriter(PhyloWriter):
-    def __init__(self, run_id, layer=-1):
-        super().__init__(run_id, dtype="pdist", data_ext="pt")
+    def __init__(self, run_id, dtype="pdist", layer=-1):
+        super().__init__(run_id, dtype=dtype, data_ext="pt")
 
         assert self.tree_method in (
             PDIST_METHODS

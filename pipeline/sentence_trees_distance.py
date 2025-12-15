@@ -2,6 +2,8 @@
 
 """Distance-based phylogenetic tree construction from the FLEURS dataset"""
 
+import os
+
 import torch
 
 from src._config import DEFAULT_PER_SENTENCE_DIR
@@ -83,7 +85,12 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    output_folder = f"{DEFAULT_PER_SENTENCE_DIR}/pdist/{inputs.run_id}"
+    dtype = f"pdist+{args.method}"
+    if args.decomposition is not None:
+        dtype += f"+{args.decomposition}"
+    pdist_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"
+    os.makedirs(pdist_dir, exist_ok=True)
+    output_folder = f"{pdist_dir}/{inputs.run_id}"
     save_state(inputs, output_folder)
 
     # Feature extraction loop (applied sentence-wise)
@@ -96,7 +103,7 @@ def main():
     )
 
     # Tree inference
-    writer = DistancePhyloWriter(run_id=inputs.run_id, layer=args.layer)
+    writer = DistancePhyloWriter(run_id=inputs.run_id, dtype=dtype, layer=args.layer)
     writer.write(export_trees=True)
 
     print(f"View results at {output_folder}")

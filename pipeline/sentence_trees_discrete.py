@@ -121,11 +121,9 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    dtype = (
-        "discrete"
-        if args.decomposition is None
-        else f"discrete+{args.decomposition}{args.n_components}"
-    )
+    dtype = "discrete"
+    if args.decomposition is not None:
+        dtype += f"+{args.decomposition}{args.n_components}"
     discrete_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"
     os.makedirs(discrete_dir, exist_ok=True)
     output_folder = f"{discrete_dir}/{inputs.run_id}"
