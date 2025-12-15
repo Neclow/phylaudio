@@ -81,9 +81,6 @@ class LogMelSpectrogramFeatureExtractor(BaseFeatureExtractor):
         self.emb_dim = self.n_mels
 
     def forward(self, x):
-        # Pad so that input is valid for whisper models
-        x = whisper.pad_or_trim(x)
-
         out = whisper.log_mel_spectrogram(x, n_mels=self.n_mels)
 
         out = out.permute(0, 2, 1)
