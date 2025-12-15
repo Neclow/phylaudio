@@ -36,3 +36,5 @@ chmod +x extern/SplitsTree_unix_$SPLITSTREE_VERSION.sh
 # Install SplitsTree to extern/splitstree
 ./extern/SplitsTree_unix_$SPLITSTREE_VERSION.sh -dir splitstree
 
+# Install Fine-tuned XLS-R weights
+wget -O data/models/xlsr_300m_voxlingua107_ft.pt https://dl.fbaipublicfiles.com/fairseq/wav2vec/xlsr_300m_voxlingua107_ft.pt
