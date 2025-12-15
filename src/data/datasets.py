@@ -212,8 +212,7 @@ class FleursParallelDataset(BaseDataset):
         glottocode=None,
         min_speakers=0.0,
         subset=None,
-        # # Only keep one sample per language (no multiple speakers)
-        # unique=False,
+        # unique=False, # Only keep one sample per language (i.e., one speaker)
         **kwargs,
     ):
         kwargs["subset"] = subset
@@ -328,18 +327,20 @@ def load_dataset(dtype, dataset, root_dir, split=True, fleurs_parallel=False, **
         cls = FleursParallelDataset
         kwargs["dtype"] = dtype
     elif dtype == "audio":
-        processor = kwargs["processor"]
-        if not isinstance(processor, TransformersAudioProcessor):
-            # Still need to trim/pad for non-Transformer models
-            # Could also be removed for Whisper models
-            kwargs["transform"] = load_transforms(
-                sr=processor.sr,
-                max_length=processor.max_length,
-                with_vad=kwargs["with_vad"],
-            )
         cls = AudioDataset
     else:
         raise NotImplementedError
+
+    processor = kwargs["processor"]
+    # For transformer models, trimming/padding is built in
+    # For other models, need to trim/pad for non-Transformer models
+    # Such that input shape is `max_length` for all samples and models
+    if not isinstance(processor, TransformersAudioProcessor):
+        kwargs["transform"] = load_transforms(
+            sr=processor.sr,
+            max_length=processor.max_length,
+            with_vad=kwargs["with_vad"],
+        )
 
     positional_args = {"dataset": dataset, "root_dir": root_dir}
 
