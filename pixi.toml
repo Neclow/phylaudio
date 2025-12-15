@@ -1,5 +1,5 @@
 [workspace]
-authors = ["Neclow <neilclow24@gmail.com>"]
+authors = ["Neclow <neil.clow@sund.ku.dk>", "Harrison Zhu <harrison.zhu@sund.ku.dk>", "David Duchêne <david.duchene@sund.ku.dk>"]
 channels = ["conda-forge", "bioconda"]
 name = "phylaudio"
 platforms = ["linux-64"]
@@ -74,7 +74,6 @@ pre-commit = ">=4.5.0,<5"
 pyglottolog = ">=3.16.0, <4"
 nemo-toolkit = { version = ">=2.0.0, <3", extras = ["asr"] }
 opensmile = ">=2.6.0, <3"
-whisper = ">=1.1.10, <2"
 speechbrain = ">=1.0.3, <2"
 openai-whisper = ">=20250625, <20250626"
 torch-pca = ">=1.1.0, <2"
