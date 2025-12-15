@@ -40,6 +40,7 @@ class FleursParallelInput:
     parallel_loader: DataLoader
     classifier: Optional[torch.nn.Module] = None
     decomposer: Optional[torch.nn.Module] = None
+    fast_dev_run: bool = False
 
 
 def get_fleurs_parallel_args(with_common_args=True):
@@ -109,6 +110,23 @@ def get_fleurs_parallel_args(with_common_args=True):
         default=DEFAULT_THREADS_NEXUS,
         help="Number of threads to use for parallel processing of iqtree",
     )
+    parser.add_argument(
+        "--glottocode",
+        type=str,
+        default="indo1319",
+        help="Glottocode to filter languages",
+    )
+    parser.add_argument(
+        "--min-speakers",
+        type=float,
+        default=1.0,
+        help="Minimum number of speakers per language",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="If true, runs a quick development run for testing purposes",
+    )
 
     return parser
 
@@ -152,6 +170,7 @@ def prepare_everything(args, verbose=True):
         num_batches=num_batches,
         num_classes=num_classes,
         feature_extractor=feature_extractor,
+        fast_dev_run=args.dry_run,
     )
 
     if args.ckpt is not None:
@@ -267,6 +286,9 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
             )
 
         downstream_func(X_emb, y, sentence_index, args, inputs, output_folder)
+
+        if args.dry_run:
+            break
 
 
 def filter_embeddings(classifier, X_emb, y):
