@@ -43,6 +43,11 @@ def parse_lid_args(with_common_args=True):
         help="Number of training epcohs",
     )
     parser.add_argument("--hidden-dim", type=int, help="Downstream hidden layer size")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="If true, runs a quick development run for testing purposes",
+    )
 
     return parser.parse_args()
 
@@ -100,6 +105,7 @@ def fit_predict(
         devices=devices,
         max_epochs=args.n_epochs,
         enable_model_summary=True,
+        fast_dev_run=args.dry_run,
         callbacks=[
             ModelCheckpoint(
                 monitor="valid_loss", mode="min", save_last=False, save_top_k=1
@@ -115,8 +121,9 @@ def fit_predict(
         val_dataloaders=valid_loader,
     )
 
-    trainer.test(
-        model=lit_mlp,
-        dataloaders=test_loader,
-        ckpt_path="best",
-    )
+    if not args.dry_run:
+        trainer.test(
+            model=lit_mlp,
+            dataloaders=test_loader,
+            ckpt_path="best",
+        )
