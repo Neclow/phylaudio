@@ -57,6 +57,8 @@ if __name__ == "__main__":
             "name": languoid.name,
             "glottocode": glottocode,
             "n_speakers": languages[code]["speakers"],
+            "longitude": languoid.longitude,
+            "latitude": languoid.latitude,
             "codes": lineage_codes,
         }
 
