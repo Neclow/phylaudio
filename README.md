@@ -80,3 +80,8 @@ Open SplitsTree &rarr; Under "File", click `Open` &rarr; Select FASTA file
 Under "Analysis", click on `Compute Delta Score...` &rarr; save as text
 
 Note: you may need to replace "?" with "-" in FASTA files.
+
+## Visualizing audio embeddings
+
+Currently, you can visualize embeddings from XLS-R (fine-tuned on VoxLingua 107)
+at: <https://neclow.github.io/phylaudio/>
