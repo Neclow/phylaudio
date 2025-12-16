@@ -14,7 +14,8 @@ download_fleurs = "python -m pipeline.download_fleurs data/datasets"
 download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
 download_models = "python -m pipeline.download_models data/models"
 download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r --preserve-branch-length"
-generate_beast_xml = "python -m pipeline.generate_beast_xml"
+beast_extract_vcov = "Rscript pipeline/extract_vcov.R"
+beast_generate_xml = "python -m pipeline.generate_beast_xml"
 lid = "python -m pipeline.language_identification"
 lid_summary = "python -m pipeline.language_identification_summary"
 oak = "python -m pipeline.run_oak"
@@ -78,6 +79,19 @@ speechbrain = ">=1.0.3, <2"
 openai-whisper = ">=20250625, <20250626"
 torch-pca = ">=1.1.0, <2"
 rapidfuzz = "==3.14.1"
+
+[environments]
+default = { solve-group = "default" }
+oak = { features = ["oak"], solve-group = "oak" }
+
+[feature.oak.dependencies]
+python = "3.10.12.*"
+numpy = "<2.0"
+
+[feature.oak.pypi-dependencies]
 tensorflow = "==2.11.0"
 tensorflow-probability = "==0.19.0"
 gpflow = "==2.2.1"
+
+[feature.oak.tasks]
+beast_oak = "python -m pipeline.run_oak"
