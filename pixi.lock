@@ -457,6 +457,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/13/84/069db1325f5a6dd034524c0099da3978de8fdb6242ce63223ead188da940/csvw-3.5.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/ae/e4ead004cc2698281d153c4a5388638d67cdb5544d6d6cc1e5b3db2bd2a3/cytoolz-1.0.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/fe/ca/75fac5856ab5cfa51bbbcefa250182e50441074fdc3f803f6e76451fab43/dataclasses-0.8-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/84/d0/205d54408c08b13550c733c4b85429e7ead111c7f0014309637425520a9a/deprecated-1.3.1-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/1a/883e47df323437aefa0d0a92ccfb38895d9416bd0b56262c2e46a47767b8/Distance-0.1.3.tar.gz
@@ -476,7 +477,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6f/d1/385110a9ae86d91cc14c5282c61fe9f4dc41c0b9f7d423c6ad77038c4448/google_auth-2.43.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b1/0e/0636cc1448a7abc444fb1b3a63655e294e0d2d49092dc3de05241be6d43c/google_auth_oauthlib-0.4.6-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a3/de/c648ef6835192e6e2cc03f40b19eeda4382c49b5bafb43d88b931c4c74ac/google_pasta-0.2.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/e2/55/aef3c47e7e59247d669e33228fc0779511199188a46add9c716879b21a2c/gpflow-2.4.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/55/25/f3d0b5a7bea6c371ddbce6f2fb17b668d2782379be9c70cc40d2f063b67c/gpflow-2.2.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/91/4c/e0ce1ef95d4000ebc1c11801f9b944fa5910ecc15b5e351865763d8657f8/graphviz-0.21-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7f/91/ae2eb6b7979e2f9b035a9f612cf70f1bf54aad4e1d125129bef1eae96f19/greenlet-3.2.4-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fd/75/a1991dd64b331d199935e096cc9daa3415ee5ccbe9f909aa48eded7bba34/grpcio-1.74.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
@@ -500,7 +501,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/de/44/bf1b0eef5b13e6201aef076ff34b91bc40aace8591cd273c1c2a94a9cc00/keras-2.11.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d4/42/0f333164e6307a0687d1eb9ad256215aae2f4bd5d28f4653d6cd319a3ba3/kiwisolver-1.4.9-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/b0/42/327554649ed2dd5ce59d3f5da176c7be20f9352c7c6c51597293660b7b08/language_tags-1.2.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/82/3d/14ce75ef66813643812f3093ab17e46d3a206942ce7376d31ec2d36229e7/lark-1.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b5/40/23569737873cc9637fd488606347e9dd92b9fa37ba4fcda1f98ee5219a97/latexcodec-3.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/83/60/d497a310bde3f01cb805196ac61b7ad6dc5dcf8dce66634dc34364b20b4f/lazy_loader-0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/2d/ed/d0c5abe8cfcf6a7f2a4197e889e12b7a0c2145a0ef3354b1c000bf367305/levenshtein-0.27.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
@@ -585,10 +585,10 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/6f/77/e624b4916531721e674aa105151ffa5223fb224d3ca4bd5c10574664f944/tensorboard-2.11.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/f9/802efd84988bffd9f644c03b6e66fde8e76c3aa33db4279ddd11c5d61f4b/tensorboard_data_server-0.6.1-py3-none-manylinux2010_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/e0/68/e8ecfac5dd594b676c23a7f07ea34c197d7d69b3313afdf8ac1b0a9905a2/tensorboard_plugin_wit-1.8.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/0d/f6/3ab09c7c161d2e08353e65f0df0512a8e4578d33497563edd61aa887f29d/tensorflow-2.11.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/71/f5/20795b0d2cc65da482ddb1735e630b85ef4916673967ce30a64ecb979303/tensorflow-2.11.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/bb/e2/8bf618c7c30a525054230ee6d40b036d3e5abc2c4ff67cf7c7420a519204/tensorflow_estimator-2.11.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f3/48/47b7d25572961a48b1de3729b7a11e835b888e41e0203cca82df95d23b91/tensorflow_io_gcs_filesystem-0.37.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/16/b6/82ebba9b9ef3de851ea2c801a1542aa47821c62851ebabab565defa453b1/tensorflow_probability-0.11.0-py2.py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/d9/2e/d1b4166e7c5235a745ce85763502d4c3e20486d6cd2a0517583817734d40/tensorflow_probability-0.19.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4f/bd/de8d508070629b6d84a30d01d57e4a65c69aa7f5abe7560b8fad3b50ea59/termcolor-3.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5c/a7/e9eb0e14633710b51b8472a3beccc7d6a44d55a0a3ef4493ebb4b7977253/TexSoup-0.3.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a6/a5/c0b6468d3824fe3fde30dbb5e1f687b291608f9473681bbf7dabbf5a87d7/text_unidecode-1.3-py2.py3-none-any.whl
@@ -1729,6 +1729,11 @@ packages:
   - toolz>=0.8.0
   - cython ; extra == 'cython'
   requires_python: '>=3.8'
+- pypi: https://files.pythonhosted.org/packages/fe/ca/75fac5856ab5cfa51bbbcefa250182e50441074fdc3f803f6e76451fab43/dataclasses-0.8-py3-none-any.whl
+  name: dataclasses
+  version: '0.8'
+  sha256: 0201d89fa866f68c8ebd9d08ee6ff50c0b255f8ec63a71c16fda7af82bb887bf
+  requires_python: '>=3.6,<3.7'
 - conda: https://conda.anaconda.org/conda-forge/noarch/datasets-3.2.0-pyhd8ed1ab_0.conda
   sha256: 63c4d81b6283885c566bc853cdf97a292f13b3f3105872acd2439a285a4b769f
   md5: 0dd08fd6a427f83c69920e7e7dab9630
@@ -2310,10 +2315,10 @@ packages:
   sha256: b32482794a366b5366a32c92a9a9201b107821889935a02b3e51f6b432ea84ed
   requires_dist:
   - six
-- pypi: https://files.pythonhosted.org/packages/e2/55/aef3c47e7e59247d669e33228fc0779511199188a46add9c716879b21a2c/gpflow-2.4.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/55/25/f3d0b5a7bea6c371ddbce6f2fb17b668d2782379be9c70cc40d2f063b67c/gpflow-2.2.1-py3-none-any.whl
   name: gpflow
-  version: 2.4.0
-  sha256: a727583ca0b1db9eb956ed9fe2597e114c11c435ad1431451a1317eab1becdc3
+  version: 2.2.1
+  sha256: f5e9ad72cc32f06dec4ccf6f199f0a7339175670aac5362a9b55e3c84bf2ad83
   requires_dist:
   - tensorflow>=2.2.0
   - tensorflow-probability>0.10.0
@@ -2325,8 +2330,7 @@ packages:
   - typing-extensions
   - packaging
   - deprecated
-  - lark>=1.1.0
-  - dataclasses ; python_full_version < '3.7'
+  - dataclasses
   - matplotlib ; extra == 'imagetotensorboard'
   requires_python: '>=3.6'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/graphite2-1.3.14-hecca717_2.conda
@@ -2864,16 +2868,6 @@ packages:
   name: language-tags
   version: 1.2.0
   sha256: d815604622242fdfbbfd747b40c31213617fd03734a267f2e39ee4bd73c88722
-- pypi: https://files.pythonhosted.org/packages/82/3d/14ce75ef66813643812f3093ab17e46d3a206942ce7376d31ec2d36229e7/lark-1.3.1-py3-none-any.whl
-  name: lark
-  version: 1.3.1
-  sha256: c629b661023a014c37da873b4ff58a817398d12635d3bbb2c5a03be7fe5d1e12
-  requires_dist:
-  - regex ; extra == 'regex'
-  - js2py ; extra == 'nearley'
-  - atomicwrites ; extra == 'atomic-cache'
-  - interegular>=0.3.1,<0.4.0 ; extra == 'interegular'
-  requires_python: '>=3.8'
 - pypi: https://files.pythonhosted.org/packages/b5/40/23569737873cc9637fd488606347e9dd92b9fa37ba4fcda1f98ee5219a97/latexcodec-3.0.1-py3-none-any.whl
   name: latexcodec
   version: 3.0.1
@@ -8348,10 +8342,10 @@ packages:
   name: tensorboard-plugin-wit
   version: 1.8.1
   sha256: ff26bdd583d155aa951ee3b152b3d0cffae8005dc697f72b44a8e8c2a77a8cbe
-- pypi: https://files.pythonhosted.org/packages/0d/f6/3ab09c7c161d2e08353e65f0df0512a8e4578d33497563edd61aa887f29d/tensorflow-2.11.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+- pypi: https://files.pythonhosted.org/packages/71/f5/20795b0d2cc65da482ddb1735e630b85ef4916673967ce30a64ecb979303/tensorflow-2.11.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
   name: tensorflow
-  version: 2.11.1
-  sha256: 9a96595e0c068d54717405fa12f36b4a5bb0a9fc53fb9065155a92cff944b35b
+  version: 2.11.0
+  sha256: d973458241c8771bf95d4ba68ad5d67b094f72dd181c2d562ffab538c1b0dad7
   requires_dist:
   - absl-py>=1.0.0
   - astunparse>=1.6.0
@@ -8391,15 +8385,16 @@ packages:
   - tensorflow-gpu>=2.16.0,<2.17.0 ; extra == 'tensorflow-gpu'
   - tensorflow-rocm>=2.16.0,<2.17.0 ; extra == 'tensorflow-rocm'
   requires_python: '>=3.7,<3.13'
-- pypi: https://files.pythonhosted.org/packages/16/b6/82ebba9b9ef3de851ea2c801a1542aa47821c62851ebabab565defa453b1/tensorflow_probability-0.11.0-py2.py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/d9/2e/d1b4166e7c5235a745ce85763502d4c3e20486d6cd2a0517583817734d40/tensorflow_probability-0.19.0-py2.py3-none-any.whl
   name: tensorflow-probability
-  version: 0.11.0
-  sha256: 60e66a376f8b3602d3f61b0ac0bf844796b2cc10c104a13bced5cb65e1770eae
+  version: 0.19.0
+  sha256: ee70967fbd52b09e9c5ec148a9437c4cf3f9e9d689cdca400a1bc921f21cdcac
   requires_dist:
+  - absl-py
   - six>=1.10.0
   - numpy>=1.13.3
   - decorator
-  - cloudpickle==1.3
+  - cloudpickle>=1.3
   - gast>=0.3.2
   - dm-tree
   - jax ; extra == 'jax'

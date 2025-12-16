@@ -8,7 +8,7 @@ uv pip install bitarray sacrebleu omegaconf hydra-core
 uv pip install flash-attn --no-build-isolation
 
 # Install missing R packages
-Rscript -e 'install.packages("Quartet", repos="https://cloud.r-project.org")'
+Rscript -e 'install.packages(c("Quartet", "brms"), repos="https://cloud.r-project.org")'
 
 # Install BEAST 2.7 and packages
 BEAST_TARGET=extern/beast2.tgz
