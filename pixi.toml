@@ -83,6 +83,7 @@ rapidfuzz = "==3.14.1"
 [environments]
 default = { solve-group = "default" }
 oak = { features = ["oak"], solve-group = "oak" }
+viz = { features = ["viz"], solve-group = "viz" }
 
 [feature.oak.dependencies]
 python = "3.10.12.*"
@@ -95,3 +96,8 @@ gpflow = "==2.2.1"
 
 [feature.oak.tasks]
 beast_oak = "python -m pipeline.run_oak"
+
+[feature.viz.dependencies]
+python = "3.10.12.*"
+plotly = ">=6.5.0,<7"
+seaborn = ">=0.13.2,<0.14"
