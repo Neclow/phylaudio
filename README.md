@@ -49,3 +49,7 @@ pixi run sentence_astral pdist
 ```bash
 pixi run sentence_summary pdist
 ```
+
+# Visualizing audio embeddings across languages
+
+NAMEOFWEBSITE shows 2D PCA embeddings for XLS-R (finetuned on VoxLingua 107)
