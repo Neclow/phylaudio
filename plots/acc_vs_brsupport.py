@@ -12,56 +12,6 @@ from src._config import DEFAULT_EVAL_DIR, DEFAULT_PER_SENTENCE_DIR
 from src.models._model_zoo import MODEL_ZOO
 from src.tasks.plot import clear_axes
 
-# MODEL_DETAILS_DICT = {
-#     "openai/whisper-small": {
-#         "type": "transformer",
-#         "arch": "Whisper",
-#     },
-#     "openai/whisper-base": {
-#         "type": "transformer",
-#         "arch": "Whisper",
-#     },
-#     "openai/whisper-tiny": {
-#         "type": "transformer",
-#         "arch": "Whisper",
-#     },
-#     "openai/whisper-medium": {
-#         "type": "transformer",
-#         "arch": "Whisper",
-#     },
-#     "openai/whisper-large-v3-turbo": {
-#         "type": "transformer",
-#         "arch": "Whisper",
-#     },
-#     "speechbrain/lang-id-voxlingua107-ecapa": {
-#         "type": "conv1d",
-#         "arch": "Other (CNN)",
-#     },
-#     "NeMo_ambernet": {"type": "conv1d", "arch": "Other (CNN)"},
-#     "baseline/CNN6": {"type": "conv2d", "arch": "Other (CNN)"},
-#     "baseline/CNN10": {"type": "conv2d", "arch": "Other (CNN)"},
-#     "facebook/wav2vec2-xls-r-300m": {
-#         "type": "transformer",
-#         "arch": "wav2vec2",
-#     },
-#     "facebook/mms-lid-126": {
-#         "type": "transformer",
-#         "arch": "wav2vec2",
-#     },
-#     "facebook/mms-lid-256": {
-#         "type": "transformer",
-#         "arch": "wav2vec2",
-#     },
-#     "facebook/mms-lid-4017": {
-#         "type": "transformer",
-#         "arch": "wav2vec2",
-#     },
-#     "mms-meta/mms-zeroshot-300m": {
-#         "type": "transformer",
-#         "arch": "wav2vec2",
-#     },
-# }
-
 
 def parse_args():
     parser = ArgumentParser()
@@ -74,8 +24,8 @@ def parse_args():
         help="Path to per-sentence tree dir.",
     )
     parser.add_argument(
-        "-s",
-        "--summary_path",
+        "-e",
+        "--eval_path",
         type=str,
         default=f"{DEFAULT_EVAL_DIR}/summary.json",
         help="Path to eval summary JSON file.",
@@ -98,7 +48,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_data(tree_dir, summary_path):
+def load_data(tree_dir, eval_path):
     tree_summary = pd.read_csv(
         f"{DEFAULT_PER_SENTENCE_DIR}/{tree_dir}/summary.csv", index_col=0
     )
@@ -127,7 +77,7 @@ def load_data(tree_dir, summary_path):
 
     tree_stats = pd.DataFrame(all_tree_stats)
     eval_stats = (
-        pd.read_json(summary_path, orient="index")
+        pd.read_json(eval_path, orient="index")
         .reset_index(names="run_id")
         .rename(columns={"model_size": "nparam"})
     )
@@ -234,7 +184,7 @@ def plot(
 if __name__ == "__main__":
     args = parse_args()
 
-    merged = load_data(tree_dir=args.tree_dir, summary_path=args.summary_path)
+    merged = load_data(tree_dir=args.tree_dir, eval_path=args.eval_path)
 
     plot(data=merged, clf_metric=args.clf_metric, output_file=args.output_file)
 
