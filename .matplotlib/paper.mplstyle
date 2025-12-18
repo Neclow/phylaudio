@@ -1,0 +1,51 @@
+# paper
+
+# Use a sans-serif font
+font.family:  sans-serif
+font.sans-serif: Arial, Helvetica, DejaVu Sans
+
+# Set the font size
+font.size: 9
+axes.titlesize: 9
+axes.formatter.use_mathtext: True
+axes.labelsize: 9
+xtick.labelsize: 9
+ytick.labelsize: 9
+legend.fontsize: 9
+
+# Set the figure size
+figure.figsize: 6.4, 4.8  # Width and height in inches
+
+# Set the line width
+lines.linewidth: 1.0
+
+# Set the marker size
+lines.markersize: 3.0
+
+# Set the grid style
+axes.grid: False
+
+# Set the axis style
+axes.spines.top: False
+axes.spines.right: False
+
+# Set the legend style
+legend.frameon: False
+legend.numpoints: 1
+legend.scatterpoints: 1
+
+# Set the color cycle
+axes.prop_cycle: cycler('color', ['1f77b4', 'ff7f0e', '2ca02c', 'd62728', '9467bd', '8c564b', 'e377c2', '7f7f7f', 'bcbd22', '17becf'])
+
+# Set the savefig parameters
+savefig.dpi: 300
+savefig.format: pdf
+
+# Set the tight layout
+figure.autolayout: True
+
+# Enable LaTeX for text rendering
+text.usetex: False
+
+# Set the preamble for LaTeX
+# text.latex.preamble: \usepackage[cm]{sfmath}\usepackage{amsmath}\renewcommand{\familydefault}{\sfdefault}

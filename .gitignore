@@ -196,5 +196,4 @@ notes.txt
 drafts*.ipynb
 
 # Plots (temporary)
-.matplotlib/
 img/
