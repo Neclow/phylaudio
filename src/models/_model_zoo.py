@@ -11,7 +11,12 @@ from .whisper import WhisperFeatureExtractor, WhisperProcessor
 AUDIO_MAX_LENGTH: Final = 160000
 
 OPENSMILE_MODELS: Final = {
-    k: {"extractor": openSmileFeatureExtractor, "processor": AudioProcessor}
+    k: {
+        "extractor": openSmileFeatureExtractor,
+        "processor": AudioProcessor,
+        "type": None,
+        "arch": None,
+    }
     for k in (
         "openSMILE/ComParE_2016",
         "openSMILE/eGeMAPSv02",
@@ -23,6 +28,8 @@ TRANSFORMERS_AUDIO_MODELS: Final = {
     k: {
         "extractor": TransformersFeatureExtractor,
         "processor": TransformersAudioProcessor,
+        "type": "transformer",
+        "arch": "wav2vec2",
     }
     for k in (
         "facebook/wav2vec2-xls-r-300m",
@@ -35,7 +42,12 @@ TRANSFORMERS_AUDIO_MODELS: Final = {
 }
 
 WHISPER_MODELS: Final = {
-    k: {"extractor": WhisperFeatureExtractor, "processor": WhisperProcessor}
+    k: {
+        "extractor": WhisperFeatureExtractor,
+        "processor": WhisperProcessor,
+        "type": "transformer",
+        "arch": "Whisper",
+    }
     for k in (
         "openai/whisper-tiny",
         "openai/whisper-base",
@@ -46,7 +58,12 @@ WHISPER_MODELS: Final = {
 }
 
 BASELINE_MODELS: Final = {
-    k: {"extractor": BaselineFeatureExtractor, "processor": AudioProcessor}
+    k: {
+        "extractor": BaselineFeatureExtractor,
+        "processor": AudioProcessor,
+        "type": "conv2d",
+        "arch": "Other (CNN)",
+    }
     for k in (
         "baseline/CNN6",
         "baseline/CNN10",
@@ -57,14 +74,20 @@ AUDIO_MODELS: Final = {
     "lms": {
         "extractor": LogMelSpectrogramFeatureExtractor,
         "processor": WhisperProcessor,
+        "type": None,
+        "arch": None,
     },
     "NeMo_ambernet": {
         "extractor": NeMoFeatureExtractor,
         "processor": AudioProcessor,
+        "type": "conv1d",
+        "arch": "Other (CNN)",
     },
     "speechbrain/lang-id-voxlingua107-ecapa": {
         "extractor": SpeechbrainFeatureExtractor,
         "processor": SpeechbrainProcessor,
+        "type": "conv1d",
+        "arch": "Other (CNN)",
     },
     **BASELINE_MODELS,
     **OPENSMILE_MODELS,
