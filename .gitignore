@@ -183,8 +183,10 @@ data/datasets
 # Models
 data/models
 
-# Evaluation
-data/eval
+# Language identification evaluation
+data/eval/*
+!data/eval/README.md
+
 
 # Tree data (except README)
 data/trees/*
