@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 """Download and process reference phylogenetic trees."""
 
 import json
@@ -12,7 +13,7 @@ import requests
 from Bio.Phylo import NewickIO, NexusIO
 from ete3 import Tree
 
-from src._config import DEFAULT_METADATA_DIR
+from src._config import DEFAULT_BEAST_DIR, DEFAULT_METADATA_DIR
 from src.data.glottolog import filter_languages_from_glottocode
 
 RAW_DIR = "data/trees/references/raw"
@@ -53,11 +54,14 @@ class BaseTreeProcessor(ABC):
         overwrite : bool, optional
             Whether to overwrite the existing file, by default False
         """
+        downloaded = False
         if os.path.exists(self.raw_file) and not overwrite:
             print(f"Target file {self.raw_file} already exists. Skipping download.")
         else:
             print(f"Downloading {self.name} tree...")
             self.download()
+            downloaded = True
+        return downloaded
 
     @abstractmethod
     def download(self):
@@ -137,8 +141,10 @@ class GlottologTreeProcessor(BaseTreeProcessor):
 
     def download(self):
         """Download the Glottolog tree for a specific languoid."""
+        # pylint: disable=invalid-name
         G = pyglottolog.Glottolog(self.glottolog_dir)
         indo1319 = G.languoid(self.languoid)
+        # pylint: enable=invalid-name
         node = indo1319.newick_node()
         tree = Tree(node.newick + ";", format=1)
         for n in tree.traverse():
@@ -329,10 +335,10 @@ class AsjpTreeProcessor(URLTreeProcessor):
         self.write(tree, process_args)
 
 
+# pylint: disable=line-too-long
 REFERENCE_TREES = {
     "gled": {
         "url": "https://raw.githubusercontent.com/tresoldi/gled/refs/heads/main/releases/20221127/trees/indoeuropean.tree",
-        "asjp_url": "https://raw.githubusercontent.com/lexibank/asjp/refs/tags/v21/cldf/languages.csv",
         "ext": "nwk",
         "downloader": GledTreeProcessor,
     },
@@ -344,10 +350,23 @@ REFERENCE_TREES = {
     },
     "asjp": {
         "url": "https://osf.io/hgru8/download",
+        "asjp_url": "https://raw.githubusercontent.com/lexibank/asjp/refs/tags/v21/cldf/languages.csv",
         "ext": "nwk",
         "downloader": AsjpTreeProcessor,
     },
 }
+
+EXTRA_IECOR_TREES = {
+    "posterior": {
+        "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined.trees",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/raw.trees",
+    },
+    "prior": {
+        "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.trees",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.trees",
+    },
+}
+# pylint: enable=line-too-long
 
 
 def parse_args():
@@ -425,8 +444,6 @@ if __name__ == "__main__":
     )
 
     for key, processor_utils in REFERENCE_TREES.items():
-        print(f"Processing: {key}...")
-
         # Prepare tree processor
         ProcessorCls = processor_utils["downloader"]
         extra_args = {}
@@ -442,13 +459,24 @@ if __name__ == "__main__":
         )
 
         # Download raw tree file
-        tree_processor.maybe_download(overwrite=args.overwrite)
+        downloaded = tree_processor.maybe_download(overwrite=args.overwrite)
 
         # Process tree file to only include relevant languages
-        tree_processor.process(
-            languages_to_prune=languages_filtered,
-            process_args=vars(args),
-            preserve_branch_length=args.preserve_branch_length,
+        if downloaded and not args.overwrite:
+            print(f"Processing: {key}...")
+            tree_processor.process(
+                languages_to_prune=languages_filtered,
+                process_args=vars(args),
+                preserve_branch_length=args.preserve_branch_length,
+            )
+
+    for key, extra_iecor_info in EXTRA_IECOR_TREES.items():
+        print(f"Downloading extra IECoR trees: {key}...")
+        response = requests.get(
+            extra_iecor_info["url"], allow_redirects=True, timeout=10
         )
+        response.raise_for_status()
+        with open(extra_iecor_info["file"], "wb") as f:
+            f.write(response.content)
 
     print("Downloaded reference trees.")
