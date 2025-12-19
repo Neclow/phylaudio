@@ -1,5 +1,9 @@
 [workspace]
-authors = ["Neclow <neil.clow@sund.ku.dk>", "Harrison Zhu <harrison.zhu@sund.ku.dk>", "David Duchêne <david.duchene@sund.ku.dk>"]
+authors = [
+    "Neclow <neil.clow@sund.ku.dk>",
+    "Harrison Zhu <harrison.zhu@sund.ku.dk>",
+    "David Duchêne <david.duchene@sund.ku.dk>",
+]
 channels = ["conda-forge", "bioconda"]
 name = "phylaudio"
 platforms = ["linux-64"]
@@ -14,8 +18,8 @@ download_fleurs = "python -m pipeline.download_fleurs data/datasets"
 download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
 download_models = "python -m pipeline.download_models data/models"
 download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r --preserve-branch-length"
-beast_extract_vcov = "Rscript pipeline/extract_vcov.R"
-beast_generate_xml = "python -m pipeline.generate_beast_xml"
+beast_phylolm = "Rscript pipeline/beast_phylolm.R"
+beast_generate_xml = "python -m pipeline.beast_generate_xml"
 lid = "python -m pipeline.language_identification"
 lid_summary = "python -m pipeline.language_identification_summary"
 oak = "python -m pipeline.run_oak"
@@ -88,6 +92,7 @@ viz = { features = ["viz"], solve-group = "viz" }
 [feature.oak.dependencies]
 python = "3.10.12.*"
 numpy = "<2.0"
+ipykernel = ">7.0,<8"
 
 [feature.oak.pypi-dependencies]
 tensorflow = "==2.11.0"
@@ -105,3 +110,4 @@ seaborn = ">=0.13.2,<0.14"
 [feature.viz.tasks]
 viz_acc_vs_brsupport = "python -m plots.acc_vs_brsupport"
 viz_embeddings_pca = "python -m plots.embeddings_pca"
+viz_beast_tree_heights = "python -m plots.beast_tree_heights"
