@@ -1,0 +1,128 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=10 nAlgorithms=7;
+PROGRAM version='SplitsTree App (version 6.3.20, built 16 May 2024)';
+WORKFLOW creationDate='1766233668424'; [Sat Dec 20 13:27:48 CET 2025]
+END; [SPLITSTREE6]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=0;
+TAXLABELS
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=0;
+TAXLABELS
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN CHARACTERS;
+TITLE 'Input Characters';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=0 nchar=0;
+FORMAT
+	datatype='Unknown' missing=? gap=- labels=left transpose=no interleave=yes;
+MATRIX
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK CHARACTERS = 'Input Characters';
+NAME 'Characters Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN CHARACTERS;
+TITLE 'Working Characters';
+LINK ALGORITHM = 'Input Data Filter';
+DIMENSIONS ntax=0 nchar=0;
+FORMAT
+	datatype='Unknown' missing=? gap=- labels=left transpose=no interleave=yes;
+MATRIX
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Log Det';
+LINK CHARACTERS = 'Working Characters';
+NAME 'Log Det';
+OPTIONS
+	PropInvariableSites = 0,
+	FudgeFactor = 'false',
+	FillZeros = 'false';
+END; [ALGORITHM]
+
+BEGIN DISTANCES;
+TITLE 'Distances';
+LINK ALGORITHM = 'Log Det';
+DIMENSIONS ntax=0;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+;
+END; [DISTANCES]
+
+BEGIN ALGORITHM;
+TITLE 'Neighbor Net';
+LINK DISTANCES = 'Distances';
+NAME 'Neighbor Net';
+OPTIONS
+	InferenceAlgorithm = 'ActiveSet';
+END; [ALGORITHM]
+
+BEGIN ALGORITHM;
+TITLE 'Delta Score';
+LINK DISTANCES = 'Distances';
+NAME 'Delta Score';
+END; [ALGORITHM]
+
+BEGIN SPLITS;
+TITLE 'Splits';
+LINK ALGORITHM = 'Neighbor Net';
+DIMENSIONS ntax=0 nsplits=0;
+FORMAT labels=no weights=yes confidences=no;
+PROPERTIES fit=-1;
+MATRIX
+;
+END; [SPLITS]
+
+BEGIN REPORT;
+TITLE 'Report';
+LINK ALGORITHM = 'Delta Score';
+TEXT
+;
+END; [REPORT]
+
+BEGIN ALGORITHM;
+TITLE 'Show Splits';
+LINK SPLITS = 'Splits';
+NAME 'Show Splits';
+OPTIONS
+	View = 'SplitNetwork';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'SplitNetwork';
+LINK ALGORITHM = 'Show Splits';
+NAME 'View';
+INPUT 'SPLITS';
+END; [VIEW]
