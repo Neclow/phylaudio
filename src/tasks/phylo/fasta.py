@@ -63,16 +63,38 @@ def merge_fastas(input_files, sequence_ids, filler="?", output_file=None):
         return seqs
 
 
-def to_beast(input_file, output_file, template_beast_file, languages, ref="iecor"):
+def to_beast(input_file, output_file, template_beast_file):
+    """Convert a FASTA file to a BEAST XML file.
+
+    Parameters
+    ----------
+    input_file : Path-like object
+        Input FASTA file
+    output_file : Path-like object
+        Output BEAST XML file
+    template_beast_file : Path-like object
+        Template BEAST XML file
+    languages : dict
+        Mapping of sequence IDs to language metadata
+    ref : str, optional
+        Reference field in language metadata to use for taxon names, by default "iecor"
+    """
     skipped = []
 
-    # Gather all sequences where the language is in IECOR
-    sequences = {
-        languages[sequence.id].get(ref, None): str(sequence.seq)
-        for sequence in SeqIO.parse(input_file, "fasta")
-    }
+    sequences = {}
+    for record in SeqIO.parse(input_file, "fasta"):
+        if record.id in sequences:
+            warnings.warn(
+                (
+                    f"Duplicate sequence ID '{record.id}' found in FASTA file '{input_file}'. "
+                    "Ignoring current sequence."
+                ),
+                UserWarning,
+            )
+            continue
+        sequences[record.id] = str(record.seq)
 
-    del sequences[None]
+    print(f"Total sequences in FASTA: {len(sequences)}")
 
     tree = xml.etree.ElementTree.parse(template_beast_file)
     root = tree.getroot()
@@ -100,10 +122,23 @@ def to_beast(input_file, output_file, template_beast_file, languages, ref="iecor
 
     if len(data_elm.findall("sequence")) >= MIN_LANGUAGES:
         tree.write(output_file)
+        print(f"Written BEAST XML to {output_file}")
     else:
         skipped.append(
             f"{Path(input_file).stem} has less than {MIN_LANGUAGES} languages"
         )
+
+
+def from_beast(input_file, output_file):
+    tree = xml.etree.ElementTree.parse(input_file)
+    root = tree.getroot()
+    data_elm = root.findall("data")[-1]
+
+    with open(output_file, "w", encoding="utf-8") as f:
+        for sequence_elm in data_elm.findall("sequence"):
+            sequence_content = sequence_elm.attrib
+            content = f">{sequence_content['taxon']}\n{sequence_content['value']}\n"
+            f.write(content)
 
 
 def zip_fastas(run_id):

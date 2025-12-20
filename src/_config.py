@@ -8,8 +8,8 @@ SAMPLE_RATE: Final = 16000
 
 NONE_TENSOR: Final = torch.tensor([-1])
 
+# Default directories
 DEFAULT_ROOT_DIR: Final = "data"
-
 DEFAULT_AUDIO_DIR: Final = f"{DEFAULT_ROOT_DIR}/datasets"
 DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
 DEFAULT_EVAL_DIR: Final = f"{DEFAULT_ROOT_DIR}/eval"
@@ -17,6 +17,11 @@ DEFAULT_METADATA_DIR: Final = f"{DEFAULT_ROOT_DIR}/metadata"
 DEFAULT_TREE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees"
 DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
 DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
+
+# Default filenames
+DEFAULT_MERGED_FASTA_FILE: Final = "__merged.fa"
+DEFAULT_MAPPED_FASTA_FILE: Final = "__merged_mapped.fa"
+DEFAULT_SPLITSTREE_FASTA_FILE: Final = "__merged_splitstree.fa"
 
 # Default number of threads for phylogenetic tree inference (iqtree/raxml)
 DEFAULT_THREADS_TREE: Final = 4
