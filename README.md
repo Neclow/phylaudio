@@ -72,21 +72,24 @@ pixi run beast2 -sampleFromPrior -beagle_SSE -threads 8 -seed 889 data/trees/bea
 pixi run treeannotator -topology CCD0 ./data/trees/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25/long_v3_44.trees long_v3_44.CCD.nex
 ```
 
-## Generating tree networks
+## Generating phylogenetic networks
 
-Open SplitsTree &rarr; Under "File", click `Open` &rarr; Select FASTA file
-&rarr; Use LogDet distance &rarr; NeighbourNet
+```bash
+pixi run network_analysis data/trees/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25/input.xml
+```
 
-Under "Analysis", click on `Compute Delta Score...` &rarr; save as text
-
-Note: you may need to replace "?" with "-" in FASTA files.
-
-## Visualizing audio embeddings
+## Plots
 
 To install visualization dependencies, run:
 
 ```bash
 pixi install -e viz
+```
+
+### Visualizing audio embeddings
+
+```bash
+pixi install -e viz_embeddings_pca
 ```
 
 Currently, you can visualize embeddings from XLS-R (fine-tuned on VoxLingua 107)
