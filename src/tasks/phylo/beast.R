@@ -323,30 +323,30 @@ get_height <- function(
 extract_beast_heights <- function(
   file = "",
   output_file = "",
-  tree = NULL,
+  trees = NULL,
   cores = 1,
   subset = NULL
 ) {
-  if (!is.null(tree)) {
-    if (!inherits(tree, "phylo")) {
-      stop("argument 'tree' must be of mode 'phylo'")
+  if (!is.null(trees)) {
+    if (!inherits(trees, "phylo")) {
+      stop("argument 'trees' must be of mode 'phylo'")
     }
   } else if (file != "") {
-    tree <- read.annot.beast(file, cores = cores)
+    trees <- read.annot.beast(file, cores = cores)
   } else {
-    stop("argument 'file' or 'tree' must be provided")
+    stop("argument 'file' or 'trees' must be provided")
   }
 
-  if (length(tree) > 1) {
+  if (length(trees) > 1) {
     registerDoParallel(cores = cores)
 
-    heights <- foreach(i = seq_along(tree), .combine = rbind) %dopar%
+    heights <- foreach(i = seq_along(trees), .combine = rbind) %dopar%
       {
-        get_height(tree[[i]], subset = subset)
+        get_height(trees[[i]], subset = subset)
       }
     heights
   } else {
-    get_height(tree, subset = subset)
+    get_height(trees, subset = subset)
   }
 
   if (output_file != "") {

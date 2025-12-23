@@ -6,6 +6,7 @@ Note: tree height is equivalent to root age here:
 """
 
 # pylint: disable=redefined-outer-name
+import os
 from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
@@ -28,7 +29,44 @@ rpy2.rinterface_lib.callbacks.consolewrite_warnerror = lambda *args: None
 XLSR_DIR = f"{DEFAULT_BEAST_DIR}/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25"
 IECOR_DIR = f"{DEFAULT_BEAST_DIR}/iecor"
 
-MODERN_LANGS = ["Danish", "Assamese", "Catalan", "Belarusian", "Pashto", "Latvian"]
+MODERN_LANGS = [
+    "ArmenianEastern",
+    "Assamese",
+    "Belarusian",
+    "Bengali",
+    "Bulgarian",
+    "Catalan",
+    "Czech",
+    "Danish",
+    "Dutch",
+    "English",
+    "French",
+    "German",
+    "Greek",
+    "Hindi",
+    "Italian",
+    "KurdishCJafi",
+    "Latvian",
+    "Lithuanian",
+    "Macedonian",
+    "Marathi",
+    "Nepali",
+    "NorwegianBokmal",
+    "Pashto",
+    "PersianTehran",
+    "Polish",
+    "Portuguese",
+    "Punjabi",
+    "Romanian",
+    "Russian",
+    "SerboCroatian",
+    "Slovak",
+    "Slovene",
+    "Spanish",
+    "Swedish",
+    "Ukrainian",
+    "Urdu",
+]
 PALETTE = ["#5e5eb5", "#bfbfe1", "#6ab06a", "#c3dfc3"]
 
 
@@ -106,9 +144,9 @@ def parse_args():
         help="Number of cores to use for parallel processing",
     )
     parser.add_argument(
-        "--save",
+        "--overwrite",
         action="store_true",
-        help="Whether to save intermediate data files",
+        help="Whether to overwrite existing height data",
     )
     parser.add_argument(
         "--burnin",
@@ -132,7 +170,7 @@ def load_data(
     cognate_prio_file,
     output_col="Root age (Years BP)",
     cores=4,
-    save=False,
+    overwrite=False,
     burnin=0.1,
 ):
     dfs = {}
@@ -142,30 +180,35 @@ def load_data(
         "Cognates (Posterior)": cognate_post_file,
         "Cognates (Prior)": cognate_prio_file,
     }
-    for col, file in file_data.items():
-        print(f"Processing {col}: {file}")
-        with localconverter(ro.default_converter + numpy2ri.converter):
-            ro.globalenv["file"] = file
-            ro.globalenv["modern_langs"] = ro.StrVector(MODERN_LANGS)
-            ro.globalenv["cores"] = cores
-            sub_df = ro.r(
-                """
-                source("src/tasks/phylo/beast.R")
-                cat("Extracting BEAST tree heights...\\n")
-                sub_df <- extract_beast_heights(file = file, subset = modern_langs, cores = cores)
-                cat("Done.\\n")
-                sub_df
-                """
-            ).flatten()
+    output_file = f"{DEFAULT_BEAST_DIR}/summary_height.csv"
+    if not os.path.exists(output_file) or overwrite:
+        for col, file in file_data.items():
+            print(f"Processing {col}: {file}")
+            with localconverter(ro.default_converter + numpy2ri.converter):
+                ro.globalenv["file"] = file
+                ro.globalenv["modern_langs"] = ro.StrVector(MODERN_LANGS)
+                ro.globalenv["cores"] = cores
+                sub_df = ro.r(
+                    """
+                    source("src/tasks/phylo/beast.R")
+                    cat("Extracting BEAST tree heights...\\n")
+                    sub_df <- extract_beast_heights(
+                        file = file,
+                        subset = modern_langs,
+                        cores = cores
+                    )
+                    cat("Done.\\n")
+                    sub_df
+                    """
+                ).flatten()
 
-            # Ignore burn-in (10%)
-            dfs[col] = sub_df[int(burnin * sub_df.shape[0]) :]
-    df = pd.DataFrame.from_dict(dfs, orient="index").T
-
-    if save:
+                # Ignore burn-in (10%)
+                dfs[col] = sub_df[int(burnin * sub_df.shape[0]) :]
+        df = pd.DataFrame.from_dict(dfs, orient="index").T
         df.to_csv(f"{DEFAULT_BEAST_DIR}/summary_height.csv", index=False)
-
-    print(f"Ignoring {burnin*100}% burn-in for tree height plotting.")
+    else:
+        print(f"Loading existing height data from {output_file}")
+        df = pd.read_csv(output_file, index_col=0)
 
     df_melt = df.melt(var_name="Model", value_name=output_col)
 
@@ -183,6 +226,7 @@ def plot(
             x=xlabel,
             hue="Model",
             fill=True,
+            common_norm=False,
             palette=PALETTE,
             alpha=0.5,
             ax=ax,
@@ -200,6 +244,7 @@ def plot(
             data=data.query("Model.str.contains('Speech')"),
             x=xlabel,
             hue="Model",
+            common_norm=False,
             fill=True,
             palette=PALETTE[:2],
             alpha=0.5,
@@ -217,20 +262,22 @@ def plot(
 if __name__ == "__main__":
     args = parse_args()
 
+    print("Loading data...")
     data = load_data(
         speech_post_file=args.speech_posterior,
         speech_prio_file=args.speech_prior,
         cognate_post_file=args.cognate_posterior,
         cognate_prio_file=args.cognate_prior,
         cores=args.n_cores,
-        save=args.save,
+        overwrite=args.overwrite,
         burnin=args.burnin,
         output_col=args.xlabel,
     )
-
+    print("Plotting data...")
     plot(
         data=data,
         output_full=args.output_full,
         output_speech=args.output_speech,
         xlabel=args.xlabel,
     )
+    print("Done.")
