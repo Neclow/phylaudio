@@ -1,3 +1,4 @@
+library(ape)
 library(phangorn)
 
 pathnode <- function(phylo, tipsonly = TRUE) {
@@ -38,7 +39,9 @@ stemmy <- function(tre) {
 
 
 rtt_cov <- function(tre) {
-  if (!is.rooted(tre)) tre <- midpoint(tre)
+  if (!is.rooted(tre)) {
+    tre <- midpoint(tre)
+  }
   rtts <- pathnode(tre)[[1]]
   rttcov <- sd(rtts, na.rm = TRUE) / mean(rtts, na.rm = TRUE)
   return(rttcov)
