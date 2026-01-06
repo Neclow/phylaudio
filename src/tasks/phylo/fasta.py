@@ -87,7 +87,7 @@ def to_beast(input_file, output_file, template_beast_file):
             warnings.warn(
                 (
                     f"Duplicate sequence ID '{record.id}' found in FASTA file '{input_file}'. "
-                    "Ignoring current sequence."
+                    "Keeping the first occurrence."
                 ),
                 UserWarning,
             )
@@ -114,9 +114,16 @@ def to_beast(input_file, output_file, template_beast_file):
     for taxon_elm in root.findall("run")[0].findall(".//taxon"):
         taxon_content = taxon_elm.attrib
 
-        if taxon_content["id"] not in sequences:
+        if "id" in taxon_content:
+            key = "id"
+        elif "idref" in taxon_content:
+            key = "idref"
+        else:
+            raise ValueError("Taxon element missing 'id' or 'idref' attribute")
+
+        if taxon_content[key] not in sequences:
             taxonset_elm = root.findall("run")[0].findall(
-                f".//taxon[@id='{taxon_content['id']}']..."
+                f".//taxon[@{key}='{taxon_content[key]}']..."
             )[0]
             taxonset_elm.remove(taxon_elm)
 
