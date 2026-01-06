@@ -1,6 +1,6 @@
 library(dplyr)
 
-PER_SENTENCE_DIR = "data/trees/per_sentence"
+PER_SENTENCE_DIR <- "data/trees/per_sentence"
 
 source("src/tasks/phylo/stats.R")
 
@@ -8,7 +8,17 @@ get_iqtree_stats <- function(run_dir, pattern = "*.treefile") {
   files <- list.files(path = run_dir, pattern = pattern, full.names = TRUE)
 
   if (length(files) == 0) {
-    stop(paste("No files found in ", run_dir, " (pattern: ", pattern, ")", sep = ""), call. = FALSE)
+    stop(
+      paste(
+        "No files found in ",
+        run_dir,
+        " (pattern: ",
+        pattern,
+        ")",
+        sep = ""
+      ),
+      call. = FALSE
+    )
   }
 
   cat(paste("Found", length(files), "files.\n", sep = " "))
@@ -16,7 +26,9 @@ get_iqtree_stats <- function(run_dir, pattern = "*.treefile") {
 
   trs <- lapply(files, function(x) read.tree(x))
 
-  trs_meansup <- sapply(trs, function(x) mean(as.numeric(x$node.label), na.rm = TRUE))
+  trs_meansup <- sapply(trs, function(x) {
+    mean(as.numeric(x$node.label), na.rm = TRUE)
+  })
   trs_rttcov <- sapply(trs, rtt_cov)
   trs_stemmy <- sapply(trs, function(x) stemmy(x))
   trs_ntip <- sapply(trs, Ntip)
@@ -52,7 +64,10 @@ if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
 }
 
 if (length(args) < 1) {
-  stop("Usage: Rscript sentence_trees_stats.R <run_dir> [pattern]\nUse -h or --help for more information", call. = FALSE)
+  stop(
+    "Usage: Rscript sentence_trees_stats.R <run_dir> [pattern]\nUse -h or --help for more information",
+    call. = FALSE
+  )
 }
 
 run_dir <- args[1]
@@ -70,8 +85,16 @@ if (!dir.exists(run_dir)) {
   if (length(potential_dirs) == 0) {
     stop(paste("Directory not found:", run_dir), call. = FALSE)
   } else if (length(potential_dirs) > 1) {
-    stop(paste("Multiple directories found for run_dir '", run_dir, "':\n  ",
-               paste(potential_dirs, collapse = "\n  "), sep = ""), call. = FALSE)
+    stop(
+      paste(
+        "Multiple directories found for run_dir '",
+        run_dir,
+        "':\n  ",
+        paste(potential_dirs, collapse = "\n  "),
+        sep = ""
+      ),
+      call. = FALSE
+    )
   }
 
   run_dir <- potential_dirs[1]
