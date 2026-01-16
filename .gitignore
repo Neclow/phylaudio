@@ -188,9 +188,12 @@ data/eval/*
 !data/eval/README.md
 
 
-# Tree data (except README)
+# Tree data (except README and template)
 data/trees/*
 !data/trees/README.md
+!data/trees/beast/
+data/trees/beast/*
+!data/trees/beast/template.xml
 
 # My drafts
 tmp/
