@@ -30,17 +30,6 @@ def get_common_args():
         help="Pre-trained model",
     )
     parser.add_argument(
-        "--root-dir",
-        default=DEFAULT_ROOT_DIR,
-        help="Root folder path for analyses",
-    )
-    parser.add_argument(
-        "--cache-dir",
-        type=str,
-        default=DEFAULT_CACHE_DIR,
-        help="Path where cached models are stored",
-    )
-    parser.add_argument(
         "--max-length",
         type=int,
         help="Number of (audio: number of frames; text: number of tokens)",
@@ -79,7 +68,7 @@ def prepare_model(args, training=False):
 
     base_kwargs = {
         "model_id": args.model_id,
-        "cache_dir": args.cache_dir,
+        "cache_dir": DEFAULT_CACHE_DIR,
     }
 
     print(f"(common) Loading processor for {args.model_id}...")
@@ -120,7 +109,7 @@ def prepare_dataset(args, processor, **kwargs):
     core_dataset_args = {
         "dataset": args.dataset,
         "dtype": MODEL_ZOO[args.model_id]["dtype"],
-        "root_dir": args.root_dir,
+        "root_dir": DEFAULT_ROOT_DIR,
         "with_vad": args.with_vad,
         "processor": processor,
     }
