@@ -320,12 +320,20 @@ get_height <- function(
   tree_height
 }
 
+get_mrca_height <- function(tr, tips) {
+  depths <- node.depth.edgelength(tr)
+  tree_height <- max(depths)
+  mrca <- getMRCA(tr, tips)
+  tree_height - depths[mrca]
+}
+
 extract_beast_heights <- function(
   file = "",
   output_file = "",
   trees = NULL,
   cores = 1,
-  subset = NULL
+  subset = NULL,
+  tips = NULL
 ) {
   if (!is.null(trees)) {
     if (!inherits(trees, "phylo")) {
@@ -337,16 +345,22 @@ extract_beast_heights <- function(
     stop("argument 'file' or 'trees' must be provided")
   }
 
+  height_fn <- if (!is.null(tips)) {
+    function(tr) get_mrca_height(tr, tips)
+  } else {
+    function(tr) get_height(tr, subset = subset)
+  }
+
   if (length(trees) > 1) {
     registerDoParallel(cores = cores)
 
     heights <- foreach(i = seq_along(trees), .combine = rbind) %dopar%
       {
-        get_height(trees[[i]], subset = subset)
+        height_fn(trees[[i]])
       }
     heights
   } else {
-    get_height(trees, subset = subset)
+    heights <- height_fn(trees)
   }
 
   if (output_file != "") {
