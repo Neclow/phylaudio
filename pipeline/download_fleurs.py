@@ -13,41 +13,49 @@ from tqdm import tqdm
 
 from src._config import DEFAULT_AUDIO_DIR, DEFAULT_METADATA_DIR
 
-DOWNLOAD_URL = "https://huggingface.co/datasets/google/fleurs-r/resolve/main/data"
-FLEURS_R_LANGUAGES = f"{DEFAULT_METADATA_DIR}/fleurs-r/languages.json"
 TIMEOUT = 10
 
 
 def parse_args():
-    """Parse arguments for FLEURS-R data preparation"""
+    """Parse arguments for FLEURS(-R) data downloading"""
 
     parser = ArgumentParser(
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "output_dir",
+        "dataset",
         type=str,
-        default=DEFAULT_AUDIO_DIR,
-        help="Output dataset folder.",
+        default="fleurs-r",
+        help="Dataset to download. Currently only `fleurs-r` is supported.",
     )
+
     return parser.parse_args()
 
 
-def download(output_dir):
-    """Download the FLEURS-R dataset into output_dir"""
+def download(dataset):
+    """Download the FLEURS(-R) dataset"""
 
-    with open(FLEURS_R_LANGUAGES, "r", encoding="utf-8") as f:
+    download_url = f"https://huggingface.co/datasets/google/{dataset}/resolve/main/data"
+
+    metadata = f"{DEFAULT_METADATA_DIR}/{dataset}/languages.json"
+
+    if not os.path.isfile(metadata):
+        raise FileNotFoundError(
+            f"Metadata file not found: {metadata}. Please run `python pipeline/download_fleurs_metadata.py` first."
+        )
+
+    with open(metadata, "r", encoding="utf-8") as f:
         langs = list(json.load(f).keys())
 
     for i, lang in enumerate(langs):
         print(f"Downloading data from language {i+1}/{len(langs)}: {lang}")
-        lang_folder = f"{output_dir}/fleurs-r/{lang}/{lang}"
+        lang_folder = f"{DEFAULT_AUDIO_DIR}/{dataset}/{lang}/{lang}"
         audio_folder = f"{lang_folder}/audio"
         os.makedirs(lang_folder, exist_ok=True)
         os.makedirs(audio_folder, exist_ok=True)
         for split in ["train", "dev", "test"]:
             # Donwload transcripts
-            transcript_url = f"{DOWNLOAD_URL}/{lang}/{split}.tsv"
+            transcript_url = f"{download_url}/{lang}/{split}.tsv"
             response = requests.get(transcript_url, timeout=TIMEOUT)
 
             if response.status_code == 200:
@@ -65,7 +73,7 @@ def download(output_dir):
             split_folder = f"{audio_folder}/{split}"
             os.makedirs(split_folder, exist_ok=True)
 
-            audio_url = f"{DOWNLOAD_URL}/{lang}/audio/{split}.tar.gz"
+            audio_url = f"{download_url}/{lang}/audio/{split}.tar.gz"
 
             response = requests.get(audio_url, timeout=TIMEOUT)
 
@@ -75,9 +83,9 @@ def download(output_dir):
                     fa.write(response.content)
 
 
-def unzip(output_dir):
+def unzip(dataset):
     """Decompress all the downloaded tar.gz files"""
-    tar_files = sorted(glob(f"{output_dir}/fleurs-r/*/*/audio/*/*.tar.gz"))
+    tar_files = sorted(glob(f"{DEFAULT_AUDIO_DIR}/{dataset}/*/*/audio/*/*.tar.gz"))
     for tf in tqdm(tar_files, desc="Unzipping .tar.gz files"):
         tf_parent = str(Path(tf).parent)
         commands = (
@@ -90,9 +98,9 @@ def main():
     """Run main loop"""
     args = parse_args()
 
-    download(output_dir=args.output_dir)
+    download(dataset=args.dataset)
 
-    unzip(output_dir=args.output_dir)
+    unzip(dataset=args.dataset)
 
 
 if __name__ == "__main__":
