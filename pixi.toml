@@ -14,11 +14,13 @@ cuda = "12.6"
 
 [tasks]
 post_install = "bash scripts/post_install.sh"
-download_fleurs = "python -m pipeline.download_fleurs data/datasets"
+download_fleurs = "python -m pipeline.download_fleurs fleurs-r"
 download_glottolog = "python -m pipeline.download_glottolog fleurs-r"
 download_phoible = "python -m pipeline.download_phoible fleurs-r"
 download_models = "python -m pipeline.download_models data/models"
 download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r --preserve-branch-length"
+download_speakerpop = "python -m pipeline.download_speakerpop fleurs-r"
+download_fleurs_metadata = "python -m pipeline.download_fleurs_metadata fleurs-r"
 beast_phylolm = "Rscript pipeline/beast_phylolm.R"
 beast_generate_xml = "python -m pipeline.beast_generate_xml"
 lid = "python -m pipeline.language_identification"
@@ -85,6 +87,7 @@ speechbrain = ">=1.0.3, <2"
 openai-whisper = ">=20250625, <20250626"
 torch-pca = ">=1.1.0, <2"
 rapidfuzz = "==3.14.1"
+pypdf = ">=6.5.0, <7"
 
 [environments]
 default = { solve-group = "default" }

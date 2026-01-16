@@ -1,0 +1,516 @@
+{
+  "Afrikaans": {
+    "value": "7.2 million (2016) 10.3 million L2 speakers in South Africa (2011)",
+    "values": null,
+    "parsed_value": 7000000
+  },
+  "Amharic": {
+    "value": "L1: 35 million (2020) L2: 25 million (2019) Total: 60 million (2019\u20132020)",
+    "values": null,
+    "parsed_value": 35000000
+  },
+  "Arabic": {
+    "value": "335 million (2023)",
+    "values": null,
+    "parsed_value": 335000000
+  },
+  "Armenian": {
+    "value": "5.3 million (2013 \u2013 2021)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Assamese": {
+    "value": "L1: 15 million (2011) L2: 8.3 million (2011) Total: 24 million (2011)",
+    "values": null,
+    "parsed_value": 15000000
+  },
+  "Asturian": {
+    "value": "(Around 1/3 of Asturians cited 2000) 62% of Asturians (2017)",
+    "values": null,
+    "parsed_value": 100000
+  },
+  "Azerbaijani": {
+    "value": "24 million (2022)",
+    "values": null,
+    "parsed_value": 24000000
+  },
+  "Belarusian": {
+    "value": "5.094 million (2019 census) 1.3 million L2 speakers (2009 census)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Bengali": {
+    "value": "L1: 242 million (24.2 crore) (2011\u20132023) L2: 43 million (4.3 crore) (2011\u20132023) Total: 284 million (28.4 crore) (2011\u20132023)",
+    "values": null,
+    "parsed_value": 242000000
+  },
+  "Bosnian": {
+    "value": "3.1 million (2020\u20132023)",
+    "values": null,
+    "parsed_value": 3000000
+  },
+  "Bulgarian": {
+    "value": "L1: 6.8 million (2019\u20132023) L2: 1.2 million (2021) Total: 7.9 million (2019\u20132023)",
+    "values": null,
+    "parsed_value": 6000000
+  },
+  "Burmese": {
+    "value": "L1: 33 million (2019) L2: 10 million (no date)",
+    "values": null,
+    "parsed_value": 33000000
+  },
+  "Catalan": {
+    "value": "L1: 4.1 million (2022) L2: 5.1 million Total: 9.2 million",
+    "values": null,
+    "parsed_value": 4000000
+  },
+  "Cebuano": {
+    "value": "20 million (2023 estimate)",
+    "values": null,
+    "parsed_value": 20000000
+  },
+  "Croatian": {
+    "value": "L1: 5.1 million (2021\u20132023) L2: 1.3 million (2012)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Czech": {
+    "value": "L1: 9.8 million (2021) L2: 2.7 million (2012) Total: 12 million (2012\u20132021)",
+    "values": null,
+    "parsed_value": 9000000
+  },
+  "Danish": {
+    "value": "6.0 million (2019)",
+    "values": null,
+    "parsed_value": 6000000
+  },
+  "Dutch": {
+    "value": "25 million (2021) Total (L1 plus L2 speakers): 30 million (2021)",
+    "values": null,
+    "parsed_value": 25000000
+  },
+  "English": {
+    "value": "L1: 380 million (2021)",
+    "values": ["  - L2: 1.077 billion (2021)[3]\n  - Total: 1.457 billion"],
+    "parsed_value": 380000000
+  },
+  "Estonian": {
+    "value": "1.2 million (2022)",
+    "values": null,
+    "parsed_value": 1000000
+  },
+  "Finnish": {
+    "value": "5.0 million Finland: 4.75 million (2023) Sweden: 200 000 \u2013 250 000 (2022) Norway: 8,000 (Kven) Russia (Karelia): 8,500 US: 26,000 (2020)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "French": {
+    "value": "L1: 74 million (2012\u20132024) L2: 238 million (2012\u20132022) Total: 312 million",
+    "values": null,
+    "parsed_value": 74000000
+  },
+  "Fula": {
+    "value": "L1: 37 million (2014\u20132021) L2: 2.7 million (2019)",
+    "values": null,
+    "parsed_value": 37000000
+  },
+  "Galician": {
+    "value": "2.4 million (2012) 58% of the population of Galicia (c. 1.56 million) are L1 speakers (2007)",
+    "values": null,
+    "parsed_value": 2000000
+  },
+  "Georgian": {
+    "value": "L1: 3.76 million (2020) L2: 150,000 (2014)",
+    "values": null,
+    "parsed_value": 3000000
+  },
+  "German": {
+    "value": "L1: 95 million L2: 80\u201385 million (2014)",
+    "values": null,
+    "parsed_value": 95000000
+  },
+  "Greek": {
+    "value": "13.5 million (2012)",
+    "values": null,
+    "parsed_value": 13000000
+  },
+  "Gujarati": {
+    "value": "L1: 57 million (2011 census) L2: 5.0 million (2011 census) Total: 62 million (2011)",
+    "values": null,
+    "parsed_value": 57000000
+  },
+  "Hausa": {
+    "value": "L1: 58 million (2023\u20132024)",
+    "values": [
+      "  - L2: 36 million (2021\u20132024)[1]\n  - Total: 94 million (2023\u20132024)[1]"
+    ],
+    "parsed_value": 58000000
+  },
+  "Hebrew": {
+    "value": "Revived in the late 19th century CE . 9 million speakers of Modern Hebrew, of which 5 million are native speakers and 3.3 million are second language speakers (2018)",
+    "values": null,
+    "parsed_value": 9000000
+  },
+  "Hungarian": {
+    "value": "14 million (2023)",
+    "values": null,
+    "parsed_value": 14000000
+  },
+  "Icelandic": {
+    "value": "(undated figure of 390,000)",
+    "values": null,
+    "parsed_value": 390000
+  },
+  "Igbo": {
+    "value": "34 million (2023)",
+    "values": null,
+    "parsed_value": 34000000
+  },
+  "Indonesian": {
+    "value": "L1: 75 million (2020) L2: 177 million (2020) Total: 252 million (2020)",
+    "values": null,
+    "parsed_value": 75000000
+  },
+  "Irish": {
+    "value": "L1: unknown People aged 3+ stating they could speak Irish \"very well\": (ROI, 2022) 195,029 Daily users outside education system: (ROI, 2022) 71,968 (NI, 2021) 43,557 L2: unknown People aged 3+ stating they could speak Irish: (ROI, 2022) 1,873,997 (NI, 2021) 228,600",
+    "values": null,
+    "parsed_value": 195029
+  },
+  "Italian": {
+    "value": "L1: 65 million (2022) L2: 3.1-21 million Total: 85 million",
+    "values": null,
+    "parsed_value": 65000000
+  },
+  "Japanese": {
+    "value": "123 million (2020)",
+    "values": null,
+    "parsed_value": 123000000
+  },
+  "Javanese": {
+    "value": "68 million (2015)",
+    "values": null,
+    "parsed_value": 68000000
+  },
+  "Kamba": {
+    "value": "4.6 million (2019 census) 600,000 L2 speakers",
+    "values": null,
+    "parsed_value": 4000000
+  },
+  "Kannada": {
+    "value": "L1: 44 million (2011) L2: 15 million (2011)",
+    "values": null,
+    "parsed_value": 44000000
+  },
+  "Kazakh": {
+    "value": "16 million (2021 census)",
+    "values": null,
+    "parsed_value": 16000000
+  },
+  "Khmer": {
+    "value": "L1: 19 million (2019) L2: 1 million (2024) Total: 21 million (2019\u20132024)",
+    "values": null,
+    "parsed_value": 19000000
+  },
+  "Korean": {
+    "value": "81 million (2019\u20132022)",
+    "values": null,
+    "parsed_value": 81000000
+  },
+  "Kyrgyz": {
+    "value": "5.15 million (2009 census)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Lao": {
+    "value": "L1: 3.7 million (2015) L2: 800,000 (no date)",
+    "values": null,
+    "parsed_value": 3000000
+  },
+  "Latvian": {
+    "value": "1.5 million (2023)",
+    "values": null,
+    "parsed_value": 1000000
+  },
+  "Lingala": {
+    "value": "L1: 21 million (2021) L2: 20 million (2021)",
+    "values": null,
+    "parsed_value": 21000000
+  },
+  "Lithuanian": {
+    "value": "4.0 million (2022)",
+    "values": null,
+    "parsed_value": 4000000
+  },
+  "Luo": {
+    "value": "4.2 million (2009 census)",
+    "values": null,
+    "parsed_value": 4000000
+  },
+  "Luxembourgish": {
+    "value": "400,000 (2024)",
+    "values": null,
+    "parsed_value": 400000
+  },
+  "Macedonian": {
+    "value": "1.7 million (2022)",
+    "values": null,
+    "parsed_value": 1000000
+  },
+  "Malay": {
+    "value": "L1: 82 million (2004\u20132010) Total (L1 and L2): 290 million (2009)",
+    "values": null,
+    "parsed_value": 82000000
+  },
+  "Maltese": {
+    "value": "570,000 (2012)",
+    "values": null,
+    "parsed_value": 570000
+  },
+  "Marathi": {
+    "value": "L1: 83 million (2011) L2: 16 million (2011)",
+    "values": null,
+    "parsed_value": 83000000
+  },
+  "Mongolian": {
+    "value": "5 million (2020\u20132022)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Nepali": {
+    "value": "L1: 19 million (2011\u20132021) L2: 14 million (2021 census) Total: 32 million",
+    "values": null,
+    "parsed_value": 19000000
+  },
+  "Northern Sotho": {
+    "value": "6.2 million (2022 Census) 9.1 million L2 speakers (2002)",
+    "values": null,
+    "parsed_value": 6000000
+  },
+  "Norwegian": {
+    "value": "4.32 million (2012)",
+    "values": null,
+    "parsed_value": 4000000
+  },
+  "Nyanja": {
+    "value": null,
+    "values": null,
+    "parsed_value": null
+  },
+  "Occitan": {
+    "value": "(c. 200,000 cited 1990 \u2013 2012) Estimates range from 100,000 to 800,000 total speakers (2007\u20132012), with 68,000 in Italy (2005 survey), 4,000 in Spain (Val d'Aran)",
+    "values": null,
+    "parsed_value": 200000
+  },
+  "Oromo": {
+    "value": "45.5 million (all countries) (2019\u20132024)",
+    "values": null,
+    "parsed_value": 45000000
+  },
+  "Persian": {
+    "value": "L1: 91 million (2023\u20132024) L2: 35 million (2020\u20132023) Total: 127 million (2020\u20132024)",
+    "values": null,
+    "parsed_value": 91000000
+  },
+  "Polish": {
+    "value": "L1: 40 million (2021) L2: 2.1 million (2021) Total: 43 million (2021)",
+    "values": null,
+    "parsed_value": 40000000
+  },
+  "Punjabi": {
+    "value": "150 million (2011\u20132023)",
+    "values": null,
+    "parsed_value": 150000000
+  },
+  "Romanian": {
+    "value": "22 million (2020)",
+    "values": null,
+    "parsed_value": 22000000
+  },
+  "Russian": {
+    "value": "L1: 145 million (2020\u20132023) L2: 108 million (2012\u20132020) Total: 253 million (2012\u20132023)",
+    "values": null,
+    "parsed_value": 145000000
+  },
+  "Serbian": {
+    "value": "8.2 million (2022\u20132023)",
+    "values": null,
+    "parsed_value": 8000000
+  },
+  "Shona": {
+    "value": "L1: 9.6 million (2010\u20132023) L2: 4.5 million (2023) Total: 14 million (2010\u20132023)",
+    "values": null,
+    "parsed_value": 9000000
+  },
+  "Sindhi": {
+    "value": "37 million (2011\u20132023)",
+    "values": null,
+    "parsed_value": 37000000
+  },
+  "Slovak": {
+    "value": "L1: 5 million (2012\u20132021) L2: 2.1 million (2012)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Somali": {
+    "value": "24 million (2019\u20132024)",
+    "values": null,
+    "parsed_value": 24000000
+  },
+  "Spanish": {
+    "value": "L1: 519 million (2025) L2: 117 million (2025) Total: 636 million (2025)",
+    "values": null,
+    "parsed_value": 519000000
+  },
+  "Swahili": {
+    "value": "L1: 5.3 million (2019\u20132023) L2: 92 million (2019\u20132021)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Swedish": {
+    "value": "Native: 10 million (2012\u20132021) L2 speakers: 3 million",
+    "values": null,
+    "parsed_value": 10000000
+  },
+  "Tajik": {
+    "value": "10.5 million (2022\u20132023)",
+    "values": null,
+    "parsed_value": 10000000
+  },
+  "Tamil": {
+    "value": "L1: 79 million (2011\u20132019) L2: 7.6 million (2011) Total: 86 million (2011\u20132019)",
+    "values": null,
+    "parsed_value": 79000000
+  },
+  "Telugu": {
+    "value": "L1: 83 million (2011 census) L2: 13 million (2011 census)",
+    "values": null,
+    "parsed_value": 83000000
+  },
+  "Thai": {
+    "value": "L1: 27 million (2024)",
+    "values": ["  - L2: 44 million (2024)[2]\n  - Total: 71 million (2024)[1]"],
+    "parsed_value": 27000000
+  },
+  "Turkish": {
+    "value": "L1: 85 million (2006\u20132021) L2: 6.1 million (2019) Total: 91 million (2006\u20132021)",
+    "values": null,
+    "parsed_value": 85000000
+  },
+  "Ukrainian": {
+    "value": "L1: 32 million (2023) L2: 6.9 million (2023) Total: 39 million (2023)",
+    "values": null,
+    "parsed_value": 32000000
+  },
+  "Uzbek": {
+    "value": "34 million (incl. both Northern Uzbek & Southern Uzbek (2020\u20132022)",
+    "values": null,
+    "parsed_value": 34000000
+  },
+  "Vietnamese": {
+    "value": "L1: 86 million (2019\u20132023) L2: 11 million (2024) Total: 97 million (2019\u20132024)",
+    "values": null,
+    "parsed_value": 86000000
+  },
+  "Welsh": {
+    "value": null,
+    "values": [
+      "  - Wales: 538,300 (2021) (17.8% of the population of Wales at the 2021 census, including both L1 and L2 speakers)\n  - England: 110,000 (2007, estimated)[1]\n  - Argentina (Chubut): 1,500\u20135,000[2][3][4][5]\n  - Canada: <3,885 (L1)[6] (2011)\n  - United States: 2,003[7]\n  - Australia: 1,737[8]"
+    ],
+    "parsed_value": 538000
+  },
+  "Wolof": {
+    "value": "L1: 8.2 million (2022\u20132023) L2: 9.5 million (2023) Total: 18 million (2022\u20132023)",
+    "values": null,
+    "parsed_value": 8000000
+  },
+  "Xhosa": {
+    "value": "8 million (2013) 11 million L2 speakers (2002)",
+    "values": null,
+    "parsed_value": 8000000
+  },
+  "Yoruba": {
+    "value": "L1: 48 million (2023) L2: 2.0 million (no date) Total: 50 million (2023)",
+    "values": null,
+    "parsed_value": 48000000
+  },
+  "Zulu": {
+    "value": "L1: 12 million (2013\u20132017) L2: 16 million (2002) Total: 28 million",
+    "values": null,
+    "parsed_value": 12000000
+  },
+  "Filipino (Tagalog)": {
+    "value": "L1: 29 million (2010) L2: 54 million (2020) Total: 83 million",
+    "values": null,
+    "parsed_value": 29000000
+  },
+  "Ganda": {
+    "value": "L1: 5.6 million (2014) L2: 5.4 million (2014)",
+    "values": null,
+    "parsed_value": 5000000
+  },
+  "Hindi": {
+    "value": "L1: 345 million (2011 census) L2: 264 million (2020) Total: 610 million (2011\u20132020)",
+    "values": null,
+    "parsed_value": 345000000
+  },
+  "Kabuverdianu": {
+    "value": "871,000 (2017)",
+    "values": null,
+    "parsed_value": 871000
+  },
+  "Malayalam": {
+    "value": "L1: 37 million (2011) L2: 810,000 (2011) Total: 38 million (2011)",
+    "values": null,
+    "parsed_value": 37000000
+  },
+  "Mandarin Chinese": {
+    "value": "L1: 990 million (2022) L2: 194 million (no date) Total: 1.184 billion (2022)",
+    "values": null,
+    "parsed_value": 990000000
+  },
+  "Maori": {
+    "value": "50,000 (well or very well) (2015) 186,000 (some knowledge) (2018)",
+    "values": null,
+    "parsed_value": 50000
+  },
+  "Oriya": {
+    "value": "L1: 34 million (2011\u20132019) L2: 3.6 million (2001)",
+    "values": null,
+    "parsed_value": 34000000
+  },
+  "Pashto": {
+    "value": "L1: 51 million (2017\u20132023) L2: 4.9 million (2022)",
+    "values": null,
+    "parsed_value": 51000000
+  },
+  "Portuguese (Brazil)": {
+    "value": "L1: 250 million (2012\u20132022) L2: 17 million (2022) Total: 267 million (2012\u20132022)",
+    "values": null,
+    "parsed_value": 250000000
+  },
+  "Slovenian": {
+    "value": "2.5 million (2010)",
+    "values": null,
+    "parsed_value": 2000000
+  },
+  "Umbundu": {
+    "value": "7,000,000 (2018)",
+    "values": null,
+    "parsed_value": 7000000
+  },
+  "Urdu": {
+    "value": "L1: 78 million (2011\u20132023) L2: 168 million (2011\u20132020) Total: 246 million (2011\u20132023)",
+    "values": null,
+    "parsed_value": 78000000
+  },
+  "Cantonese Chinese": {
+    "value": "L1: 85 million (2021\u20132024) L2: 550,000 (2021) Total: 86 million (2021\u20132024)",
+    "values": null,
+    "parsed_value": 85000000
+  },
+  "Sorani Kurdish": {
+    "value": "6.1 million (2023\u20132024)",
+    "values": null,
+    "parsed_value": 6000000
+  }
+}

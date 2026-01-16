@@ -1,701 +1,1004 @@
 {
   "af_za": {
     "full": "Afrikaans",
-    "sonar": "afr_Latn",
+    "fleurs": "Afrikaans",
+    "fleurs_iso639-3": "afr",
     "glottolog": "afri1274",
-    "speakers": 17.0,
+    "speakers": {
+      "wikimedia": 7.0,
+      "linguameta": 7.3
+    },
+    "iecor": "Afrikaans",
     "taxonset": "germanic"
   },
   "am_et": {
     "full": "Amharic",
-    "sonar": "amh_Ethi",
+    "fleurs": "Amharic",
+    "fleurs_iso639-3": "amh",
     "glottolog": "amha1245",
-    "speakers": 22.0
+    "speakers": {
+      "wikimedia": 35.0,
+      "linguameta": 36.0
+    }
   },
   "ar_eg": {
-    "full": "Cairo Arabic",
-    "sonar": "arz_Arab",
-    "glottolog": "egyp1253",
-    "speakers": 78.0
+    "full": "Standard Arabic",
+    "fleurs": "Arabic",
+    "fleurs_iso639-3": "ara",
+    "glottolog": "stan1318",
+    "speakers": {
+      "wikimedia": 335.0,
+      "linguameta": 346.3
+    }
+  },
+  "hy_am": {
+    "full": "Eastern Armenian",
+    "fleurs": "Armenian",
+    "fleurs_iso639-3": "hye",
+    "glottolog": "nucl1235",
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 3.0
+    },
+    "iecor": "ArmenianEastern",
+    "taxonset": "armenian"
   },
   "as_in": {
     "full": "Assamese",
-    "sonar": "asm_Beng",
+    "fleurs": "Assamese",
+    "fleurs_iso639-3": "asm",
     "glottolog": "assa1263",
-    "speakers": 13.0,
+    "speakers": {
+      "wikimedia": 15.0,
+      "linguameta": 17.0
+    },
     "iecor": "Assamese",
     "taxonset": "indoaryan"
   },
-  "ast_es": {
-    "full": "Asturian",
-    "sonar": "ast_Latn",
-    "glottolog": "astu1245",
-    "speakers": 0.6
-  },
   "az_az": {
-    "full": "Azerbaijani",
-    "sonar": "azj_Latn",
+    "full": "North Azerbaijani",
+    "fleurs": "Azerbaijani",
+    "fleurs_iso639-3": "azj",
     "glottolog": "nort2697",
-    "speakers": 18.0
+    "speakers": {
+      "wikimedia": 24.0,
+      "linguameta": 24.0
+    }
   },
   "be_by": {
     "full": "Belarusian",
-    "sonar": "bel_Cyrl",
+    "fleurs": "Belarusian",
+    "fleurs_iso639-3": "bel",
     "glottolog": "bela1254",
-    "speakers": 3.0,
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 9.5
+    },
     "iecor": "Belarusian",
-    "taxonset": "slavic"
-  },
-  "bg_bg": {
-    "full": "Bulgarian",
-    "sonar": "bul_Cyrl",
-    "glottolog": "bulg1262",
-    "speakers": 7.0,
-    "iecor": "Bulgarian",
     "taxonset": "slavic"
   },
   "bn_in": {
     "full": "Bengali",
-    "sonar": "ben_Beng",
+    "fleurs": "Bengali",
+    "fleurs_iso639-3": "ben",
     "glottolog": "beng1280",
-    "speakers": 260.0,
+    "speakers": {
+      "wikimedia": 242.0,
+      "linguameta": 266.0
+    },
     "iecor": "Bengali",
     "taxonset": "indoaryan"
   },
   "bs_ba": {
-    "full": "Bosnian",
-    "sonar": "bos_Latn",
+    "full": "Bosnian Standard",
+    "fleurs": "Bosnian",
+    "fleurs_iso639-3": "bos",
     "glottolog": "bosn1245",
-    "speakers": 9.0,
+    "speakers": {
+      "wikimedia": 3.0,
+      "linguameta": 3.8
+    },
+    "iecor": "SerboCroatian",
     "taxonset": "slavic"
+  },
+  "bg_bg": {
+    "full": "Bulgarian",
+    "fleurs": "Bulgarian",
+    "fleurs_iso639-3": "bul",
+    "glottolog": "bulg1262",
+    "speakers": {
+      "wikimedia": 6.0,
+      "linguameta": 7.0
+    },
+    "iecor": "Bulgarian",
+    "taxonset": "slavic"
+  },
+  "my_mm": {
+    "full": "Burmese",
+    "fleurs": "Burmese",
+    "fleurs_iso639-3": "mya",
+    "glottolog": "nucl1310",
+    "speakers": {
+      "wikimedia": 33.0,
+      "linguameta": 36.0
+    }
   },
   "ca_es": {
     "full": "Catalan",
-    "sonar": "cat_Latn",
+    "fleurs": "Catalan",
+    "fleurs_iso639-3": "cat",
     "glottolog": "stan1289",
-    "speakers": 4.0,
+    "speakers": {
+      "wikimedia": 4.0,
+      "linguameta": 8.5
+    },
     "iecor": "Catalan",
     "taxonset": "latinofaliscan"
   },
-  "ceb_ph": {
-    "full": "Cebuano",
-    "sonar": "ceb_Latn",
-    "glottolog": "cebu1242",
-    "speakers": 16.0
-  },
-  "ckb_iq": {
-    "full": "Kurdish Central",
-    "sonar": "ckb_Arab",
-    "glottolog": "cent1972",
-    "speakers": 5.3,
-    "iecor": "KurdishCJafi",
-    "taxonset": "iranian"
-  },
-  "cmn_hans_cn": {
-    "full": "Mandarin",
-    "sonar": "zho_Hans",
-    "glottolog": "mand1415",
-    "speakers": 940.0
+  "hr_hr": {
+    "full": "Croatian Standard",
+    "fleurs": "Croatian",
+    "fleurs_iso639-3": "hrv",
+    "glottolog": "croa1245",
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 4.7
+    },
+    "iecor": "SerboCroatian",
+    "taxonset": "slavic"
   },
   "cs_cz": {
     "full": "Czech",
-    "sonar": "ces_Latn",
+    "fleurs": "Czech",
+    "fleurs_iso639-3": "ces",
     "glottolog": "czec1258",
-    "speakers": 10.0,
+    "speakers": {
+      "wikimedia": 9.0,
+      "linguameta": 10.0
+    },
     "iecor": "Czech",
     "taxonset": "slavic"
   },
-  "cy_gb": {
-    "full": "Welsh",
-    "sonar": "cym_Latn",
-    "glottolog": "wels1247",
-    "speakers": 0.7,
-    "iecor": "WelshNorth"
-  },
   "da_dk": {
     "full": "Danish",
-    "sonar": "dan_Latn",
+    "fleurs": "Danish",
+    "fleurs_iso639-3": "dan",
     "glottolog": "dani1285",
-    "speakers": 5.0,
+    "speakers": {
+      "wikimedia": 6.0,
+      "linguameta": 5.5
+    },
     "iecor": "Danish",
     "taxonset": "germanic"
   },
+  "nl_nl": {
+    "full": "Dutch",
+    "fleurs": "Dutch",
+    "fleurs_iso639-3": "nld",
+    "glottolog": "dutc1256",
+    "speakers": {
+      "wikimedia": 25.0,
+      "linguameta": 24.1
+    },
+    "iecor": "Dutch",
+    "taxonset": "germanic"
+  },
+  "en_us": {
+    "full": "English",
+    "fleurs": "English",
+    "fleurs_iso639-3": "eng",
+    "glottolog": "stan1293",
+    "speakers": {
+      "wikimedia": 380.0,
+      "linguameta": 1267.4
+    },
+    "iecor": "English",
+    "taxonset": "germanic"
+  },
+  "et_ee": {
+    "full": "Estonian",
+    "fleurs": "Estonian",
+    "fleurs_iso639-3": "est",
+    "glottolog": "esto1258",
+    "speakers": {
+      "wikimedia": 1.0,
+      "linguameta": 1.2
+    }
+  },
+  "fi_fi": {
+    "full": "Finnish",
+    "fleurs": "Finnish",
+    "fleurs_iso639-3": "fin",
+    "glottolog": "finn1318",
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 5.2
+    }
+  },
+  "fr_fr": {
+    "full": "French",
+    "fleurs": "French",
+    "fleurs_iso639-3": "fra",
+    "glottolog": "stan1290",
+    "speakers": {
+      "wikimedia": 74.0,
+      "linguameta": 203.2
+    },
+    "iecor": "French",
+    "taxonset": "latinofaliscan"
+  },
+  "ff_sn": {
+    "full": "Fula",
+    "fleurs": "Fula",
+    "fleurs_iso639-3": "ful",
+    "glottolog": "fula1264",
+    "speakers": {
+      "wikimedia": 37.0,
+      "linguameta": 37.0
+    }
+  },
+  "gl_es": {
+    "full": "Galician",
+    "fleurs": "Galician",
+    "fleurs_iso639-3": "glg",
+    "glottolog": "gali1258",
+    "speakers": {
+      "wikimedia": 2.0,
+      "linguameta": 3.5
+    },
+    "iecor": "Galician",
+    "taxonset": "latinofaliscan"
+  },
+  "lg_ug": {
+    "full": "Ganda",
+    "fleurs": "Ganda",
+    "fleurs_iso639-3": "lug",
+    "glottolog": "gand1255",
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 5.6
+    }
+  },
+  "ka_ge": {
+    "full": "Georgian",
+    "fleurs": "Georgian",
+    "fleurs_iso639-3": "kat",
+    "glottolog": "nucl1302",
+    "speakers": {
+      "wikimedia": 3.0,
+      "linguameta": 3.4
+    }
+  },
   "de_de": {
     "full": "German",
-    "sonar": "deu_Latn",
+    "fleurs": "German",
+    "fleurs_iso639-3": "deu",
     "glottolog": "stan1295",
-    "speakers": 83.0,
+    "speakers": {
+      "wikimedia": 95.0,
+      "linguameta": 91.7
+    },
     "iecor": "German",
     "taxonset": "germanic"
   },
   "el_gr": {
-    "full": "Greek",
-    "sonar": "ell_Grek",
+    "full": "Modern Greek",
+    "fleurs": "Greek",
+    "fleurs_iso639-3": "ell",
     "glottolog": "mode1248",
-    "speakers": 13.0,
+    "speakers": {
+      "wikimedia": 13.0,
+      "linguameta": 12.2
+    },
     "iecor": "Greek",
     "taxonset": "Greek"
   },
-  "en_us": {
-    "full": "English",
-    "sonar": "eng_Latn",
-    "glottolog": "stan1293",
-    "speakers": 550.0,
-    "iecor": "English",
-    "taxonset": "germanic"
-  },
-  "es_419": {
-    "full": "Spanish",
-    "sonar": "spa_Latn",
-    "glottolog": "stan1288",
-    "speakers": 490.0,
-    "iecor": "Spanish",
-    "taxonset": "latinofaliscan"
-  },
-  "et_ee": {
-    "full": "Estonian",
-    "sonar": "est_Latn",
-    "glottolog": "esto1258",
-    "speakers": 1.0
-  },
-  "fa_ir": {
-    "full": "Persian",
-    "sonar": "pes_Arab",
-    "glottolog": "west2369",
-    "speakers": 40.0,
-    "iecor": "PersianTehran",
-    "taxonset": "iranian"
-  },
-  "fi_fi": {
-    "full": "Finnish",
-    "sonar": "fin_Latn",
-    "glottolog": "finn1318",
-    "speakers": 5.0
-  },
-  "fil_ph": {
-    "full": "Tagalog",
-    "sonar": "tgl_Latn",
-    "glottolog": "taga1270",
-    "speakers": 29.0
-  },
-  "ff_sn": {
-    "full": "Fula",
-    "sonar": "fuv_Latn",
-    "glottolog": "nige1253",
-    "speakers": 12.0
-  },
-  "fr_fr": {
-    "full": "French",
-    "sonar": "fra_Latn",
-    "glottolog": "stan1290",
-    "speakers": 280.0,
-    "iecor": "French",
-    "taxonset": "latinofaliscan"
-  },
-  "ga_ie": {
-    "full": "Irish Gaelic",
-    "sonar": "gle_Latn",
-    "glottolog": "iris1253",
-    "speakers": 0.2,
-    "iecor": "GaelicIrish"
-  },
-  "gl_es": {
-    "full": "Galician",
-    "sonar": "glg_Latn",
-    "glottolog": "gali1258",
-    "speakers": 2.0,
-    "taxonset": "latinofaliscan"
-  },
   "gu_in": {
     "full": "Gujarati",
-    "sonar": "grn_Latn",
+    "fleurs": "Gujarati",
+    "fleurs_iso639-3": "guj",
     "glottolog": "guja1252",
-    "speakers": 56.0,
+    "speakers": {
+      "wikimedia": 57.0,
+      "linguameta": 60.0
+    },
+    "iecor": "Gujarati",
     "taxonset": "indoaryan"
   },
   "ha_ng": {
     "full": "Hausa",
-    "sonar": "hau_Latn",
+    "fleurs": "Hausa",
+    "fleurs_iso639-3": "hau",
     "glottolog": "haus1257",
-    "speakers": 70.0
+    "speakers": {
+      "wikimedia": 58.0,
+      "linguameta": 28.2
+    }
   },
   "he_il": {
-    "full": "Hebrew",
-    "sonar": "heb_Hebr",
+    "full": "Modern Hebrew",
+    "fleurs": "Hebrew",
+    "fleurs_iso639-3": "heb",
     "glottolog": "hebr1245",
-    "speakers": 4.0
+    "speakers": {
+      "wikimedia": 9.0,
+      "linguameta": 8.7
+    }
   },
   "hi_in": {
     "full": "Hindi",
-    "sonar": "hin_Deva",
+    "fleurs": "Hindi",
+    "fleurs_iso639-3": "hin",
     "glottolog": "hind1269",
-    "speakers": 320.0,
+    "speakers": {
+      "wikimedia": 345.0,
+      "linguameta": 544.0
+    },
     "iecor": "Hindi",
     "taxonset": "indoaryan"
   },
-  "hr_hr": {
-    "full": "Croatian",
-    "sonar": "hrv_Latn",
-    "glottolog": "croa1245",
-    "speakers": 4.0,
-    "iecor": "SerboCroatian",
-    "taxonset": "slavic"
-  },
   "hu_hu": {
     "full": "Hungarian",
-    "sonar": "hun_Latn",
+    "fleurs": "Hungarian",
+    "fleurs_iso639-3": "hun",
     "glottolog": "hung1274",
-    "speakers": 13.0
-  },
-  "hy_am": {
-    "full": "Armenian",
-    "sonar": "hye_Armn",
-    "glottolog": "nucl1235",
-    "speakers": 6.0,
-    "iecor": "ArmenianEastern",
-    "taxonset": "armenian"
-  },
-  "id_id": {
-    "full": "Indonesian",
-    "sonar": "ind_Latn",
-    "glottolog": "indo1317",
-    "speakers": 200.0
-  },
-  "ig_ng": {
-    "full": "Igbo",
-    "sonar": "ibo_Latn",
-    "glottolog": "nucl1417",
-    "speakers": 18.0
+    "speakers": {
+      "wikimedia": 14.0,
+      "linguameta": 11.8
+    }
   },
   "is_is": {
     "full": "Icelandic",
-    "sonar": "isl_Latn",
+    "fleurs": "Icelandic",
+    "fleurs_iso639-3": "isl",
     "glottolog": "icel1247",
-    "speakers": 0.3,
+    "speakers": {
+      "wikimedia": 0.4,
+      "linguameta": 0.4
+    },
     "iecor": "Icelandic",
     "taxonset": "germanic"
   },
+  "ig_ng": {
+    "full": "Igbo",
+    "fleurs": "Igbo",
+    "fleurs_iso639-3": "ibo",
+    "glottolog": "nucl1417",
+    "speakers": {
+      "wikimedia": 34.0,
+      "linguameta": 28.0
+    }
+  },
+  "id_id": {
+    "full": "Standard Indonesian",
+    "fleurs": "Indonesian",
+    "fleurs_iso639-3": "ind",
+    "glottolog": "indo1316",
+    "speakers": {
+      "wikimedia": 75.0,
+      "linguameta": 171.0
+    }
+  },
+  "ga_ie": {
+    "full": "Irish",
+    "fleurs": "Irish",
+    "fleurs_iso639-3": "gle",
+    "glottolog": "iris1253",
+    "speakers": {
+      "wikimedia": 0.2,
+      "linguameta": 1.1
+    },
+    "iecor": "GaelicIrish"
+  },
   "it_it": {
     "full": "Italian",
-    "sonar": "ita_Latn",
+    "fleurs": "Italian",
+    "fleurs_iso639-3": "ita",
     "glottolog": "ital1282",
-    "speakers": 61.0,
+    "speakers": {
+      "wikimedia": 65.0,
+      "linguameta": 65.3
+    },
     "iecor": "Italian",
     "taxonset": "latinofaliscan"
   },
   "ja_jp": {
     "full": "Japanese",
-    "sonar": "jpn_Jpan",
+    "fleurs": "Japanese",
+    "fleurs_iso639-3": "jpn",
     "glottolog": "nucl1643",
-    "speakers": 130.0
+    "speakers": {
+      "wikimedia": 123.0,
+      "linguameta": 119.0
+    }
   },
   "jv_id": {
     "full": "Javanese",
-    "sonar": "jav_Latn",
+    "fleurs": "Javanese",
+    "fleurs_iso639-3": "jav",
     "glottolog": "java1254",
-    "speakers": 85.0
-  },
-  "ka_ge": {
-    "full": "Georgian",
-    "sonar": "kat_Geor",
-    "glottolog": "nucl1302",
-    "speakers": 4.0
-  },
-  "kam_ke": {
-    "full": "Kamba Kenya",
-    "sonar": "kam_Latn",
-    "glottolog": "kamb1297",
-    "speakers": 4.6
-  },
-  "kea_cv": {
-    "full": "Kabuverdianu",
-    "sonar": "kea_Latn",
-    "glottolog": "kabu1256",
-    "speakers": 0.9
-  },
-  "kk_kz": {
-    "full": "Kazakh",
-    "sonar": "kaz_Cyrl",
-    "glottolog": "kaza1248",
-    "speakers": 11.0
-  },
-  "km_kh": {
-    "full": "Khmer",
-    "sonar": "khm_Khmr",
-    "glottolog": "cent1989",
-    "speakers": 16.0
+    "speakers": {
+      "wikimedia": 68.0,
+      "linguameta": 91.0
+    }
   },
   "kn_in": {
     "full": "Kannada",
-    "sonar": "kan_Knda",
+    "fleurs": "Kannada",
+    "fleurs_iso639-3": "kan",
     "glottolog": "nucl1305",
-    "speakers": 43.0
+    "speakers": {
+      "wikimedia": 44.0,
+      "linguameta": 49.0
+    }
+  },
+  "kk_kz": {
+    "full": "Kazakh",
+    "fleurs": "Kazakh",
+    "fleurs_iso639-3": "kaz",
+    "glottolog": "kaza1248",
+    "speakers": {
+      "wikimedia": 16.0,
+      "linguameta": 13.2
+    }
+  },
+  "km_kh": {
+    "full": "Central Khmer",
+    "fleurs": "Khmer",
+    "fleurs_iso639-3": "khm",
+    "glottolog": "cent1989",
+    "speakers": {
+      "wikimedia": 19.0,
+      "linguameta": 15.0
+    }
   },
   "ko_kr": {
     "full": "Korean",
-    "sonar": "kor_Hang",
+    "fleurs": "Korean",
+    "fleurs_iso639-3": "kor",
     "glottolog": "kore1280",
-    "speakers": 52.0
+    "speakers": {
+      "wikimedia": 81.0,
+      "linguameta": 75.0
+    }
   },
   "ky_kg": {
-    "full": "Kyrgyz",
-    "sonar": "kir_Cyrl",
+    "full": "Kirghiz",
+    "fleurs": "Kyrgyz",
+    "fleurs_iso639-3": "kir",
     "glottolog": "kirg1245",
-    "speakers": 8.0
-  },
-  "lb_lu": {
-    "full": "Luxembourgish",
-    "sonar": "ltz_Latn",
-    "glottolog": "luxe1243",
-    "speakers": 0.4,
-    "iecor": "Luxembourgish",
-    "taxonset": "germanic"
-  },
-  "lg_ug": {
-    "full": "Luganda",
-    "sonar": "lug_Latn",
-    "glottolog": "gand1255",
-    "speakers": 5.6
-  },
-  "ln_cd": {
-    "full": "Lingala",
-    "sonar": "lin_Latn",
-    "glottolog": "ling1263",
-    "speakers": 15.0
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 2.9
+    }
   },
   "lo_la": {
     "full": "Lao",
-    "sonar": "lao_Laoo",
+    "fleurs": "Lao",
+    "fleurs_iso639-3": "lao",
     "glottolog": "laoo1244",
-    "speakers": 20.0
-  },
-  "lt_lt": {
-    "full": "Lithuanian",
-    "sonar": "lit_Latn",
-    "glottolog": "lith1251",
-    "speakers": 2.0,
-    "iecor": "Lithuanian",
-    "taxonset": "baltic"
-  },
-  "luo_ke": {
-    "full": "Luo",
-    "sonar": "luo_Latn",
-    "glottolog": "luok1236",
-    "speakers": 4.0
+    "speakers": {
+      "wikimedia": 3.0,
+      "linguameta": 5.1
+    }
   },
   "lv_lv": {
     "full": "Latvian",
-    "sonar": "lvs_Latn",
-    "glottolog": "stan1325",
-    "speakers": 2.0,
+    "fleurs": "Latvian",
+    "fleurs_iso639-3": "lav",
+    "glottolog": "latv1249",
+    "speakers": {
+      "wikimedia": 1.0,
+      "linguameta": 1.1
+    },
     "iecor": "Latvian",
     "taxonset": "baltic"
   },
-  "mi_nz": {
-    "full": "Maori",
-    "sonar": "mri_Latn",
-    "glottolog": "maor1246",
-    "speakers": 0.2
+  "ln_cd": {
+    "full": "Kinshasa Lingala",
+    "fleurs": "Lingala",
+    "fleurs_iso639-3": "lin",
+    "glottolog": "ling1263",
+    "speakers": {
+      "wikimedia": 21.0,
+      "linguameta": 3.4
+    }
+  },
+  "lt_lt": {
+    "full": "Lithuanian",
+    "fleurs": "Lithuanian",
+    "fleurs_iso639-3": "lit",
+    "glottolog": "lith1251",
+    "speakers": {
+      "wikimedia": 4.0,
+      "linguameta": 2.3
+    },
+    "iecor": "Lithuanian",
+    "taxonset": "baltic"
+  },
+  "lb_lu": {
+    "full": "Moselle Franconian",
+    "fleurs": "Luxembourgish",
+    "fleurs_iso639-3": "ltz",
+    "glottolog": "luxe1241",
+    "speakers": {
+      "wikimedia": 0.4,
+      "linguameta": 0.4
+    },
+    "iecor": "Luxembourgish",
+    "taxonset": "germanic"
   },
   "mk_mk": {
     "full": "Macedonian",
-    "sonar": "mkd_Cyrl",
+    "fleurs": "Macedonian",
+    "fleurs_iso639-3": "mkd",
     "glottolog": "mace1250",
-    "speakers": 1.0,
+    "speakers": {
+      "wikimedia": 1.0,
+      "linguameta": 1.4
+    },
     "iecor": "Macedonian",
     "taxonset": "slavic"
   },
+  "ms_my": {
+    "full": "Standard Malay",
+    "fleurs": "Malay",
+    "fleurs_iso639-3": "msa",
+    "glottolog": "stan1306",
+    "speakers": {
+      "wikimedia": 82.0,
+      "linguameta": 34.4
+    }
+  },
   "ml_in": {
     "full": "Malayalam",
-    "sonar": "mal_Mlym",
+    "fleurs": "Malayalam",
+    "fleurs_iso639-3": "mal",
     "glottolog": "mala1464",
-    "speakers": 77.0
-  },
-  "mn_mn": {
-    "full": "Mongolian",
-    "sonar": "khk_Cyrl",
-    "glottolog": "halh1238",
-    "speakers": 5.0
-  },
-  "mr_in": {
-    "full": "Marathi",
-    "sonar": "mar_Deva",
-    "glottolog": "mara1378",
-    "speakers": 83.0,
-    "iecor": "Marathi",
-    "taxonset": "indoaryan"
-  },
-  "ms_my": {
-    "full": "Malay",
-    "sonar": "zsm_Latn",
-    "glottolog": "band1353",
-    "speakers": 80.0
+    "speakers": {
+      "wikimedia": 37.0,
+      "linguameta": 42.0
+    }
   },
   "mt_mt": {
     "full": "Maltese",
-    "sonar": "mlt_Latn",
+    "fleurs": "Maltese",
+    "fleurs_iso639-3": "mlt",
     "glottolog": "malt1254",
-    "speakers": 0.5
+    "speakers": {
+      "wikimedia": 0.6,
+      "linguameta": 0.5
+    }
   },
-  "my_mm": {
-    "full": "Burmese",
-    "sonar": "mya_Mymr",
-    "glottolog": "nucl1310",
-    "speakers": 33.0
+  "mi_nz": {
+    "full": "Maori",
+    "fleurs": "Maori",
+    "fleurs_iso639-3": "mri",
+    "glottolog": "maor1246",
+    "speakers": {
+      "wikimedia": 0.0,
+      "linguameta": 0.1
+    }
   },
-  "nb_no": {
-    "full": "Norwegian Bokmaal",
-    "sonar": "nob_Latn",
-    "glottolog": "norw1258",
-    "speakers": 5,
-    "iecor": "NorwegianBokmal",
-    "taxonset": "germanic"
+  "mr_in": {
+    "full": "Marathi",
+    "fleurs": "Marathi",
+    "fleurs_iso639-3": "mar",
+    "glottolog": "mara1378",
+    "speakers": {
+      "wikimedia": 83.0,
+      "linguameta": 93.0
+    },
+    "iecor": "Marathi",
+    "taxonset": "indoaryan"
+  },
+  "mn_mn": {
+    "full": "Mongolian",
+    "fleurs": "Mongolian",
+    "fleurs_iso639-3": "mon",
+    "glottolog": "mong1331",
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 6.5
+    }
   },
   "ne_np": {
     "full": "Nepali",
-    "sonar": "npi_Deva",
+    "fleurs": "Nepali",
+    "fleurs_iso639-3": "npi",
     "glottolog": "nepa1254",
-    "speakers": 16.0,
+    "speakers": {
+      "wikimedia": 19.0,
+      "linguameta": 16.0
+    },
     "iecor": "Nepali",
     "taxonset": "indoaryan"
   },
-  "nl_nl": {
-    "full": "Dutch",
-    "sonar": "nld_Latn",
-    "glottolog": "dutc1256",
-    "speakers": 21.0,
-    "iecor": "Dutch",
+  "nb_no": {
+    "full": "Norwegian Bokm\u00e5l",
+    "fleurs": "Norwegian",
+    "fleurs_iso639-3": "nob",
+    "glottolog": "norw1259",
+    "speakers": {
+      "wikimedia": 4.0,
+      "linguameta": 10.5
+    },
+    "iecor": "NorwegianBokmal",
     "taxonset": "germanic"
-  },
-  "nso_za": {
-    "full": "Northern Sotho",
-    "sonar": "nso_Latn",
-    "glottolog": "sout2807",
-    "speakers": 14.0
   },
   "ny_mw": {
     "full": "Nyanja",
-    "sonar": "nya_Latn",
+    "fleurs": "Nyanja",
+    "fleurs_iso639-3": "nya",
     "glottolog": "nyan1308",
-    "speakers": 12.0
+    "speakers": {
+      "wikimedia": null,
+      "linguameta": 13.0
+    }
   },
   "oc_fr": {
     "full": "Occitan",
-    "sonar": "oci_Latn",
+    "fleurs": "Occitan",
+    "fleurs_iso639-3": "oci",
     "glottolog": "occi1239",
-    "speakers": 0.5
-  },
-  "om_et": {
-    "full": "Oromo",
-    "sonar": "gaz_Latn",
-    "glottolog": "west2721",
-    "speakers": 24.0
+    "speakers": {
+      "wikimedia": 0.2,
+      "linguameta": 2.0
+    }
   },
   "or_in": {
-    "full": "Oriya",
-    "sonar": "ory_Orya",
-    "glottolog": "adiv1239",
-    "speakers": 35.0,
+    "full": "Odia",
+    "fleurs": "Oriya",
+    "fleurs_iso639-3": "ory",
+    "glottolog": "oriy1255",
+    "speakers": {
+      "wikimedia": 34.0,
+      "linguameta": 35.0
+    },
+    "iecor": "Oriya",
     "taxonset": "indoaryan"
   },
-  "pa_in": {
-    "full": "Punjabi",
-    "sonar": "pan_Guru",
-    "glottolog": "panj1256",
-    "speakers": 113.0,
-    "iecor": "Punjabi",
-    "taxonset": "indoaryan"
-  },
-  "pl_pl": {
-    "full": "Polish",
-    "sonar": "pol_Latn",
-    "glottolog": "poli1260",
-    "speakers": 38.0,
-    "iecor": "Polish",
-    "taxonset": "slavic"
+  "om_et": {
+    "full": "West Central Oromo",
+    "fleurs": "Oromo",
+    "fleurs_iso639-3": "orm",
+    "glottolog": "west2721",
+    "speakers": {
+      "wikimedia": 45.0,
+      "linguameta": 42.0
+    }
   },
   "ps_af": {
-    "full": "Pashto",
-    "sonar": "pbt_Arab",
-    "glottolog": "pash1269",
-    "speakers": 44.0,
+    "full": "Nuclear Pashto",
+    "fleurs": "Pashto",
+    "fleurs_iso639-3": "pus",
+    "glottolog": "nucl1276",
+    "speakers": {
+      "wikimedia": 51.0,
+      "linguameta": 53.0
+    },
     "iecor": "Pashto",
     "taxonset": "iranian"
   },
+  "fa_ir": {
+    "full": "Western Farsi",
+    "fleurs": "Persian",
+    "fleurs_iso639-3": "fas",
+    "glottolog": "west2369",
+    "speakers": {
+      "wikimedia": 91.0,
+      "linguameta": 82.0
+    },
+    "iecor": "PersianTehran",
+    "taxonset": "iranian"
+  },
+  "pl_pl": {
+    "full": "Polish",
+    "fleurs": "Polish",
+    "fleurs_iso639-3": "pol",
+    "glottolog": "poli1260",
+    "speakers": {
+      "wikimedia": 40.0,
+      "linguameta": 37.0
+    },
+    "iecor": "Polish",
+    "taxonset": "slavic"
+  },
   "pt_br": {
     "full": "Portuguese",
-    "sonar": "por_Latn",
+    "fleurs": "Portuguese",
+    "fleurs_iso639-3": "por",
     "glottolog": "port1283",
-    "speakers": 220.0,
+    "speakers": {
+      "wikimedia": 250.0,
+      "linguameta": 225.8
+    },
     "iecor": "Portuguese",
     "taxonset": "latinofaliscan"
   },
+  "pa_in": {
+    "full": "Eastern Panjabi",
+    "fleurs": "Punjabi",
+    "fleurs_iso639-3": "pan",
+    "glottolog": "panj1256",
+    "speakers": {
+      "wikimedia": 150.0,
+      "linguameta": 200.0
+    },
+    "iecor": "Punjabi",
+    "taxonset": "indoaryan"
+  },
   "ro_ro": {
     "full": "Romanian",
-    "sonar": "ron_Latn",
+    "fleurs": "Romanian",
+    "fleurs_iso639-3": "ron",
     "glottolog": "roma1327",
-    "speakers": 19.0,
+    "speakers": {
+      "wikimedia": 22.0,
+      "linguameta": 21.1
+    },
     "iecor": "Romanian",
     "taxonset": "latinofaliscan"
   },
   "ru_ru": {
     "full": "Russian",
-    "sonar": "rus_Cyrl",
+    "fleurs": "Russian",
+    "fleurs_iso639-3": "rus",
     "glottolog": "russ1263",
-    "speakers": 150.0,
+    "speakers": {
+      "wikimedia": 145.0,
+      "linguameta": 170.2
+    },
     "iecor": "Russian",
     "taxonset": "slavic"
   },
+  "sr_rs": {
+    "full": "Serbian Standard",
+    "fleurs": "Serbian",
+    "fleurs_iso639-3": "srp",
+    "glottolog": "serb1264",
+    "speakers": {
+      "wikimedia": 8.0,
+      "linguameta": 7.9
+    },
+    "iecor": "SerboCroatian",
+    "taxonset": "slavic"
+  },
+  "sn_zw": {
+    "full": "Shona",
+    "fleurs": "Shona",
+    "fleurs_iso639-3": "sna",
+    "glottolog": "shon1251",
+    "speakers": {
+      "wikimedia": 9.0,
+      "linguameta": 12.0
+    }
+  },
   "sd_in": {
     "full": "Sindhi",
-    "sonar": "snd_Arab",
+    "fleurs": "Sindhi",
+    "fleurs_iso639-3": "snd",
     "glottolog": "sind1272",
-    "speakers": 68.0,
+    "speakers": {
+      "wikimedia": 37.0,
+      "linguameta": 38.4
+    },
+    "iecor": "Sindhi",
     "taxonset": "indoaryan"
   },
   "sk_sk": {
     "full": "Slovak",
-    "sonar": "slk_Latn",
+    "fleurs": "Slovak",
+    "fleurs_iso639-3": "slk",
     "glottolog": "slov1269",
-    "speakers": 4.0,
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": 4.9
+    },
     "iecor": "Slovak",
     "taxonset": "slavic"
   },
   "sl_si": {
     "full": "Slovenian",
-    "sonar": "slv_Latn",
+    "fleurs": "Slovenian",
+    "fleurs_iso639-3": "slv",
     "glottolog": "slov1268",
-    "speakers": 2.0,
+    "speakers": {
+      "wikimedia": 2.0,
+      "linguameta": 1.8
+    },
     "iecor": "Slovene",
     "taxonset": "slavic"
   },
-  "sn_zw": {
-    "full": "Shona",
-    "sonar": "sna_Latn",
-    "glottolog": "shon1251",
-    "speakers": 9.0
-  },
   "so_so": {
     "full": "Somali",
-    "sonar": "som_Latn",
+    "fleurs": "Somali",
+    "fleurs_iso639-3": "som",
     "glottolog": "soma1255",
-    "speakers": 24.0
+    "speakers": {
+      "wikimedia": 24.0,
+      "linguameta": 9.2
+    }
   },
-  "sr_rs": {
-    "full": "Serbian",
-    "sonar": "srp_Cyrl",
-    "glottolog": "sout1528",
-    "speakers": 6.0,
-    "iecor": "SerboCroatian",
-    "taxonset": "slavic"
-  },
-  "sv_se": {
-    "full": "Swedish",
-    "sonar": "swe_Latn",
-    "glottolog": "swed1254",
-    "speakers": 8.0,
-    "iecor": "Swedish",
-    "taxonset": "germanic"
+  "es_419": {
+    "full": "Spanish",
+    "fleurs": "Spanish",
+    "fleurs_iso639-3": "spa",
+    "glottolog": "stan1288",
+    "speakers": {
+      "wikimedia": 519.0,
+      "linguameta": 468.4
+    },
+    "iecor": "Spanish",
+    "taxonset": "latinofaliscan"
   },
   "sw_ke": {
     "full": "Swahili",
-    "sonar": "swh_Latn",
+    "fleurs": "Swahili",
+    "fleurs_iso639-3": "swh",
     "glottolog": "swah1253",
-    "speakers": 24.0
+    "speakers": {
+      "wikimedia": 5.0,
+      "linguameta": null
+    }
+  },
+  "sv_se": {
+    "full": "Swedish",
+    "fleurs": "Swedish",
+    "fleurs_iso639-3": "swe",
+    "glottolog": "swed1254",
+    "speakers": {
+      "wikimedia": 10.0,
+      "linguameta": 12.2
+    },
+    "iecor": "Swedish",
+    "taxonset": "germanic"
+  },
+  "tg_tj": {
+    "full": "Tagalog",
+    "fleurs": "Tajik",
+    "fleurs_iso639-3": "tgl",
+    "glottolog": "taga1270",
+    "speakers": {
+      "wikimedia": 29.0,
+      "linguameta": null
+    },
+    "iecor": "Tajik",
+    "taxonset": "iranian"
   },
   "ta_in": {
     "full": "Tamil",
-    "sonar": "tam_Taml",
+    "fleurs": "Tamil",
+    "fleurs_iso639-3": "tam",
     "glottolog": "tami1289",
-    "speakers": 76.0
+    "speakers": {
+      "wikimedia": 79.0,
+      "linguameta": 81.5
+    }
   },
   "te_in": {
     "full": "Telugu",
-    "sonar": "tel_Telu",
+    "fleurs": "Telugu",
+    "fleurs_iso639-3": "tel",
     "glottolog": "telu1262",
-    "speakers": 82.0
-  },
-  "tg_tj": {
-    "full": "Tajik",
-    "sonar": "tgk_Cyrl",
-    "glottolog": "taji1245",
-    "speakers": 8.0,
-    "taxonset": "iranian"
+    "speakers": {
+      "wikimedia": 83.0,
+      "linguameta": 95.0
+    }
   },
   "th_th": {
     "full": "Thai",
-    "sonar": "tha_Thai",
+    "fleurs": "Thai",
+    "fleurs_iso639-3": "tha",
     "glottolog": "thai1261",
-    "speakers": 20.0
+    "speakers": {
+      "wikimedia": 27.0,
+      "linguameta": 55.0
+    }
   },
   "tr_tr": {
     "full": "Turkish",
-    "sonar": "tur_Latn",
+    "fleurs": "Turkish",
+    "fleurs_iso639-3": "tur",
     "glottolog": "nucl1301",
-    "speakers": 82.0
+    "speakers": {
+      "wikimedia": 85.0,
+      "linguameta": 76.3
+    }
   },
   "uk_ua": {
     "full": "Ukrainian",
-    "sonar": "ukr_Cyrl",
+    "fleurs": "Ukrainian",
+    "fleurs_iso639-3": "ukr",
     "glottolog": "ukra1253",
-    "speakers": 32.0,
+    "speakers": {
+      "wikimedia": 32.0,
+      "linguameta": 29.0
+    },
     "iecor": "Ukrainian",
     "taxonset": "slavic"
   },
-  "umb_ao": {
-    "full": "Mbundu",
-    "sonar": "umb_Latn",
-    "glottolog": "umbu1257",
-    "speakers": 6.0
-  },
   "ur_pk": {
     "full": "Urdu",
-    "sonar": "urd_Arab",
+    "fleurs": "Urdu",
+    "fleurs_iso639-3": "urd",
     "glottolog": "urdu1245",
-    "speakers": 120.0,
+    "speakers": {
+      "wikimedia": 78.0,
+      "linguameta": 288.0
+    },
     "iecor": "Urdu",
     "taxonset": "indoaryan"
   },
   "uz_uz": {
     "full": "Uzbek",
-    "sonar": "uzn_Latn",
-    "glottolog": "nort2690",
-    "speakers": 57.0
+    "fleurs": "Uzbek",
+    "fleurs_iso639-3": "uzb",
+    "glottolog": "uzbe1247",
+    "speakers": {
+      "wikimedia": 34.0,
+      "linguameta": 26.0
+    }
   },
   "vi_vn": {
     "full": "Vietnamese",
-    "sonar": "vie_Latn",
+    "fleurs": "Vietnamese",
+    "fleurs_iso639-3": "vie",
     "glottolog": "viet1252",
-    "speakers": 96.0
+    "speakers": {
+      "wikimedia": 86.0,
+      "linguameta": 85.0
+    }
+  },
+  "cy_gb": {
+    "full": "Welsh",
+    "fleurs": "Welsh",
+    "fleurs_iso639-3": "cym",
+    "glottolog": "wels1247",
+    "speakers": {
+      "wikimedia": 0.5,
+      "linguameta": 0.8
+    },
+    "iecor": "WelshNorth"
   },
   "wo_sn": {
     "full": "Wolof",
-    "sonar": "wol_Latn",
+    "fleurs": "Wolof",
+    "fleurs_iso639-3": "wol",
     "glottolog": "nucl1347",
-    "speakers": 4.0
+    "speakers": {
+      "wikimedia": 8.0,
+      "linguameta": 11.0
+    }
   },
   "xh_za": {
     "full": "Xhosa",
-    "sonar": "xho_Latn",
+    "fleurs": "Xhosa",
+    "fleurs_iso639-3": "xho",
     "glottolog": "xhos1239",
-    "speakers": 19.0
+    "speakers": {
+      "wikimedia": 8.0,
+      "linguameta": 10.0
+    }
   },
   "yo_ng": {
     "full": "Yoruba",
-    "sonar": "yor_Latn",
+    "fleurs": "Yoruba",
+    "fleurs_iso639-3": "yor",
     "glottolog": "yoru1245",
-    "speakers": 21.0
-  },
-  "yue_hant_hk": {
-    "full": "Cantonese",
-    "sonar": "yue_Hant",
-    "glottolog": "yuec1235",
-    "speakers": 68.0
+    "speakers": {
+      "wikimedia": 48.0,
+      "linguameta": 28.0
+    }
   },
   "zu_za": {
     "full": "Zulu",
-    "sonar": "zul_Latn",
+    "fleurs": "Zulu",
+    "fleurs_iso639-3": "zul",
     "glottolog": "zulu1248",
-    "speakers": 11.0
+    "speakers": {
+      "wikimedia": 12.0,
+      "linguameta": 14.0
+    }
   }
 }
