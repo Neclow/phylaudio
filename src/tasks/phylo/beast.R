@@ -320,24 +320,17 @@ get_height <- function(
   tree_height
 }
 
-get_mrca_height <- function(tr, tips) {
-  depths <- node.depth.edgelength(tr)
-  tree_height <- max(depths)
-  mrca <- getMRCA(tr, tips)
-  tree_height - depths[mrca]
-}
 
 extract_beast_heights <- function(
   file = "",
   output_file = "",
   trees = NULL,
   cores = 1,
-  subset = NULL,
-  tips = NULL
+  subset = NULL
 ) {
   if (!is.null(trees)) {
-    if (!inherits(trees, "phylo")) {
-      stop("argument 'trees' must be of mode 'phylo'")
+    if (!inherits(trees, "phylo") && !inherits(trees, "multiPhylo")) {
+      stop("argument 'trees' must be of mode 'phylo' or 'multiPhylo'")
     }
   } else if (file != "") {
     trees <- read.annot.beast(file, cores = cores)
@@ -345,11 +338,7 @@ extract_beast_heights <- function(
     stop("argument 'file' or 'trees' must be provided")
   }
 
-  height_fn <- if (!is.null(tips)) {
-    function(tr) get_mrca_height(tr, tips)
-  } else {
-    function(tr) get_height(tr, subset = subset)
-  }
+  height_fn <- function(tr) get_height(tr, subset = subset)
 
   if (length(trees) > 1) {
     registerDoParallel(cores = cores)
