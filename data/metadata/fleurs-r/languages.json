@@ -7,9 +7,7 @@
     "speakers": {
       "wikimedia": 7.0,
       "linguameta": 7.3
-    },
-    "iecor": "Afrikaans",
-    "taxonset": "germanic"
+    }
   },
   "am_et": {
     "full": "Amharic",
@@ -245,9 +243,7 @@
     "speakers": {
       "wikimedia": 2.0,
       "linguameta": 3.5
-    },
-    "iecor": "Galician",
-    "taxonset": "latinofaliscan"
+    }
   },
   "lg_ug": {
     "full": "Ganda",
@@ -301,9 +297,7 @@
     "speakers": {
       "wikimedia": 57.0,
       "linguameta": 60.0
-    },
-    "iecor": "Gujarati",
-    "taxonset": "indoaryan"
+    }
   },
   "ha_ng": {
     "full": "Hausa",
@@ -654,9 +648,7 @@
     "speakers": {
       "wikimedia": 34.0,
       "linguameta": 35.0
-    },
-    "iecor": "Oriya",
-    "taxonset": "indoaryan"
+    }
   },
   "om_et": {
     "full": "West Central Oromo",
@@ -782,9 +774,7 @@
     "speakers": {
       "wikimedia": 37.0,
       "linguameta": 38.4
-    },
-    "iecor": "Sindhi",
-    "taxonset": "indoaryan"
+    }
   },
   "sk_sk": {
     "full": "Slovak",
@@ -862,9 +852,7 @@
     "speakers": {
       "wikimedia": 29.0,
       "linguameta": null
-    },
-    "iecor": "Tajik",
-    "taxonset": "iranian"
+    }
   },
   "ta_in": {
     "full": "Tamil",
