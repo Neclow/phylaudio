@@ -37,6 +37,9 @@ sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
 [tasks.beast2]
 cmd = "extern/beast2/bin/beast"
 
+[tasks.loganalyser]
+cmd = "extern/beast2/bin/loganalyser"
+
 [tasks.packagemanager]
 cmd = "extern/beast2/bin/packagemanager"
 
