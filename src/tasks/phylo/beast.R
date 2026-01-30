@@ -207,12 +207,27 @@ extract_annot <- function(tr) {
 #' tr$ordered.edges <- order.edges(tr)
 #' plot(tr)
 #' edgelabels(edge = tr$ordered.edges, text = round(tr$posterior, 2), cex = 0.5)
+read.nexus.partial <- function(file) {
+  tryCatch(read.nexus(file), error = function(e) {
+    lines <- readLines(file)
+    last <- trimws(tail(lines, 1))
+    if (!grepl("End;$", last, ignore.case = TRUE)) {
+      tmp <- tempfile(fileext = ".nex")
+      on.exit(unlink(tmp), add = TRUE)
+      writeLines(c(lines, "End;"), tmp)
+      read.nexus(tmp)
+    } else {
+      stop(e)
+    }
+  })
+}
+
 read.annot.beast <- function(file, cores = 1) {
   tree <- scan(file = file, what = character(), sep = "\n", quiet = TRUE)
   tree <- tree[grep("^[[:space:]]*tree", tree)]
   if (length(tree) > 1) {
     cat("Multiple trees detected. Reading as 'multiPhylo' object.\n")
-    trs <- read.nexus(file)
+    trs <- read.nexus.partial(file)
 
     cat("Extracting annotations in parallel with", cores, "cores...\n")
     registerDoParallel(cores = cores)
@@ -235,21 +250,25 @@ read.annot.beast <- function(file, cores = 1) {
     tr <- tree[[1]]
     tr <- sub("^[[:space:]]*tree.* \\(", "\\(", tr)
     annots <- extract_annot(tr)
-    tr <- read.nexus(file)
+    tr <- read.nexus.partial(file)
     tr$metadata <- annots$metadata
     tr$posterior <- annots$posterior
     return(tr)
   }
 }
 
-
-extract_beast_metadata <- function(file = "", tree = NULL) {
+#' @examples
+#' input_dir <- "data/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/sentence"
+#' pattern <- "*\\_treeannotator_CCD.nex"
+#' cores <- 16
+#' extract_beast_metadata(input_dir, pattern, cores)
+extract_beast_metadata <- function(file = "", tree = NULL, cores = 1) {
   if (!is.null(tree)) {
     if (!inherits(tree, "phylo")) {
       stop("argument 'tree' must be of mode 'phylo'")
     }
   } else if (file != "") {
-    tree <- read.annot.beast(file)
+    tree <- read.annot.beast(file, cores = cores)
   } else {
     stop("argument 'file' or 'tree' must be provided")
   }
@@ -264,11 +283,7 @@ extract_beast_metadata <- function(file = "", tree = NULL) {
   df
 }
 
-#' @examples
-#' input_dir <- "data/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/sentence"
-#' pattern <- "*\\_treeannotator_CCD.nex"
-#' cores <- 16
-#' extract_beast_metadata(input_dir, pattern, cores)
+
 extract_beast_metadata2 <- function(
   files = "",
   trees = "",
