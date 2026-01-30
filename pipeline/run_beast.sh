@@ -2,11 +2,16 @@
 # Run BEAST2 with GPU acceleration
 set -e
 
+RESUME=false
+
 usage() {
     cat <<EOF
-Usage: $(basename "$0") <uuid> <size> <version> <run_number>
+Usage: $(basename "$0") [-r] <uuid> <size> <version> <run_number>
 
 Run BEAST2 with GPU acceleration (BEAGLE).
+
+Options:
+  -r           Resume from existing state file
 
 Arguments:
   uuid         Run UUID under data/trees/beast/ (supports partial matching)
@@ -20,6 +25,7 @@ Seed is computed as: version * 100 + run_number
 
 Examples:
   run_beast.sh c59 0.01 11 3         # c5969221-.../0.01_brsupport, v11, seed 1103
+  run_beast.sh -r c59 0.01 11 3      # Resume from state file
   run_beast.sh abc123 0.05 12 1      # abc123.../0.05_brsupport, v12, seed 1201
 
 Output files (in matched directory):
@@ -29,6 +35,11 @@ Output files (in matched directory):
 EOF
     exit 1
 }
+
+if [[ "$1" == "-r" ]]; then
+    RESUME=true
+    shift
+fi
 
 [[ $# -lt 4 || "$1" == "-h" || "$1" == "--help" ]] && usage
 
@@ -81,6 +92,11 @@ if [[ ! -f "$INPUT_FILE" ]]; then
     exit 1
 fi
 
+if $RESUME && [[ ! -f "$STATE_FILE" ]]; then
+    echo "Error: State file not found for resume: $STATE_FILE"
+    exit 1
+fi
+
 echo "BEAST2 run configuration:"
 echo "  Version: v${VERSION}"
 echo "  Run: ${RUN}"
@@ -88,6 +104,7 @@ echo "  Seed: ${SEED}"
 echo "  Dir: ${WORKING_DIR}"
 echo "  Input: ${INPUT_FILE}"
 echo "  State: ${STATE_FILE}"
+echo "  Resume: ${RESUME}"
 echo ""
 
 read -rp "Proceed? [y/N] " confirm
@@ -96,12 +113,18 @@ if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+BEAST_ARGS=(
+    -beagle_GPU
+    -beagle_order "$BEAGLE_ORDER"
+    -seed "$SEED"
+    -working
+    -packagedir "$BEAST_DIR/.beast"
+    -statefile "$STATE_FILE"
+)
+
+if $RESUME; then
+    BEAST_ARGS+=(-resume)
+fi
+
 cd "$BEAST_DIR"
-pixi run beast2 \
-    -beagle_GPU \
-    -beagle_order "$BEAGLE_ORDER" \
-    -seed "$SEED" \
-    -working \
-    -packagedir "$BEAST_DIR/.beast" \
-    -statefile "$STATE_FILE" \
-    "$INPUT_FILE"
+pixi run beast2 "${BEAST_ARGS[@]}" "$INPUT_FILE"
