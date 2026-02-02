@@ -250,7 +250,7 @@
     "glottolog": "taga1270",
     "speakers": {
       "wikimedia": 29.0,
-      "linguameta": null
+      "linguameta": NaN
     }
   },
   "fi_fi": {
@@ -716,7 +716,7 @@
     "fleurs_iso639-3": "nya",
     "glottolog": "nyan1308",
     "speakers": {
-      "wikimedia": null,
+      "wikimedia": NaN,
       "linguameta": 13.0
     }
   },
@@ -931,7 +931,7 @@
     "glottolog": "swah1253",
     "speakers": {
       "wikimedia": 5.0,
-      "linguameta": null
+      "linguameta": NaN
     }
   },
   "sv_se": {

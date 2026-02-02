@@ -197,8 +197,9 @@ data/trees/beast/*
 
 # My drafts
 tmp/
-notes.txt
+notes/
 drafts*.ipynb
+drafts*.R
 
 # Plots (temporary)
 img/

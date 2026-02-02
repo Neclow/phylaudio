@@ -227,7 +227,7 @@ class FleursParallelDataset(BaseDataset):
         if self.glottocode is not None:
             glottolog_path = f"{self.meta_dir}/glottolog.csv"
             languages_to_keep = filter_languages_from_glottocode(
-                glottolog_path=glottolog_path,
+                self.dataset,
                 glottocode=glottocode,
                 min_speakers=min_speakers,
             )

@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 from pyglottolog import Glottolog
 from tqdm import tqdm
@@ -21,7 +23,7 @@ def get_languoid_data(repos, glottocodes):
             right_index=True,
         )
         .drop("codes", axis=1)
-        .reset_index(names="code")
+        .set_index("name")
     )
     return df
 
@@ -40,7 +42,22 @@ def _get_languoid_data_single(g, glottocode):
 
 
 # pylint: disable=unused-argument
-def filter_languages_from_glottocode(filepath_or_dataset, glottocode, min_speakers=0):
+def filter_languages_from_glottocode(
+    filepath_or_dataset, glottocode, min_speakers=0, speaker_db="linguameta"
+):
+    with open(
+        f"{DEFAULT_METADATA_DIR}/{filepath_or_dataset}/languages.json",
+        "r",
+        encoding="utf-8",
+    ) as f:
+        languages = json.load(f)
+
+    enough_speakers = {
+        k: v["glottolog"]
+        for k, v in languages.items()
+        if v["speakers"][speaker_db] >= min_speakers
+    }
+
     if filepath_or_dataset.endswith(".csv"):
         glottolog_path = filepath_or_dataset
     else:
@@ -48,8 +65,8 @@ def filter_languages_from_glottocode(filepath_or_dataset, glottocode, min_speake
 
     lang_clf_df = (
         pd.read_csv(glottolog_path)
-        .query("n_speakers >= @min_speakers")
-        .set_index("code")
+        .query("glottocode in @enough_speakers.values()")
+        .set_index("glottocode")
         .ffill(axis=1)
         .astype(str)
     )
@@ -58,9 +75,13 @@ def filter_languages_from_glottocode(filepath_or_dataset, glottocode, min_speake
 
     filtered_stack = stack_df.query("codes.str.contains(@glottocode)")
 
-    filtered_languages = filtered_stack.unstack().index.to_list()
+    filtered_glottocodes = filtered_stack.unstack().index.to_list()
 
-    assert len(filtered_languages) > 0, "No languages found"
+    assert len(filtered_glottocodes) > 0, "No languages found"
+
+    filtered_languages = {
+        k: v for k, v in languages.items() if v["glottolog"] in filtered_glottocodes
+    }
 
     return filtered_languages
 

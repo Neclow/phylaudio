@@ -116,9 +116,7 @@ if __name__ == "__main__":
 
     # Download glottolog data
     glottolog_data = get_languoid_data(args.glottolog_dir, speakerpop_data.glottocode)
-    glottolog_data.to_csv(
-        f"{DEFAULT_METADATA_DIR}/{args.dataset}/glottolog.csv", index=False
-    )
+    glottolog_data.to_csv(f"{DEFAULT_METADATA_DIR}/{args.dataset}/glottolog.csv")
 
     # Make languages.json file
     # key: fleurs dir
@@ -137,10 +135,8 @@ if __name__ == "__main__":
         glottocode = row["glottocode"]
 
         # Get glottolog full name
-        glottolog_row = glottolog_data[glottolog_data["code"] == glottocode]
-        full_name = (
-            glottolog_row.iloc[0]["name"] if not glottolog_row.empty else fleurs_name
-        )
+        glottolog_row = glottolog_data[glottolog_data["glottocode"] == glottocode]
+        full_name = glottolog_row.index[0] if not glottolog_row.empty else fleurs_name
 
         # Build language entry (convert NaN to None for valid JSON)
         wikimedia = row["speakers_wikimedia"]
@@ -151,8 +147,8 @@ if __name__ == "__main__":
             "fleurs_iso639-3": row["ISO_639-3"],
             "glottolog": glottocode,
             "speakers": {
-                "wikimedia": None if pd.isna(wikimedia) else round(wikimedia, 1),
-                "linguameta": None if pd.isna(linguameta) else round(linguameta, 1),
+                "wikimedia": round(wikimedia, 1),
+                "linguameta": round(linguameta, 1),
             },
         }
 
