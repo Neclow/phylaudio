@@ -119,7 +119,9 @@ def download_wikimedia(languages, dataset, overwrite=False):
     speakers_path = f"{DEFAULT_METADATA_DIR}/{dataset}/wikimedia_speakers.json"
     if not overwrite:
         if os.path.exists(speakers_path):
-            print(f"Wikimedia speakers already exists at {speakers_path}, loading...")
+            print(
+                f"Wikimedia speaker data already exists at {speakers_path}, loading..."
+            )
             with open(speakers_path, "r", encoding="utf-8") as f:
                 speaker_data = json.load(f)
             return speaker_data
@@ -453,10 +455,25 @@ def download_speakerpop(dataset, overwrite=False):
             "speakers_linguameta",
         ],
     ]
+    # For filipino, replace ISO_639-1 "tg" by "-", and ISO_639-3 "tgl" by "fil"
+    # FLEURS paper encodes Filipino as "tg" and "tgl", but _FLEURS_LANG_ID uses "fil"
+    # For Chinese Mandarin, replace ISO_639-3 "cmn" by "cmn_hans", and for Cantonese "yue" by "yue_hant"
+    # FLEURS paper sets both Tajik and Tagalog to "tg" in ISO_639-1 (!)
+    speakerpop_data["ISO_639-1"] = speakerpop_data["ISO_639-1"].replace({"tg": "-"})
+    speakerpop_data["ISO_639-3"] = speakerpop_data["ISO_639-3"].replace(
+        {"tgl": "fil", "cmn": "cmn_hans", "yue": "yue_hant"}
+    )
+    # For Tajik, set ISO_639-1 as "tg"
+    speakerpop_data.loc[speakerpop_data["Language"] == "Tajik", "ISO_639-1"] = "tg"
+    # If ISO_639-1 is "-", replace by ISO_639-3
+    speakerpop_data["ISO_639-1"] = speakerpop_data.apply(
+        lambda row: row["ISO_639-3"] if row["ISO_639-1"] == "-" else row["ISO_639-1"],
+        axis=1,
+    )
     speakerpop_data["speakers_linguameta"] /= 1e6
     speakerpop_data["speakers_wikimedia"] = speakerpop_data["Language"].map(
         lambda x: (
-            wikimedia_data[x]["parsed_value"] / 1e6
+            wikimedia_data[x].get("parsed_value", float("nan")) / 1e6
             if x in wikimedia_data
             else float("nan")
         )
@@ -466,7 +483,5 @@ def download_speakerpop(dataset, overwrite=False):
     speakerpop_data["fleurs_dir"] = speakerpop_data["ISO_639-1"].map(
         lambda x: _FLEURS_SHORT_TO_LANG.get(x, None)
     )
-
-    print("Done")
 
     return speakerpop_data

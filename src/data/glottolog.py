@@ -8,7 +8,9 @@ from src._config import DEFAULT_METADATA_DIR
 def get_languoid_data(repos, glottocodes):
     g = Glottolog(repos)
     data = {}
-    for glottocode in tqdm(glottocodes, total=len(glottocodes)):
+    for glottocode in tqdm(
+        glottocodes, total=len(glottocodes), desc="Fetching Glottolog data"
+    ):
         if glottocode is not None:
             data[glottocode] = _get_languoid_data_single(g, glottocode)
     df = pd.DataFrame.from_dict(data, orient="index")
