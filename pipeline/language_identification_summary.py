@@ -87,9 +87,8 @@ def get_test_data(dataset_args, processor, glottocode, min_speakers):
     print("Loading data...")
     _, _, test_dataset = load_dataset(**dataset_args, processor=processor, split=True)
 
-    glottolog_path = f"{test_dataset.meta_dir}/glottolog.csv"
     languages_to_keep = filter_languages_from_glottocode(
-        glottolog_path=glottolog_path,
+        dataset=test_dataset.dataset,
         glottocode=glottocode,
         min_speakers=min_speakers,
     )
