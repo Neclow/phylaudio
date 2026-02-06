@@ -4,16 +4,19 @@ set -e
 
 RESUME=false
 OVERWRITE=false
+VALIDATE=false
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [-r] [-o] <uuid> <size> <version> <run_number>
+Usage: $(basename "$0") [-r] [-o] [-v] [-h|--help] <uuid> <size> <version> <run_number>
 
 Run BEAST2 with GPU acceleration (BEAGLE).
 
 Options:
   -r           Resume from existing state file
   -o           Overwrite existing output files
+  -v           Validate XML without running BEAST2
+  -h, --help   Show this help message and exit
 
 Arguments:
   uuid         Run UUID under data/trees/beast/ (supports partial matching)
@@ -43,6 +46,7 @@ while [[ "$1" == -* ]]; do
     case "$1" in
         -r) RESUME=true; shift ;;
         -o) OVERWRITE=true; shift ;;
+        -v) VALIDATE=true; shift ;;
         -h|--help) usage ;;
         *) echo "Unknown option: $1"; usage ;;
     esac
@@ -113,6 +117,7 @@ echo "  Input: ${INPUT_FILE}"
 echo "  State: ${STATE_FILE}"
 echo "  Resume: ${RESUME}"
 echo "  Overwrite: ${OVERWRITE}"
+echo "  Validate only: ${VALIDATE}"
 echo ""
 
 read -rp "Proceed? [y/N] " confirm
@@ -129,6 +134,10 @@ BEAST_ARGS=(
     -packagedir "$BEAST_DIR/.beast"
     -statefile "$STATE_FILE"
 )
+
+if $VALIDATE; then
+    BEAST_ARGS+=(-validate)
+fi
 
 if $RESUME; then
     BEAST_ARGS+=(-resume)
