@@ -470,6 +470,17 @@ def download_speakerpop(dataset, overwrite=False):
         lambda row: row["ISO_639-3"] if row["ISO_639-1"] == "-" else row["ISO_639-1"],
         axis=1,
     )
+    # Glottocode changes
+    for old_code, new_code in [
+        # Norwegian Bokmål to Norwegian (spoken form; FLEURS does not contain pure Bokmål text either)
+        ("norw1259", "norw1258"),
+        # Fula to Pulaar (variety in FLEURS; https://aclanthology.org/2025.acl-long.370.pdf)
+        ("fula1264", "pula1263"),
+    ]:
+        speakerpop_data.loc[speakerpop_data["glottocode"] == old_code, "glottocode"] = (
+            new_code
+        )
+
     speakerpop_data["speakers_linguameta"] /= 1e6
     speakerpop_data["speakers_wikimedia"] = speakerpop_data["Language"].map(
         lambda x: (

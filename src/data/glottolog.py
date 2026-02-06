@@ -16,24 +16,34 @@ def get_languoid_data(repos, glottocodes):
         if glottocode is not None:
             data[glottocode] = _get_languoid_data_single(g, glottocode)
     df = pd.DataFrame.from_dict(data, orient="index")
-    df = (
-        df.merge(
-            pd.DataFrame(df.codes.to_list(), index=df.index).add_prefix("H"),
-            left_index=True,
-            right_index=True,
-        )
-        .drop("codes", axis=1)
-        .set_index("name")
-    )
+    df = df.merge(
+        pd.DataFrame(df.codes.to_list(), index=df.index).add_prefix("H"),
+        left_index=True,
+        right_index=True,
+    ).drop("codes", axis=1)
     return df
 
 
 def _get_languoid_data_single(g, glottocode):
     languoid = g.languoid(id_=glottocode)
+    # If the parsed language is a macrolanguage, average the lat/lon of its children
+    if languoid.level.ordinal < 2:
+        lats = []
+        lons = []
+        for child in languoid.children:
+            if child.latitude is not None:
+                lats.append(child.latitude)
+            if child.longitude is not None:
+                lons.append(child.longitude)
+        if lats:
+            languoid.latitude = sum(lats) / len(lats)
+        if lons:
+            languoid.longitude = sum(lons) / len(lons)
     lineage_codes = [x[1] for x in languoid.lineage]
 
     return {
         "name": languoid.name,
+        "level": languoid.level.id,
         "glottocode": glottocode,
         "longitude": languoid.longitude,
         "latitude": languoid.latitude,
@@ -43,25 +53,24 @@ def _get_languoid_data_single(g, glottocode):
 
 # pylint: disable=unused-argument
 def filter_languages_from_glottocode(
-    filepath_or_dataset, glottocode, min_speakers=0, speaker_db="linguameta"
+    dataset, glottocode, min_speakers=0, speaker_db="linguameta"
 ):
     with open(
-        f"{DEFAULT_METADATA_DIR}/{filepath_or_dataset}/languages.json",
+        f"{DEFAULT_METADATA_DIR}/{dataset}/languages.json",
         "r",
         encoding="utf-8",
     ) as f:
         languages = json.load(f)
 
-    enough_speakers = {
-        k: v["glottolog"]
-        for k, v in languages.items()
-        if v["speakers"][speaker_db] >= min_speakers
-    }
+    enough_speakers = {}
+    for k, v in languages.items():
+        n_speakers_db = v["speakers"][speaker_db]
+        if pd.isna(n_speakers_db):
+            n_speakers_db = max(v["speakers"].values())
+        if n_speakers_db >= min_speakers:
+            enough_speakers[k] = v["glottolog"]
 
-    if filepath_or_dataset.endswith(".csv"):
-        glottolog_path = filepath_or_dataset
-    else:
-        glottolog_path = f"{DEFAULT_METADATA_DIR}/{filepath_or_dataset}/glottolog.csv"
+    glottolog_path = f"{DEFAULT_METADATA_DIR}/{dataset}/glottolog.csv"
 
     lang_clf_df = (
         pd.read_csv(glottolog_path)

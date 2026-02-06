@@ -2,68 +2,14 @@
 import json
 from argparse import ArgumentParser
 
-import pandas as pd
-
-from src._config import _FLEURS_NAMES, DEFAULT_METADATA_DIR, FLEURS_TO_IECOR
+from src._config import (
+    _FLEURS_NAMES,
+    _FLEURS_TO_IECOR,
+    _FLEURS_TO_INDO1319_FAMILIES,
+    DEFAULT_METADATA_DIR,
+)
 from src.data.glottolog import get_languoid_data
 from src.data.speakerpop import download_speakerpop
-
-# Taxonset memberships by IECOR name (from BEAST2 template.xml)
-TAXONSETS = {
-    "germanic": [
-        "Afrikaans",
-        "Danish",
-        "Dutch",
-        "English",
-        "German",
-        "Icelandic",
-        "Luxembourgish",
-        "NorwegianBokmal",
-        "Swedish",
-    ],
-    "slavic": [
-        "Belarusian",
-        "Bulgarian",
-        "Czech",
-        "Macedonian",
-        "Polish",
-        "Russian",
-        "SerboCroatian",
-        "Slovak",
-        "Slovene",
-        "Ukrainian",
-    ],
-    "indoaryan": [
-        "Assamese",
-        "Bengali",
-        "Gujarati",
-        "Hindi",
-        "Marathi",
-        "Nepali",
-        "Oriya",
-        "Punjabi",
-        "Sindhi",
-        "Urdu",
-    ],
-    "iranian": ["KurdishCJafi", "Pashto", "PersianTehran", "Tajik"],
-    "latinofaliscan": [
-        "Catalan",
-        "French",
-        "Galician",
-        "Italian",
-        "Portuguese",
-        "Romanian",
-        "Spanish",
-    ],
-    "baltic": ["Latvian", "Lithuanian"],
-    "armenian": ["ArmenianEastern"],
-    "Greek": ["Greek"],
-}
-
-# Invert taxonsets: iecor_name -> taxonset
-IECOR_TO_TAXONSET = {
-    iecor: taxonset for taxonset, iecors in TAXONSETS.items() for iecor in iecors
-}
 
 
 def parse_args():
@@ -93,20 +39,27 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    print(_FLEURS_TO_INDO1319_FAMILIES)
+
     # Download speaker population data
     speakerpop_data = download_speakerpop(
         dataset=args.dataset, overwrite=args.overwrite
-    )
-    speakerpop_data.to_csv(
-        f"{DEFAULT_METADATA_DIR}/{args.dataset}/n_speakers.csv", index=False
-    )
+    ).set_index("fleurs_dir")
+    speakerpop_data.to_csv(f"{DEFAULT_METADATA_DIR}/{args.dataset}/n_speakers.csv")
 
     missing_glottocodes = {
-        "Arabic": "stan1318",  # Modern Standard Arabic
-        "Estonian": "esto1258",  # Estonian
-        "Malay": "stan1306",  # Standard Malay
-        "Oromo": "west2721",  # West-Central Oromo, which is a lingua franca in the area
-        "Persian": "west2369",  # Western Persian, which contains the standard Tehran dialect
+        # Arabic FLEURS speakers are Egyptian speakers speaking Modern Standard Arabic
+        # Modern Standard Arabic
+        "Arabic": "stan1318",
+        # Estonian
+        "Estonian": "esto1258",
+        # Standard Malay
+        "Malay": "stan1306",
+        # West-Central Oromo, which is a lingua franca in the area
+        "Oromo": "west2721",
+        # We assume "Persian" in FLEURS refers to Western Persian from FLORES, although it could include Dari
+        # I couldn't find a definitive source on this, neither a "Persian dialect" speech classifier to check the data
+        "Persian": "west2369",
     }
 
     for lang, glottocode in missing_glottocodes.items():
@@ -116,6 +69,7 @@ if __name__ == "__main__":
 
     # Download glottolog data
     glottolog_data = get_languoid_data(args.glottolog_dir, speakerpop_data.glottocode)
+    glottolog_data.index = speakerpop_data.index
     glottolog_data.to_csv(f"{DEFAULT_METADATA_DIR}/{args.dataset}/glottolog.csv")
 
     # Make languages.json file
@@ -126,38 +80,31 @@ if __name__ == "__main__":
         fleurs_name = fleurs_info["fleurs"]
 
         # Get speaker data
-        row = speakerpop_data[speakerpop_data["fleurs_dir"] == fleurs_dir]
+        row = speakerpop_data.loc[fleurs_dir, :]
         if row.empty:
             print(f"Warning: No speaker data for {fleurs_dir}")
             continue
 
-        row = row.iloc[0]
-        glottocode = row["glottocode"]
-
-        # Get glottolog full name
-        glottolog_row = glottolog_data[glottolog_data["glottocode"] == glottocode]
-        full_name = glottolog_row.index[0] if not glottolog_row.empty else fleurs_name
+        # Get glottocode & full name
+        glottocode, full_name = glottolog_data.loc[fleurs_dir, ["glottocode", "name"]]
 
         # Build language entry (convert NaN to None for valid JSON)
-        wikimedia = row["speakers_wikimedia"]
-        linguameta = row["speakers_linguameta"]
         lang_entry = {
             "full": full_name,
             "fleurs": fleurs_name,
             "fleurs_iso639-3": row["ISO_639-3"],
             "glottolog": glottocode,
             "speakers": {
-                "wikimedia": round(wikimedia, 1),
-                "linguameta": round(linguameta, 1),
+                "wikimedia": round(row["speakers_wikimedia"], 1),
+                "linguameta": round(row["speakers_linguameta"], 1),
             },
         }
 
-        # Add iecor and taxonset if language is in FLEURS_TO_IECOR
-        if fleurs_dir in FLEURS_TO_IECOR:
-            iecor_name = FLEURS_TO_IECOR[fleurs_dir]
-            lang_entry["iecor"] = iecor_name
-            if iecor_name in IECOR_TO_TAXONSET:
-                lang_entry["taxonset"] = IECOR_TO_TAXONSET[iecor_name]
+        # Add taxon set and iecor language name if available
+        if fleurs_dir in _FLEURS_TO_INDO1319_FAMILIES:
+            lang_entry["taxonset"] = _FLEURS_TO_INDO1319_FAMILIES[fleurs_dir]
+        if fleurs_dir in _FLEURS_TO_IECOR:
+            lang_entry["iecor"] = _FLEURS_TO_IECOR[fleurs_dir]
 
         languages[fleurs_dir] = lang_entry
 

@@ -7,7 +7,8 @@
     "speakers": {
       "wikimedia": 7.0,
       "linguameta": 7.3
-    }
+    },
+    "taxonset": "germanic"
   },
   "am_et": {
     "full": "Amharic",
@@ -38,8 +39,8 @@
       "wikimedia": 5.0,
       "linguameta": 3.0
     },
-    "iecor": "ArmenianEastern",
-    "taxonset": "armenian"
+    "taxonset": "armenian",
+    "iecor": "ArmenianEastern"
   },
   "as_in": {
     "full": "Assamese",
@@ -50,8 +51,8 @@
       "wikimedia": 15.0,
       "linguameta": 17.0
     },
-    "iecor": "Assamese",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Assamese"
   },
   "ast_es": {
     "full": "Asturian-Leonese-Cantabrian",
@@ -61,7 +62,8 @@
     "speakers": {
       "wikimedia": 0.1,
       "linguameta": 0.6
-    }
+    },
+    "taxonset": "romance"
   },
   "az_az": {
     "full": "North Azerbaijani",
@@ -82,8 +84,8 @@
       "wikimedia": 5.0,
       "linguameta": 9.5
     },
-    "iecor": "Belarusian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Belarusian"
   },
   "bn_in": {
     "full": "Bengali",
@@ -94,8 +96,8 @@
       "wikimedia": 242.0,
       "linguameta": 266.0
     },
-    "iecor": "Bengali",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Bengali"
   },
   "bs_ba": {
     "full": "Bosnian Standard",
@@ -106,8 +108,8 @@
       "wikimedia": 3.0,
       "linguameta": 3.8
     },
-    "iecor": "SerboCroatian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "SerboCroatian"
   },
   "bg_bg": {
     "full": "Bulgarian",
@@ -118,8 +120,8 @@
       "wikimedia": 6.0,
       "linguameta": 7.0
     },
-    "iecor": "Bulgarian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Bulgarian"
   },
   "my_mm": {
     "full": "Burmese",
@@ -140,8 +142,8 @@
       "wikimedia": 4.0,
       "linguameta": 8.5
     },
-    "iecor": "Catalan",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "Catalan"
   },
   "ceb_ph": {
     "full": "Cebuano",
@@ -182,8 +184,8 @@
       "wikimedia": 5.0,
       "linguameta": 4.7
     },
-    "iecor": "SerboCroatian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "SerboCroatian"
   },
   "cs_cz": {
     "full": "Czech",
@@ -194,8 +196,8 @@
       "wikimedia": 9.0,
       "linguameta": 10.0
     },
-    "iecor": "Czech",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Czech"
   },
   "da_dk": {
     "full": "Danish",
@@ -206,8 +208,8 @@
       "wikimedia": 6.0,
       "linguameta": 5.5
     },
-    "iecor": "Danish",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "Danish"
   },
   "nl_nl": {
     "full": "Dutch",
@@ -218,8 +220,8 @@
       "wikimedia": 25.0,
       "linguameta": 24.1
     },
-    "iecor": "Dutch",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "Dutch"
   },
   "en_us": {
     "full": "English",
@@ -230,8 +232,8 @@
       "wikimedia": 380.0,
       "linguameta": 1267.4
     },
-    "iecor": "English",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "English"
   },
   "et_ee": {
     "full": "Estonian",
@@ -272,16 +274,16 @@
       "wikimedia": 74.0,
       "linguameta": 203.2
     },
-    "iecor": "French",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "French"
   },
   "ff_sn": {
-    "full": "Fula",
+    "full": "Pulaar",
     "fleurs": "Fula",
     "fleurs_iso639-3": "ful",
-    "glottolog": "fula1264",
+    "glottolog": "pula1263",
     "speakers": {
-      "wikimedia": 37.0,
+      "wikimedia": NaN,
       "linguameta": 37.0
     }
   },
@@ -293,7 +295,8 @@
     "speakers": {
       "wikimedia": 2.0,
       "linguameta": 3.5
-    }
+    },
+    "taxonset": "romance"
   },
   "lg_ug": {
     "full": "Ganda",
@@ -324,8 +327,8 @@
       "wikimedia": 95.0,
       "linguameta": 91.7
     },
-    "iecor": "German",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "German"
   },
   "el_gr": {
     "full": "Modern Greek",
@@ -336,8 +339,8 @@
       "wikimedia": 13.0,
       "linguameta": 12.2
     },
-    "iecor": "Greek",
-    "taxonset": "Greek"
+    "taxonset": "greek",
+    "iecor": "Greek"
   },
   "gu_in": {
     "full": "Gujarati",
@@ -347,7 +350,8 @@
     "speakers": {
       "wikimedia": 57.0,
       "linguameta": 60.0
-    }
+    },
+    "taxonset": "indoaryan"
   },
   "ha_ng": {
     "full": "Hausa",
@@ -378,8 +382,8 @@
       "wikimedia": 345.0,
       "linguameta": 544.0
     },
-    "iecor": "Hindi",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Hindi"
   },
   "hu_hu": {
     "full": "Hungarian",
@@ -400,8 +404,8 @@
       "wikimedia": 0.4,
       "linguameta": 0.4
     },
-    "iecor": "Icelandic",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "Icelandic"
   },
   "ig_ng": {
     "full": "Igbo",
@@ -432,6 +436,7 @@
       "wikimedia": 0.2,
       "linguameta": 1.1
     },
+    "taxonset": "celtic",
     "iecor": "GaelicIrish"
   },
   "it_it": {
@@ -443,8 +448,8 @@
       "wikimedia": 65.0,
       "linguameta": 65.3
     },
-    "iecor": "Italian",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "Italian"
   },
   "ja_jp": {
     "full": "Japanese",
@@ -474,7 +479,8 @@
     "speakers": {
       "wikimedia": 0.9,
       "linguameta": 0.5
-    }
+    },
+    "taxonset": "romance"
   },
   "kam_ke": {
     "full": "Kamba (Kenya)",
@@ -555,8 +561,8 @@
       "wikimedia": 1.0,
       "linguameta": 1.1
     },
-    "iecor": "Latvian",
-    "taxonset": "baltic"
+    "taxonset": "baltic",
+    "iecor": "Latvian"
   },
   "ln_cd": {
     "full": "Kinshasa Lingala",
@@ -577,8 +583,8 @@
       "wikimedia": 4.0,
       "linguameta": 2.3
     },
-    "iecor": "Lithuanian",
-    "taxonset": "baltic"
+    "taxonset": "baltic",
+    "iecor": "Lithuanian"
   },
   "luo_ke": {
     "full": "Luo (Kenya and Tanzania)",
@@ -599,8 +605,8 @@
       "wikimedia": 0.4,
       "linguameta": 0.4
     },
-    "iecor": "Luxembourgish",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "Luxembourgish"
   },
   "mk_mk": {
     "full": "Macedonian",
@@ -611,8 +617,8 @@
       "wikimedia": 1.0,
       "linguameta": 1.4
     },
-    "iecor": "Macedonian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Macedonian"
   },
   "ms_my": {
     "full": "Standard Malay",
@@ -663,8 +669,8 @@
       "wikimedia": 83.0,
       "linguameta": 93.0
     },
-    "iecor": "Marathi",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Marathi"
   },
   "mn_mn": {
     "full": "Mongolian",
@@ -685,8 +691,8 @@
       "wikimedia": 19.0,
       "linguameta": 16.0
     },
-    "iecor": "Nepali",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Nepali"
   },
   "nso_za": {
     "full": "Pedi",
@@ -699,16 +705,16 @@
     }
   },
   "nb_no": {
-    "full": "Norwegian Bokm\u00e5l",
+    "full": "Norwegian",
     "fleurs": "Norwegian",
     "fleurs_iso639-3": "nob",
-    "glottolog": "norw1259",
+    "glottolog": "norw1258",
     "speakers": {
       "wikimedia": 4.0,
       "linguameta": 10.5
     },
-    "iecor": "NorwegianBokmal",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "NorwegianBokmal"
   },
   "ny_mw": {
     "full": "Nyanja",
@@ -728,7 +734,8 @@
     "speakers": {
       "wikimedia": 0.2,
       "linguameta": 2.0
-    }
+    },
+    "taxonset": "romance"
   },
   "or_in": {
     "full": "Odia",
@@ -738,7 +745,8 @@
     "speakers": {
       "wikimedia": 34.0,
       "linguameta": 35.0
-    }
+    },
+    "taxonset": "indoaryan"
   },
   "om_et": {
     "full": "West Central Oromo",
@@ -759,8 +767,8 @@
       "wikimedia": 51.0,
       "linguameta": 53.0
     },
-    "iecor": "Pashto",
-    "taxonset": "iranian"
+    "taxonset": "iranian",
+    "iecor": "Pashto"
   },
   "fa_ir": {
     "full": "Western Farsi",
@@ -771,8 +779,8 @@
       "wikimedia": 91.0,
       "linguameta": 82.0
     },
-    "iecor": "PersianTehran",
-    "taxonset": "iranian"
+    "taxonset": "iranian",
+    "iecor": "PersianTehran"
   },
   "pl_pl": {
     "full": "Polish",
@@ -783,8 +791,8 @@
       "wikimedia": 40.0,
       "linguameta": 37.0
     },
-    "iecor": "Polish",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Polish"
   },
   "pt_br": {
     "full": "Portuguese",
@@ -795,8 +803,8 @@
       "wikimedia": 250.0,
       "linguameta": 225.8
     },
-    "iecor": "Portuguese",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "Portuguese"
   },
   "pa_in": {
     "full": "Eastern Panjabi",
@@ -807,8 +815,8 @@
       "wikimedia": 150.0,
       "linguameta": 200.0
     },
-    "iecor": "Punjabi",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Punjabi"
   },
   "ro_ro": {
     "full": "Romanian",
@@ -819,8 +827,8 @@
       "wikimedia": 22.0,
       "linguameta": 21.1
     },
-    "iecor": "Romanian",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "Romanian"
   },
   "ru_ru": {
     "full": "Russian",
@@ -831,8 +839,8 @@
       "wikimedia": 145.0,
       "linguameta": 170.2
     },
-    "iecor": "Russian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Russian"
   },
   "sr_rs": {
     "full": "Serbian Standard",
@@ -843,8 +851,8 @@
       "wikimedia": 8.0,
       "linguameta": 7.9
     },
-    "iecor": "SerboCroatian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "SerboCroatian"
   },
   "sn_zw": {
     "full": "Shona",
@@ -864,7 +872,8 @@
     "speakers": {
       "wikimedia": 37.0,
       "linguameta": 38.4
-    }
+    },
+    "taxonset": "indoaryan"
   },
   "sk_sk": {
     "full": "Slovak",
@@ -875,8 +884,8 @@
       "wikimedia": 5.0,
       "linguameta": 4.9
     },
-    "iecor": "Slovak",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Slovak"
   },
   "sl_si": {
     "full": "Slovenian",
@@ -887,8 +896,8 @@
       "wikimedia": 2.0,
       "linguameta": 1.8
     },
-    "iecor": "Slovene",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Slovene"
   },
   "so_so": {
     "full": "Somali",
@@ -909,8 +918,8 @@
       "wikimedia": 6.0,
       "linguameta": 11.1
     },
-    "iecor": "KurdishCJafi",
-    "taxonset": "iranian"
+    "taxonset": "iranian",
+    "iecor": "KurdishCJafi"
   },
   "es_419": {
     "full": "Spanish",
@@ -921,8 +930,8 @@
       "wikimedia": 519.0,
       "linguameta": 468.4
     },
-    "iecor": "Spanish",
-    "taxonset": "latinofaliscan"
+    "taxonset": "romance",
+    "iecor": "Spanish"
   },
   "sw_ke": {
     "full": "Swahili",
@@ -943,8 +952,8 @@
       "wikimedia": 10.0,
       "linguameta": 12.2
     },
-    "iecor": "Swedish",
-    "taxonset": "germanic"
+    "taxonset": "germanic",
+    "iecor": "Swedish"
   },
   "tg_tj": {
     "full": "Tajik",
@@ -954,7 +963,8 @@
     "speakers": {
       "wikimedia": 10.0,
       "linguameta": 8.9
-    }
+    },
+    "taxonset": "iranian"
   },
   "ta_in": {
     "full": "Tamil",
@@ -1005,8 +1015,8 @@
       "wikimedia": 32.0,
       "linguameta": 29.0
     },
-    "iecor": "Ukrainian",
-    "taxonset": "slavic"
+    "taxonset": "slavic",
+    "iecor": "Ukrainian"
   },
   "umb_ao": {
     "full": "Umbundu",
@@ -1027,8 +1037,8 @@
       "wikimedia": 78.0,
       "linguameta": 288.0
     },
-    "iecor": "Urdu",
-    "taxonset": "indoaryan"
+    "taxonset": "indoaryan",
+    "iecor": "Urdu"
   },
   "uz_uz": {
     "full": "Uzbek",
@@ -1059,6 +1069,7 @@
       "wikimedia": 0.5,
       "linguameta": 0.8
     },
+    "taxonset": "celtic",
     "iecor": "WelshNorth"
   },
   "wo_sn": {
