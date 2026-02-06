@@ -12,10 +12,13 @@ rpy2.rinterface_lib.callbacks.consolewrite_warnerror = lambda *args: None
 
 
 def robinson_foulds(ftry, ftrue):
-    tree = Tree(ftry)
-    ref_tree = Tree(ftrue)
+    tree = Tree(ftry, format=1)
+    ref_tree = Tree(ftrue, format=1)
     rf, rf_max, *_ = tree.robinson_foulds(ref_tree, unrooted_trees=True)
-    return rf / rf_max
+    try:
+        return rf / rf_max
+    except ZeroDivisionError:
+        return float("nan")
 
 
 def generalized_robinson_foulds(ftry, ftrue):
@@ -49,32 +52,39 @@ def quartet_similarity(ftry, fref):
         ro.globalenv["ftry"] = ftry
         ro.globalenv["fref"] = fref
 
-        s2r = ro.r(
-            """
-            tree_try <- read.tree(ftry)
-            tree_ref <- read.tree(fref)
+        try:
+            s2r = ro.r(
+                """
+                tree_try <- read.tree(ftry)
+                tree_ref <- read.tree(fref)
 
-            # Make sure tips match
-            s2r <- NA
+                # Make sure tips match
+                s2r <- NA
 
-            tip_diffs <- setdiff(tree_try$tip.label, tree_ref$tip.label)
-
-            if (length(tip_diffs) > 0) {
-                tree_try <- drop.tip(tree_try, tip_diffs)
-            }
-
-            if (length(setdiff(tree_try$tip.label, tree_ref$tip.label)) == 0) {
-                status <- QuartetStatus(tree_try, cf = tree_ref)
-
-                s2r <- SimilarityToReference(
-                    status,
-                    similarity = FALSE,
-                    normalize = TRUE
+                tip_diffs <- union(
+                    setdiff(tree_try$tip.label, tree_ref$tip.label),
+                    setdiff(tree_ref$tip.label, tree_try$tip.label)
                 )
-            }
 
-            s2r
-            """
-        )
+                if (length(tip_diffs) > 0) {
+                    tree_try <- drop.tip(tree_try, tip_diffs)
+                    tree_ref <- drop.tip(tree_ref, tip_diffs)
+                }
+
+                if (length(setdiff(tree_try$tip.label, tree_ref$tip.label)) == 0) {
+                    status <- QuartetStatus(tree_try, cf = tree_ref)
+
+                    s2r <- SimilarityToReference(
+                        status,
+                        similarity = FALSE,
+                        normalize = TRUE
+                    )
+                }
+
+                s2r
+                """
+            )
+        except rpy2.rinterface_lib.embedded.RRuntimeError:
+            return float("nan")
 
     return s2r[0]
