@@ -63,7 +63,7 @@ def merge_fastas(input_files, sequence_ids, filler="?", output_file=None):
         return seqs
 
 
-def to_beast(input_file, output_file, template_beast_file):
+def to_beast(input_file, output_file, template_beast_file, taxonsets=None):
     """Convert a FASTA file to a BEAST XML file.
 
     Parameters
@@ -74,66 +74,56 @@ def to_beast(input_file, output_file, template_beast_file):
         Output BEAST XML file
     template_beast_file : Path-like object
         Template BEAST XML file
-    languages : dict
-        Mapping of sequence IDs to language metadata
-    ref : str, optional
-        Reference field in language metadata to use for taxon names, by default "iecor"
     """
-    skipped = []
-
     sequences = {}
     for record in SeqIO.parse(input_file, "fasta"):
-        if record.id in sequences:
+        taxon = record.id
+        if taxon in sequences:
             warnings.warn(
                 (
-                    f"Duplicate sequence ID '{record.id}' found in FASTA file '{input_file}'. "
+                    f"Duplicate sequence ID '{taxon}' found in FASTA file '{input_file}'. "
                     "Keeping the first occurrence."
                 ),
                 UserWarning,
             )
             continue
-        sequences[record.id] = str(record.seq)
+        sequences[taxon] = str(record.seq)
 
     print(f"Total sequences in FASTA: {len(sequences)}")
 
     tree = xml.etree.ElementTree.parse(template_beast_file)
     root = tree.getroot()
     data_elm = root.findall("data")[-1]
-    taxon_elm = root.findall("run")[0].findall(".//taxon")
 
-    # Update the xml data with the matched fasta sequences
+    # Clear existing sequence elements from the data section
     for sequence_elm in data_elm.findall("sequence"):
-        sequence_content = sequence_elm.attrib
+        data_elm.remove(sequence_elm)
 
-        if sequence_content["taxon"] in sequences:
-            sequence_content["value"] = sequences[sequence_content["taxon"]]
-        else:
-            data_elm.remove(sequence_elm)
+    # Determine totalcount from the sequence data
+    all_states = set()
+    for seq in sequences.values():
+        all_states.update(seq)
+    all_states -= {"?", "-"}
+    totalcount = str(max(int(c) for c in all_states) + 1)
 
-    # Update the xml data with the matched taxon names
-    for taxon_elm in root.findall("run")[0].findall(".//taxon"):
-        taxon_content = taxon_elm.attrib
+    # Fill the data section directly from the FASTA sequences
+    for taxon, seq in sequences.items():
+        sequence_elm = xml.etree.ElementTree.SubElement(data_elm, "sequence")
+        sequence_elm.set("id", f"seq_{taxon}")
+        sequence_elm.set("spec", "Sequence")
+        sequence_elm.set("taxon", taxon)
+        sequence_elm.set("totalcount", totalcount)
+        sequence_elm.set("value", seq)
 
-        if "id" in taxon_content:
-            key = "id"
-        elif "idref" in taxon_content:
-            key = "idref"
-        else:
-            raise ValueError("Taxon element missing 'id' or 'idref' attribute")
+    xml.etree.ElementTree.indent(tree, space="    ")
 
-        if taxon_content[key] not in sequences:
-            taxonset_elm = root.findall("run")[0].findall(
-                f".//taxon[@{key}='{taxon_content[key]}']..."
-            )[0]
-            taxonset_elm.remove(taxon_elm)
+    # TODO: fill in taxonsets if provided
 
     if len(data_elm.findall("sequence")) >= MIN_LANGUAGES:
         tree.write(output_file)
         print(f"Written BEAST XML to {output_file}")
     else:
-        skipped.append(
-            f"{Path(input_file).stem} has less than {MIN_LANGUAGES} languages"
-        )
+        print(f"{Path(input_file).stem} has less than {MIN_LANGUAGES} languages")
 
 
 def from_beast(input_file, output_file):

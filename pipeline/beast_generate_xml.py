@@ -13,6 +13,7 @@ import pandas as pd
 from Bio import SeqIO
 
 from src._config import (
+    _FLEURS_TO_INDO1319_FAMILIES,
     DEFAULT_BEAST_DIR,
     DEFAULT_MAPPED_FASTA_FILE,
     DEFAULT_MERGED_FASTA_FILE,
@@ -63,13 +64,6 @@ def parse_args():
         default="iecor",
         help="Reference field in language metadata to use for taxon names",
     )
-    parser.add_argument(
-        "--min-speakers",
-        type=int,
-        default=1,
-        help="Minimum number of speakers per language",
-    )
-
     return parser.parse_args()
 
 
@@ -106,7 +100,8 @@ def main():
     input_files = [f"{run_dir}/{x}" for x in sub_df.index.to_list()]
 
     with open(f"{run_dir}/cfg.json", "r", encoding="utf-8") as f:
-        dataset = json.load(f)["dataset"]
+        cfg = json.load(f)
+        dataset = cfg["dataset"]
 
     with open(
         f"{DEFAULT_METADATA_DIR}/{dataset}/languages.json", "r", encoding="utf-8"
@@ -114,10 +109,10 @@ def main():
         languages = json.load(f)
 
     beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
-    if args.by != "clock":
-        beast_p_dir += f"_{args.by}"
+    beast_p_dir += f"_{args.by}"
     os.makedirs(beast_p_dir, exist_ok=True)
 
+    # Merge FASTA files
     merged_file = f"{beast_p_dir}/{DEFAULT_MERGED_FASTA_FILE}"
 
     merge_fastas(
@@ -126,6 +121,7 @@ def main():
         sequence_ids=list(languages.keys()),
     )
 
+    # Map sequence IDs to reference names in mapped FASTA file
     mapped_file = f"{beast_p_dir}/{DEFAULT_MAPPED_FASTA_FILE}"
 
     with open(mapped_file, "w", encoding="utf-8") as f_out:
@@ -133,19 +129,22 @@ def main():
             language = str(record.id)
             seq = str(record.seq)
 
-            if (
-                language in languages
-                and args.key in languages[language]
-                and languages[language]["speakers"] >= args.min_speakers
-            ):
-                f_out.write(f">{languages[language][args.key]}\n{seq}\n")
+            if language in languages and args.key in languages[language]:
+                f_out.write(
+                    f">{languages[language][args.key].replace(' ', '')}\n{seq}\n"
+                )
 
-    output_file = f"{beast_p_dir}/input.xml"
+    output_file = f"{beast_p_dir}/input_v1.xml"
     print(f"Generating BEAST XML file ({output_file})...")
+
+    taxonsets = (
+        None if cfg["glottocode"] != "indo1319" else _FLEURS_TO_INDO1319_FAMILIES
+    )
     to_beast(
         input_file=mapped_file,
         output_file=output_file,
         template_beast_file=XML_TEMPLATE_FILE,
+        taxonsets=taxonsets,
     )
 
     print("Done")
