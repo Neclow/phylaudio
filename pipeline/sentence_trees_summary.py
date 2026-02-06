@@ -8,6 +8,7 @@ import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from functools import partial
 from glob import glob
+from pathlib import Path
 
 import ete3
 import pandas as pd
@@ -15,7 +16,11 @@ import rpy2
 from scipy.stats import gmean
 from tqdm import tqdm
 
-from src._config import DEFAULT_PER_SENTENCE_DIR
+from src._config import (
+    DEFAULT_PER_SENTENCE_DIR,
+    DEFAULT_REFERENCE_TREE_PROCESSED_DIR,
+    REFERENCE_TREES,
+)
 from src.models._model_zoo import MODEL_ZOO
 from src.tasks.phylo.metrics import (
     generalized_robinson_foulds,
@@ -30,8 +35,9 @@ METRICS = {
     "s2r": quartet_similarity,
 }
 OUTPUT_FILES = {"none": "_trees.txt", "astral4": "_trees_astral4.txt"}
-REFERENCE_DIR = "data/trees/references/processed"
-REFERENCE_TREE_NAMES = ("iecor", "gled", "glottolog", "asjp")
+REFERENCE_TREE_NAMES = [
+    Path(f).stem for f in glob(f"{DEFAULT_REFERENCE_TREE_PROCESSED_DIR}/*.nwk")
+]
 
 
 def parse_args():
@@ -88,7 +94,7 @@ def extract_metrics_single(cfg_file, refs, output_tree_name):
 
     for ref in refs:
         # Reference tree file
-        ref_tree_file = f"{REFERENCE_DIR}/{ref}.nwk"
+        ref_tree_file = f"{DEFAULT_REFERENCE_TREE_PROCESSED_DIR}/{ref}.nwk"
         if not os.path.exists(ref_tree_file):
             raise FileNotFoundError(f"Reference tree file not found: {ref_tree_file}")
 
