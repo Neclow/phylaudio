@@ -63,13 +63,11 @@ MATRIX
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Log Det';
+TITLE 'P Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Log Det';
+NAME 'P Distance';
 OPTIONS
-	PropInvariableSites = 0,
-	FudgeFactor = 'false',
-	FillZeros = 'false';
+	HandleAmbiguousStates = 'Ignore';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
@@ -83,7 +81,7 @@ END; [DISTANCES]
 
 BEGIN ALGORITHM;
 TITLE 'Neighbor Net';
-LINK DISTANCES = 'Distances';
+LINK ALGORITHM = 'P Distance';
 NAME 'Neighbor Net';
 OPTIONS
 	InferenceAlgorithm = 'ActiveSet';
