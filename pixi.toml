@@ -24,6 +24,7 @@ download_fleurs_metadata = "python -m pipeline.download_fleurs_metadata fleurs-r
 beast_phylolm = "Rscript pipeline/beast_phylolm.R"
 beast_generate_xml = "python -m pipeline.beast_generate_xml"
 beazt = "bash pipeline/run_beast.sh"
+extract_embeddings = "python -m pipeline.extract_embeddings"
 lid = "python -m pipeline.language_identification"
 lid_summary = "python -m pipeline.language_identification_summary"
 network_analysis = "python -m pipeline.network_analysis"
@@ -115,6 +116,10 @@ beast_oak = "python -m pipeline.run_oak"
 python = "3.10.12.*"
 plotly = ">=6.5.0,<7"
 seaborn = ">=0.13.2,<0.14"
+
+[feature.viz.pypi-dependencies]
+llvmlite = "==0.44.0"
+numba = "==0.61.2"
 
 [feature.viz.tasks]
 viz_acc_vs_brsupport = "python -m plots.acc_vs_brsupport"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install missing python packages
-## Install fairseq manually to make it compatible with xls-r weigts
+## Install fairseq manually to make it compatible with xls-r weights
 uv pip install fairseq --no-deps
 uv pip install bitarray sacrebleu omegaconf hydra-core
 ## Flash attention
