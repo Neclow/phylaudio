@@ -187,6 +187,8 @@ data/models
 data/eval/*
 !data/eval/README.md
 
+# Embeddings
+data/embeddings/*
 
 # Tree data (except README and template)
 data/trees/*
@@ -203,3 +205,6 @@ drafts*.R
 
 # Plots (temporary)
 img/
+
+# BEAST xml states
+*.xml.*state
