@@ -22,6 +22,7 @@ NONE_TENSOR: Final = torch.tensor([-1])
 DEFAULT_ROOT_DIR: Final = "data"
 DEFAULT_AUDIO_DIR: Final = f"{DEFAULT_ROOT_DIR}/datasets"
 DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
+DEFAULT_EMBEDDING_DIR: Final = f"{DEFAULT_ROOT_DIR}/embeddings"
 DEFAULT_EVAL_DIR: Final = f"{DEFAULT_ROOT_DIR}/eval"
 DEFAULT_METADATA_DIR: Final = f"{DEFAULT_ROOT_DIR}/metadata"
 DEFAULT_TREE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees"
