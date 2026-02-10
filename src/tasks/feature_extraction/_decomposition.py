@@ -26,6 +26,25 @@ def load_decomposer(method, device):
         print("Using sklearn FastICA")
         decomposer = FastICA
         decomposer.device = "cpu"
+    # elif method == "lda":
+    #     print("Using sklearn LDA")
+    #     decomposer = LDA
+    #     decomposer.device = "cpu"
+    # elif method == "umap":
+    #     from functools import partial
+    #     try:
+    #         from cuml import UMAP
+    #     except ImportError as exc:
+    #         raise RuntimeError(
+    #             "cuML UMAP is not installed. Are you using the viz environment? Please install cuML or use a different decomposition method."
+    #         ) from exc
+
+    #     print("Using cuML UMAP")
+    #     decomposer = UMAP
+    #     decomposer.device = "cuda"
+    #     decomposer = partial(
+    #         decomposer, n_neighbors=200, min_dist=0.3, metric="manhattan"
+    #     )
     else:
         raise ValueError(f"Unknown decomposition method: {method}")
 
