@@ -200,8 +200,14 @@ data/trees/beast/*
 # My drafts
 tmp/
 notes/
+notebooks/
 drafts*.ipynb
 drafts*.R
+
+# CLAUDE and AGENTS
+.claude/
+AGENTS.md
+CLAUDE.md
 
 # Plots (temporary)
 img/
