@@ -23,16 +23,19 @@ Arguments:
                e.g., "c59" matches "c5969221-5f5d-4f4b-874e-dcf96e9831b9"
   size         Branch support threshold (e.g., 0.01, 0.05)
   version      XML version number (e.g., 11 for input_v11.xml)
+               or subdir/name path (e.g., ns_v12/M0 for ns_v12/M0.xml)
   run_number   Run number (1-99), used to compute seed
 
-Seed is computed as: version * 100 + run_number
+Seed is computed as: version * 100 + run_number (for numeric versions)
   e.g., version=11, run=3 -> seed=1103
+For path-style versions, seed = run_number directly.
 
 Examples:
   run_beast.sh c59 0.01 11 3         # c5969221-.../0.01_brsupport, v11, seed 1103
   run_beast.sh -r c59 0.01 11 3      # Resume from state file
   run_beast.sh -o c59 0.01 11 3      # Overwrite existing output
   run_beast.sh abc123 0.05 12 1      # abc123.../0.05_brsupport, v12, seed 1201
+  run_beast.sh dd2 0.01 ns_v12/M0 1  # NS run: .../ns_v12/M0.xml, seed 1
 
 Output files (in matched directory):
   input_v{version}_{seed}.log        # Parameter trace
@@ -59,8 +62,13 @@ SIZE=$2
 VERSION=$3
 RUN=$4
 
-# Seed = version * 100 + run_number (e.g., v11 run 3 = 1103)
-SEED="${VERSION}$(printf '%02d' "$RUN")"
+# Seed = version * 100 + run_number for numeric versions (e.g., v11 run 3 = 1103)
+# For path-style versions (e.g., ns_v12/M0), seed = run_number directly
+if [[ "$VERSION" =~ ^[0-9]+$ ]]; then
+    SEED="${VERSION}$(printf '%02d' "$RUN")"
+else
+    SEED="$RUN"
+fi
 
 # Alternate GPUs: odd seed (1,3,5...) -> GPU 1, even seed (2,4,6...) -> GPU 2
 if (( SEED % 2 == 1 )); then
@@ -95,8 +103,14 @@ if [[ ! -d "$WORKING_DIR" ]]; then
     exit 1
 fi
 
-INPUT_FILE="$WORKING_DIR/input_v${VERSION}.xml"
-STATE_FILE="$WORKING_DIR/input_v${VERSION}_${SEED}.xml.state"
+# Build file paths: numeric version -> input_v{VERSION}.xml, path -> {VERSION}.xml
+if [[ "$VERSION" =~ ^[0-9]+$ ]]; then
+    INPUT_FILE="$WORKING_DIR/input_v${VERSION}.xml"
+    STATE_FILE="$WORKING_DIR/input_v${VERSION}_${SEED}.xml.state"
+else
+    INPUT_FILE="$WORKING_DIR/${VERSION}.xml"
+    STATE_FILE="$WORKING_DIR/${VERSION}_${SEED}.xml.state"
+fi
 
 if [[ ! -f "$INPUT_FILE" ]]; then
     echo "Error: Input file not found: $INPUT_FILE"
