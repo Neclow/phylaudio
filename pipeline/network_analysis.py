@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     print(
         (
-            "By default, we use the LogDet distance transformation and NeighborNet in the workflow. "
+            "By default, we use the P-distance transformation and NeighborNet in the workflow. "
             "Use the SplitsTree6 GUI to modify the analysis as needed."
             f"Or modify the workflow file at {args.workflow} to customize the analysis."
         )

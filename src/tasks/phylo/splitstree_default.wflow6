@@ -1,14 +1,13 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=10 nAlgorithms=7;
-PROGRAM version='SplitsTree App (version 6.3.20, built 16 May 2024)';
-WORKFLOW creationDate='1766233668424'; [Sat Dec 20 13:27:48 CET 2025]
+DIMENSIONS nDataNodes=10 nAlgorithms=6;
+PROGRAM version='SplitsTree App (version 6.6.5, built 25 Nov 2025)';
+WORKFLOW creationDate='1771517700534'; [Thu Feb 19 17:15:00 CET 2026]
 END; [SPLITSTREE6]
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=0;
 TAXLABELS
 ;
@@ -18,7 +17,6 @@ END; [TAXA]
 
 BEGIN ALGORITHM;
 TITLE 'Taxa Filter';
-LINK ALGORITHM = 'Input Data Loader';
 NAME 'Taxa Filter';
 OPTIONS
 ;
@@ -36,7 +34,7 @@ END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Input Data Loader';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=0 nchar=0;
 FORMAT
 	datatype='Unknown' missing=? gap=- labels=left transpose=no interleave=yes;
@@ -72,7 +70,7 @@ END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Log Det';
+LINK ALGORITHM = 'P Distance';
 DIMENSIONS ntax=0;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
@@ -81,7 +79,7 @@ END; [DISTANCES]
 
 BEGIN ALGORITHM;
 TITLE 'Neighbor Net';
-LINK ALGORITHM = 'P Distance';
+LINK DISTANCES = 'Distances';
 NAME 'Neighbor Net';
 OPTIONS
 	InferenceAlgorithm = 'ActiveSet';
@@ -121,6 +119,6 @@ END; [ALGORITHM]
 BEGIN VIEW;
 TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'View';
+NAME 'ViewView';
 INPUT 'SPLITS';
 END; [VIEW]
