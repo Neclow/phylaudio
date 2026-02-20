@@ -36,14 +36,20 @@ if __name__ == "__main__":
     with open(f"{dataset_meta_dir}/languages.json", "r", encoding="utf-8") as f:
         languages = json.load(f)
 
+    glottocodes = {v["glottolog"] for v in languages.values()}
+
     response = requests.get(PHOIBLE_URL, timeout=10)
     response.raise_for_status()
     raw_data = pd.read_csv(StringIO(response.content.decode("utf-8")))
 
-    glottocodes = {v["glottolog"] for v in languages.values()}
-
     data = raw_data.query("Glottocode.isin(@glottocodes)")
 
     output_file = f"{dataset_meta_dir}/phoible.csv"
+
+    print(
+        f"Found data for {data.Glottocode.nunique()} languages. Saving to {output_file}."
+    )
+
+    print(f"Missing: {set(glottocodes) - set(data.Glottocode.unique())}")
 
     data.to_csv(output_file, index=False)
