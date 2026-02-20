@@ -2,6 +2,7 @@ import warnings
 import xml
 from pathlib import Path
 
+import numpy as np
 from Bio import SeqIO
 from tqdm import tqdm
 
@@ -145,3 +146,43 @@ def zip_fastas(run_id):
     )
 
     _run_command(command)
+
+
+def to_numpy(fa_path):
+    """
+    Parse a binary FASTA alignment (0/1/? characters) into a numpy matrix.
+    Missing values (?) are imputed with column means; all-missing columns get 0.0.
+
+    Returns (X, labels) where X is (n_languages, n_sites) and labels is a list of names.
+    """
+    seqs = {}
+    name = None
+    with open(fa_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith(">"):
+                name = line[1:]
+                seqs[name] = ""
+            else:
+                seqs[name] += line
+
+    labels = list(seqs.keys())
+    n = len(labels)
+    L = len(seqs[labels[0]])
+
+    X_raw = np.full((n, L), np.nan)
+    for i, nm in enumerate(labels):
+        for j, c in enumerate(seqs[nm]):
+            if c != "?":
+                X_raw[i, j] = int(c)
+
+    col_means = np.nanmean(X_raw, axis=0)
+    # If an entire column is NaN, set its mean to 0.5
+    col_means = np.where(np.isnan(col_means), 0.5, col_means)
+
+    X = X_raw.copy()
+    for j in range(L):
+        missing = np.isnan(X[:, j])
+        X[missing, j] = col_means[j]
+
+    return X, labels

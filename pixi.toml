@@ -34,6 +34,7 @@ sentence_distance = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
+nmf_structure = "python -m pipeline.nmf_structure"
 
 [tasks.beast2]
 cmd = "extern/beast2/bin/beast"
