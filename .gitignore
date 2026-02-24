@@ -215,3 +215,6 @@ plots/
 
 # BEAST xml states
 *.xml.*state
+
+# Wikimedia outputs
+wikimedia.json
