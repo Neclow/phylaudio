@@ -37,7 +37,7 @@ DEFAULT_SPLITSTREE_FASTA_FILE: Final = "__merged_splitstree.fa"
 # Default number of threads for phylogenetic tree inference (iqtree/raxml)
 DEFAULT_THREADS_TREE: Final = 4
 
-# Default number for discrete to nexus
+# Default number of threads for discrete to nexus
 DEFAULT_THREADS_NEXUS: Final = 16
 
 # Minimum number of different languages (leaves) to infer a tree
