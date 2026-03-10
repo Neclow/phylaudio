@@ -11,6 +11,13 @@ from src._config import DEFAULT_METADATA_DIR
 
 PHOIBLE_URL = "https://raw.githubusercontent.com/phoible/dev/7030ae02863f0e1ddaf67f0f950c0ea1477cd4ee/data/phoible.csv"
 
+# Additional glottocodes to download for languages whose PHOIBLE entry
+# uses a different glottocode than the one in our metadata.
+GLOTTOCODE_REMAPPINGS = {
+    "latv1249": "stan1325",  # Latvian: Standard Latvian in PHOIBLE
+    "nucl1276": "nort2646",  # Pashto: Northern Pashto (most spoken variety)
+}
+
 
 def parse_args():
     parser = ArgumentParser(
@@ -37,19 +44,28 @@ if __name__ == "__main__":
         languages = json.load(f)
 
     glottocodes = {v["glottolog"] for v in languages.values()}
+    glottocodes |= set(GLOTTOCODE_REMAPPINGS.values())
 
     response = requests.get(PHOIBLE_URL, timeout=10)
     response.raise_for_status()
     raw_data = pd.read_csv(StringIO(response.content.decode("utf-8")))
 
-    data = raw_data.query("Glottocode.isin(@glottocodes)")
+    data = raw_data.query("Glottocode.isin(@glottocodes)").copy()
+
+    # Remap glottocodes back to our metadata's codes
+    reverse_map = {v: k for k, v in GLOTTOCODE_REMAPPINGS.items()}
+    data["Glottocode"] = data["Glottocode"].replace(reverse_map)
 
     output_file = f"{dataset_meta_dir}/phoible.csv"
+
+    # Report missing using our metadata's glottocodes (after remap)
+    expected = {v["glottolog"] for v in languages.values()}
+    missing = expected - set(data.Glottocode.unique())
 
     print(
         f"Found data for {data.Glottocode.nunique()} languages. Saving to {output_file}."
     )
 
-    print(f"Missing: {set(glottocodes) - set(data.Glottocode.unique())}")
+    print(f"Missing: {missing}")
 
     data.to_csv(output_file, index=False)

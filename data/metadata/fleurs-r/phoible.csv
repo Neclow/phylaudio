@@ -8433,6 +8433,39 @@ InventoryID,Glottocode,ISO6393,LanguageName,SpecificDialect,GlyphID,Phoneme,Allo
 2320,laoo1244,lao,Lao,Lao (Chieng Khouang),0264,ɤ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,-,+,+,-,-,+,-,-,-,0,0,-,-,0
 2320,laoo1244,lao,Lao,Lao (Chieng Khouang),026F,ɯ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,+,+,-,-,+,-,-,-,0,0,-,-,0
 2320,laoo1244,lao,Lao,Lao (Chieng Khouang),026F+0251,ɯɑ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,"+,-","-,+",-,+,+,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0062,b,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0064+0320+0292,d̠ʒ,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0064+032A,d̪,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,+,+,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0068,h,,False,consonant,ea,0,-,-,-,-,-,-,+,+,-,-,-,-,-,-,0,0,-,0,0,0,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),006A,j,,False,consonant,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),006B+02B0,kʰ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),006D,m,,False,consonant,ea,0,-,-,-,-,+,+,-,0,-,-,-,+,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),006E,n,,False,consonant,ea,0,-,-,-,-,+,+,-,0,-,-,-,+,-,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0070+02B0,pʰ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0073,s,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0074+0320+0283+02B0,t̠ʃʰ,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0074+032A+02B0,t̪ʰ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,+,+,-,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0077,w,,False,consonant,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,+,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0078,x,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),007A,z,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0256,ɖ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,-,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0261,ɡ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0263,ɣ,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),027D,ɽ,,False,consonant,ea,0,-,-,-,-,+,+,+,0,+,+,-,-,-,-,0,0,+,-,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),027D+0303,ɽ̃,,False,consonant,ea,0,-,-,-,-,+,+,+,0,+,+,-,+,-,-,0,0,+,-,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0283,ʃ,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0288+02B0,ʈʰ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,-,-,-,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0061,a,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,-,-,0,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0061+02D0,aː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,-,-,0,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0065+02D0,eː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,+,-,+,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0069+02D0,iː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),006F+02D0,oː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,-,-,-,+,+,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0075+02D0,uː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,+,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0251+02D0,ɑː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,-,+,0,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),0259,ə,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,-,-,-,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),025B,ɛ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),026A,ɪ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
+2321,nucl1276,pbu,Yousafzai Pashto,Yousafzai Pashto (Peshāwar),028A,ʊ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
 2337,luxe1241,ltz,Luxembourgish,,0066,f,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,+,-,+,-,0,0,0,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
 2337,luxe1241,ltz,Luxembourgish,,0068,h,,False,consonant,ea,0,-,-,-,-,-,-,+,+,-,-,-,-,-,-,0,0,-,0,0,0,-,0,0,0,0,0,-,-,-,-,+,-,-,-,-,-,-
 2337,luxe1241,ltz,Luxembourgish,,006A,j,,False,consonant,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,-,-,-,-,-
@@ -9778,6 +9811,48 @@ InventoryID,Glottocode,ISO6393,LanguageName,SpecificDialect,GlyphID,Phoneme,Allo
 2488,lith1251,lit,Lithuanian,Lithuanian (South Samogitian),025B,ɛ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
 2488,lith1251,lit,Lithuanian,Lithuanian (South Samogitian),026A+032F,ɪ̯,,False,vowel,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
 2488,lith1251,lit,Lithuanian,Lithuanian (South Samogitian),028A+032F,ʊ̯,,False,vowel,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0062,b,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0063,c,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,-,+,-,+,+,-,+,-,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0064,d,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0064+007A,dz,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0064+0320+0292,d̠ʒ,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0066,f,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,+,-,+,-,0,0,0,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),006A,j,,False,consonant,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),006B,k,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),006C,l,,False,consonant,ea,0,-,-,-,-,+,+,+,0,+,-,-,-,+,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),006D,m,,False,consonant,ea,0,-,-,-,-,+,+,-,0,-,-,-,+,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),006E,n,,False,consonant,ea,0,-,-,-,-,+,+,-,0,-,-,-,+,-,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0070,p,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0072,r,,False,consonant,ea,0,-,-,-,-,+,+,+,0,+,-,+,-,-,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0073,s,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0074,t,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,+,-,-,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0074+0073,ts,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0074+0320+0283,t̠ʃ,,False,consonant,ea,0,-,-,-,-,+,-,-,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0076,v,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,+,-,+,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0078,x,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),007A,z,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,+,-,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),025F,ɟ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,-,+,-,+,+,-,+,-,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0261,ɡ,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,-,0,0,0,+,+,-,-,-,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0272,ɲ,,False,consonant,ea,0,-,-,-,-,+,+,-,0,-,-,-,+,-,-,0,0,+,-,+,-,+,+,-,+,-,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0283,ʃ,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,-,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),028E,ʎ,,False,consonant,ea,0,-,-,-,-,+,+,+,0,+,-,-,-,+,-,0,0,+,-,+,-,+,+,-,+,-,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0292,ʒ,,False,consonant,ea,0,-,-,-,-,+,-,+,+,-,-,-,-,-,-,0,0,+,-,+,+,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
+2493,latv1249,lvs,Latvian,Latvian (Standard),0061+0308,ä,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,-,-,0,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0061+0308+02D0,äː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,-,-,0,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0069,i,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0069+0259,iə,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,"+,-",-,"+,-",-,"+,-",-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0069+02D0,iː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0069+032F,i̯,,False,vowel,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,+,-,+,-,+,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0075+028C,uʌ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,"+,-",+,-,-,0,0,0,+,"+,-",-,-,+,"+,-",-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0075+02D0,uː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,+,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),00E6,æ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,+,-,0,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),00E6+02D0,æː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,+,+,-,0,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0254,ɔ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,-,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),0254+02D0,ɔː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,-,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),025B,ɛ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),025B+02D0,ɛː,,False,vowel,ea,0,-,+,-,+,-,+,+,0,+,-,-,-,-,-,0,0,-,0,0,0,+,-,-,+,-,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),028A,ʊ,,False,vowel,ea,0,-,+,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
+2493,latv1249,lvs,Latvian,Latvian (Standard),028A+032F,ʊ̯,,False,vowel,ea,0,-,-,-,-,-,+,+,0,+,-,-,-,-,+,+,-,-,0,0,0,+,+,-,-,+,-,-,-,+,-,-,-,0,0,-,-,0
 2495,oriy1255,ory,Oriya,,0062,b,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,-,-,-,-,-,-,-
 2495,oriy1255,ory,Oriya,,0062+0324,b̤,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,+,-,-,-,0,0,0,-,0,0,0,0,0,-,-,+,-,+,-,-,-,-,-,-
 2495,oriy1255,ory,Oriya,,0063,c,,False,consonant,ea,0,-,-,-,-,+,-,-,-,-,-,-,-,-,-,0,0,+,-,+,-,+,+,-,+,-,0,-,-,-,-,-,-,-,-,-,-,-
