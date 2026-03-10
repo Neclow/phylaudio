@@ -2,23 +2,17 @@
 
 """Non-intrusive speech quality estimation using torchaudio SQUIM"""
 
-import json
-import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from concurrent.futures import ThreadPoolExecutor
 from glob import glob
 
 import pandas as pd
 import torch
 import torchaudio
+from torchaudio.pipelines import SQUIM_OBJECTIVE
 from tqdm import tqdm
 
-from src._config import (
-    DEFAULT_AUDIO_DIR,
-    DEFAULT_METADATA_DIR,
-    DEFAULT_ROOT_DIR,
-    SAMPLE_RATE,
-)
+from src._config import DEFAULT_METADATA_DIR, DEFAULT_ROOT_DIR, SAMPLE_RATE
+from src.data.datasets import FleursParallelDataset
 
 
 def parse_args():
@@ -29,17 +23,9 @@ def parse_args():
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--dataset",
-        default="fleurs-r",
+        "dataset",
         type=str,
-        help="Dataset name",
-    )
-    parser.add_argument(
-        "--subset",
-        default=None,
-        type=str,
-        choices=["train", "dev", "test"],
-        help="Data subset (default: all splits)",
+        help="Dataset. Example: `fleurs-r`. ",
     )
     parser.add_argument(
         "--device",
@@ -48,20 +34,22 @@ def parse_args():
     )
     parser.add_argument(
         "--batch-size",
-        default=32,
         type=int,
+        default=32,
         help="Number of waveforms to process at once",
     )
 
     return parser.parse_args()
 
 
-def load_audio(path, target_sr=SAMPLE_RATE):
-    """Load and resample a single audio file to mono at target_sr"""
-    waveform, sr = torchaudio.load(path)
+def load_audio(pattern, target_sr=SAMPLE_RATE):
+    """Load a single audio file as mono waveform at target_sr"""
+    wav_path = glob(pattern)
+    if len(wav_path) != 1:
+        raise ValueError(f"Expected 1 file for {pattern}, got {len(wav_path)}")
+    waveform, sr = torchaudio.load(wav_path[0])
     if sr != target_sr:
         waveform = torchaudio.functional.resample(waveform, sr, target_sr)
-    # Mono
     if waveform.shape[0] > 1:
         waveform = waveform.mean(dim=0, keepdim=True)
     return waveform
@@ -72,85 +60,71 @@ def main():
 
     args = parse_args()
 
-    # Load language metadata
-    metadata_path = f"{DEFAULT_METADATA_DIR}/{args.dataset}/languages.json"
-    with open(metadata_path, "r", encoding="utf-8") as f:
-        languages = json.load(f)
+    # Build dataset with same config as embedding run
+    dataset = FleursParallelDataset(
+        dataset=args.dataset,
+        root_dir=DEFAULT_ROOT_DIR,
+        dtype="audio",
+        glottocode=None,
+        min_speakers=0.0,
+    )
 
     # Load SQUIM objective model
     print("(squim) Loading SQUIM objective model...")
-    objective_model = torchaudio.pipelines.SQUIM_OBJECTIVE.get_model().to(args.device)
+    objective_model = SQUIM_OBJECTIVE.get_model().to(args.device)
     objective_model.eval()
 
-    # Output directory
-    output_dir = f"{DEFAULT_METADATA_DIR}/{args.dataset}"
-    os.makedirs(output_dir, exist_ok=True)
-
-    subsets = [args.subset] if args.subset else ["train", "dev", "test"]
+    df = dataset.data.copy().reset_index(drop=True)
     all_records = []
+    bs = args.batch_size
+    n = len(df)
 
-    with torch.no_grad(), torch.amp.autocast(device_type=args.device.split(":")[0], dtype=torch.bfloat16):
-        for lang in sorted(languages.keys()):
-            for subset in subsets:
-                audio_dir = (
-                    f"{DEFAULT_AUDIO_DIR}/{args.dataset}/{lang}/{lang}/audio/{subset}"
+    with (
+        torch.no_grad(),
+        torch.amp.autocast(device_type=args.device.split(":")[0], dtype=torch.bfloat16),
+    ):
+        for start in tqdm(range(0, n, bs), total=(n + bs - 1) // bs, desc="(squim)"):
+            batch = df.iloc[start : start + bs]
+
+            waveforms = []
+            for _, row in batch.iterrows():
+                _, basename, *_, subset, _ = row
+                x = load_audio(f"{dataset.data_dir}/*/*/audio/{subset}/{basename}")
+                waveforms.append(x.squeeze(0))
+
+            # Pad to max length in batch
+            max_len = max(w.shape[-1] for w in waveforms)
+            padded = torch.stack(
+                [
+                    torch.nn.functional.pad(w, (0, max_len - w.shape[-1]))
+                    for w in waveforms
+                ]
+            ).to(args.device)
+
+            stoi, pesq, si_sdr = objective_model(padded)
+
+            for i, (_, row) in enumerate(batch.iterrows()):
+                sentence_index, basename, *_, subset, label = row
+                all_records.append(
+                    {
+                        "sentence_index": sentence_index,
+                        "language": dataset.label_encoder.decode_ndim(label),
+                        "subset": subset,
+                        "file": basename,
+                        "stoi": stoi[i].item(),
+                        "pesq": pesq[i].item(),
+                        "si_sdr": si_sdr[i].item(),
+                    }
                 )
-                audio_files = sorted(glob(f"{audio_dir}/*.wav"))
 
-                if not audio_files:
-                    continue
-
-                # Process in batches
-                for batch_start in tqdm(
-                    range(0, len(audio_files), args.batch_size),
-                    total=(len(audio_files) + args.batch_size - 1) // args.batch_size,
-                    desc=f"(squim) Processing {lang}/{subset}",
-                ):
-                    batch_files = audio_files[
-                        batch_start : batch_start + args.batch_size
-                    ]
-
-                    # Load audio in parallel threads (I/O-bound)
-                    with ThreadPoolExecutor(max_workers=4) as pool:
-                        waveforms = list(
-                            pool.map(
-                                lambda p: load_audio(p, target_sr=SAMPLE_RATE).squeeze(0),
-                                batch_files,
-                            )
-                        )
-
-                    # Pad to max length in batch
-                    lengths = [w.shape[-1] for w in waveforms]
-                    max_len = max(lengths)
-                    padded = torch.stack(
-                        [
-                            torch.nn.functional.pad(w, (0, max_len - w.shape[-1]))
-                            for w in waveforms
-                        ]
-                    ).to(args.device)
-
-                    stoi, pesq, si_sdr = objective_model(padded)
-
-                    for i, fpath in enumerate(batch_files):
-                        all_records.append(
-                            {
-                                "language": lang,
-                                "subset": subset,
-                                "file": os.path.basename(fpath),
-                                "stoi": stoi[i].item(),
-                                "pesq": pesq[i].item(),
-                                "si_sdr": si_sdr[i].item(),
-                            }
-                        )
-
-    # Save results
-    df = pd.DataFrame(all_records)
-    output_file = f"{output_dir}/squim.csv"
-    df.to_csv(output_file, index=False)
-    print(f"(squim) Saved {len(df)} records to {output_file}")
+    # Save results alongside the embedding run
+    output_file = f"{DEFAULT_METADATA_DIR}/{args.dataset}/squim.csv"
+    results = pd.DataFrame(all_records)
+    results.to_csv(output_file, index=False)
+    print(f"(squim) Saved {len(results)} records to {output_file}")
 
     # Print per-language summary
-    summary = df.groupby("language")[["stoi", "pesq", "si_sdr"]].mean()
+    summary = results.groupby("language")[["stoi", "pesq", "si_sdr"]].mean()
     print("\n(squim) Per-language summary (mean):")
     print(summary.to_string())
 
