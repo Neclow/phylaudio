@@ -1,3 +1,7 @@
+import json
+from glob import glob
+
+import pandas as pd
 import torch
 from tqdm import tqdm
 
@@ -8,6 +12,29 @@ from src.tasks.feature_extraction.base import (
     save_state,
     sentence_loop,
 )
+
+IGNORE_COLUMNS = ["dbs", "ebs", "device", "Commit"]
+
+
+def update_summary(dataset_embedding_dir):
+    """Update summary.csv from all cfg.json files in the embedding directory."""
+    cfg_files = glob(f"{dataset_embedding_dir}/*/cfg.json")
+    if not cfg_files:
+        return
+
+    rows = []
+    for cfg_file in cfg_files:
+        with open(cfg_file, "r", encoding="utf-8") as f:
+            rows.append(json.load(f))
+
+    df = (
+        pd.DataFrame(rows)
+        .set_index("run_id")
+        .drop(columns=IGNORE_COLUMNS, errors="ignore")
+    )
+    df.to_csv(f"{dataset_embedding_dir}/summary.csv")
+    print(f"Updated {dataset_embedding_dir}/summary.csv ({len(df)} runs)")
+
 
 if __name__ == "__main__":
     args = get_fleurs_parallel_args().parse_args()
@@ -53,3 +80,5 @@ if __name__ == "__main__":
     X_emb_cat = torch.cat(all_X_emb, dim=0)
 
     torch.save(X_emb_cat, f"{output_folder}/embeddings.pt")
+
+    update_summary(dataset_embedding_dir)
