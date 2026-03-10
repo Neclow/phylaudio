@@ -9,7 +9,6 @@ Example:
 """
 
 import os
-import pickle
 from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
@@ -17,6 +16,7 @@ from argparse import (
 )
 from glob import glob
 
+import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -62,7 +62,9 @@ def parse_args():
         choices=["kullback-leibler", "frobenius"],
         help="NMF loss function",
     )
-    parser.add_argument("--no-plots", action="store_true", help="Skip plot generation")
+    parser.add_argument(
+        "--plot", action="store_true", help="Generate STRUCTURE plots for each K"
+    )
     parser.add_argument("--dpi", type=int, default=200, help="Plot DPI")
     return parser.parse_args()
 
@@ -88,12 +90,45 @@ def find_fasta(beast_dir):
     if len(hits) == 1:
         return hits[0]
     if len(hits) == 0:
-        raise FileNotFoundError(
-            f"No {DEFAULT_MAPPED_FASTA_FILE} found in {beast_dir}/"
-        )
+        raise FileNotFoundError(f"No {DEFAULT_MAPPED_FASTA_FILE} found in {beast_dir}/")
     raise ValueError(
         f"Multiple {DEFAULT_MAPPED_FASTA_FILE} found in {beast_dir}/: {hits}"
     )
+
+
+def _write_h5(path, results, labels):
+    """Write NMF K-sweep results to HDF5."""
+    with h5py.File(path, "w") as f:
+        f.create_dataset("labels", data=np.array(labels, dtype=h5py.string_dtype()))
+        for k_val, res in results.items():
+            g = f.create_group(f"K{k_val:02d}")
+            g.create_dataset("W", data=res["best"]["W"])
+            g.create_dataset("H", data=res["best"]["H"])
+            g.create_dataset("errs", data=res["errs"])
+            g.attrs["err"] = res["best"]["err"]
+            g.attrs["stability"] = res["stability"]
+
+
+def _read_h5(path):
+    """Read NMF K-sweep results from HDF5."""
+    results = {}
+    with h5py.File(path, "r") as f:
+        labels = list(f["labels"].asstr()[()])
+        for key in f:
+            if not key.startswith("K"):
+                continue
+            g = f[key]
+            k_val = int(key[1:])
+            results[k_val] = {
+                "best": {
+                    "W": g["W"][()],
+                    "H": g["H"][()],
+                    "err": float(g.attrs["err"]),
+                },
+                "errs": g["errs"][()],
+                "stability": float(g.attrs["stability"]),
+            }
+    return results, labels
 
 
 def main():
@@ -110,16 +145,13 @@ def main():
     print(f"Loaded {n} languages × {L} sites from {fa_path}")
     print(f"Matrix range: [{X.min():.3f}, {X.max():.3f}]")
 
-    # -- NMF K-sweep (with pickle caching) --
-    pkl_name = f"nmf_sweep_k{args.k_min}_k{args.k_max}.pkl"
-    pkl_path = f"{out_dir}/{pkl_name}"
+    # -- NMF K-sweep (with HDF5 caching) --
+    h5_name = f"sweep_k{args.k_min}_k{args.k_max}.h5"
+    h5_path = f"{out_dir}/{h5_name}"
 
-    if os.path.isfile(pkl_path):
-        print(f"Loading cached results from {pkl_path}")
-        with open(pkl_path, "rb") as f:
-            cached = pickle.load(f)
-        results = cached["results"]
-        labels = cached["labels"]
+    if os.path.isfile(h5_path):
+        print(f"Loading cached results from {h5_path}")
+        results, labels = _read_h5(h5_path)
     else:
         results = nmf_k_sweep(
             X,
@@ -129,9 +161,8 @@ def main():
             seed0=args.seed,
             loss=args.loss,
         )
-        with open(pkl_path, "wb") as f:
-            pickle.dump({"results": results, "labels": labels}, f)
-        print(f"Saved results to {pkl_path}")
+        _write_h5(h5_path, results, labels)
+        print(f"Saved results to {h5_path}")
 
     k_star = choose_k(results, error_slack=args.error_slack)
     print(f"\n>>> Chosen K = {k_star}\n")
@@ -139,16 +170,16 @@ def main():
     # -- Plots --
     ks = sorted(results.keys())
 
-    if not args.no_plots:
-        fig = plot_k_diagnostics(results, k_star=k_star)
-        diag_path = f"{out_dir}/nmf_diagnostics_k{args.k_min}_k{args.k_max}.png"
-        fig.savefig(diag_path, dpi=args.dpi)
-        plt.close(fig)
-        print(f"Saved {diag_path}")
+    fig = plot_k_diagnostics(results, k_star=k_star)
+    diag_path = f"{out_dir}/diagnostics_k{args.k_min}_k{args.k_max}.png"
+    fig.savefig(diag_path, dpi=args.dpi)
+    plt.close(fig)
+    print(f"Saved {diag_path}")
 
+    if args.plot:
         for k_val in ks:
             W = results[k_val]["best"]["W"]
-            out_path = f"{out_dir}/nmf_structure_K{k_val:02d}.png"
+            out_path = f"{out_dir}/structure_K{k_val:02d}.png"
             fig = plot_structure(
                 W,
                 labels=labels,
