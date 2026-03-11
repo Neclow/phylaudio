@@ -1,4 +1,10 @@
-"""Extract phoneme information from a language dataset using phoible"""
+"""Download PHOIBLE phoneme inventories and aggregate to one row per language.
+
+Outputs a CSV with columns: Glottocode, n_phonemes, n_consonants, n_vowels,
+plus two representations of each phonological feature:
+  - n_{feat}:   count of segments with [+feat]
+  - has_{feat}: binary (1 if any segment has [+feat], else 0)
+"""
 
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
@@ -11,6 +17,10 @@ from src._config import DEFAULT_METADATA_DIR
 
 PHOIBLE_URL = "https://raw.githubusercontent.com/phoible/dev/7030ae02863f0e1ddaf67f0f950c0ea1477cd4ee/data/phoible.csv"
 
+# Source priority hierarchy from Urban & Moran (2021), PLoS One 16(2):e0245522.
+# Maximizes one-inventory-per-doculect and inclusion of contrastive tone.
+SOURCE_PRIORITY = ["ph", "gm", "saphon", "uz", "ea", "er", "spa", "aa", "ra", "upsid"]
+
 # Additional glottocodes to download for languages whose PHOIBLE entry
 # uses a different glottocode than the one in our metadata.
 GLOTTOCODE_REMAPPINGS = {
@@ -21,7 +31,7 @@ GLOTTOCODE_REMAPPINGS = {
 
 def parse_args():
     parser = ArgumentParser(
-        description="Arguments for phoible lineage extraction",
+        description="Download and aggregate PHOIBLE phoneme inventories",
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -46,6 +56,7 @@ if __name__ == "__main__":
     glottocodes = {v["glottolog"] for v in languages.values()}
     glottocodes |= set(GLOTTOCODE_REMAPPINGS.values())
 
+    # Download raw PHOIBLE data
     response = requests.get(PHOIBLE_URL, timeout=10)
     response.raise_for_status()
     raw_data = pd.read_csv(StringIO(response.content.decode("utf-8")))
@@ -56,16 +67,45 @@ if __name__ == "__main__":
     reverse_map = {v: k for k, v in GLOTTOCODE_REMAPPINGS.items()}
     data["Glottocode"] = data["Glottocode"].replace(reverse_map)
 
-    output_file = f"{dataset_meta_dir}/phoible.csv"
-
-    # Report missing using our metadata's glottocodes (after remap)
-    expected = {v["glottolog"] for v in languages.values()}
-    missing = expected - set(data.Glottocode.unique())
-
-    print(
-        f"Found data for {data.Glottocode.nunique()} languages. Saving to {output_file}."
+    # Select best inventory per language (source priority hierarchy)
+    priority_map = {s: i for i, s in enumerate(SOURCE_PRIORITY)}
+    data = data[data["Source"].str.lower().isin(SOURCE_PRIORITY)].copy()
+    data["_priority"] = data["Source"].str.lower().map(priority_map)
+    best_inv = (
+        data.sort_values("_priority")
+        .groupby("Glottocode")[["InventoryID"]]
+        .first()
+        .reset_index()
+    )
+    data = data.drop(columns="_priority").merge(
+        best_inv, on=["Glottocode", "InventoryID"]
     )
 
-    print(f"Missing: {missing}")
+    # Identify feature columns (from "tone" onward)
+    feat_cols = list(data.columns[data.columns.get_loc("tone") :])
 
-    data.to_csv(output_file, index=False)
+    # Aggregate to one row per Glottocode
+    def _agg(group):
+        row = {
+            "n_phonemes": len(group),
+            "n_consonants": (group["SegmentClass"] == "consonant").sum(),
+            "n_vowels": (group["SegmentClass"] == "vowel").sum(),
+        }
+        for feat in feat_cols:
+            count = (group[feat] == "+").sum()
+            row[f"n_{feat}"] = count
+            row[f"has_{feat}"] = int(count > 0)
+        return pd.Series(row)
+
+    agg = data.groupby("Glottocode").apply(_agg)
+
+    # Report coverage
+    expected = {v["glottolog"] for v in languages.values()}
+    missing = expected - set(agg.index)
+
+    output_file = f"{dataset_meta_dir}/phoible.csv"
+    agg.to_csv(output_file)
+
+    print(f"Saved {len(agg)} languages x {len(agg.columns)} features to {output_file}")
+    if missing:
+        print(f"Missing: {missing}")
