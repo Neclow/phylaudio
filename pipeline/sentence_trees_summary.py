@@ -16,11 +16,7 @@ import rpy2
 from scipy.stats import gmean
 from tqdm import tqdm
 
-from src._config import (
-    DEFAULT_PER_SENTENCE_DIR,
-    DEFAULT_REFERENCE_TREE_PROCESSED_DIR,
-    REFERENCE_TREES,
-)
+from src._config import DEFAULT_PER_SENTENCE_DIR, DEFAULT_REFERENCE_TREE_PROCESSED_DIR
 from src.models._model_zoo import MODEL_ZOO
 from src.tasks.phylo.metrics import (
     generalized_robinson_foulds,
@@ -49,28 +45,26 @@ def parse_args():
         help=f"Sentence tree directory in {DEFAULT_PER_SENTENCE_DIR}",
     )
     parser.add_argument(
-        "--by",
-        default="rf_generalized",
-        choices=("rf_generalized", "rf_norm", "s2r"),
-        help="Tree metric to sort the output by",
-    )
-    parser.add_argument(
         "-r",
-        "--ref",
-        default="iecor",
+        dest="ref",
+        default="all",
         choices=(*REFERENCE_TREE_NAMES, "all"),
         type=str,
         help="Reference tree(s).",
     )
     parser.add_argument(
         "-nt",
-        "--n-threads",
+        dest="n_threads",
         default=4,
         type=int,
         help="Number of parallel threads to use.",
     )
     parser.add_argument(
-        "-ot", "--output-type", default="astral4", choices=("astral4", "none"), type=str
+        "-ot",
+        dest="output_type",
+        default="astral4",
+        choices=("astral4", "none"),
+        type=str,
     )
     parser.add_argument("--overwrite", action="store_true")
 
@@ -86,6 +80,13 @@ def extract_metrics_single(cfg_file, refs, output_tree_name):
     model_cfg = MODEL_ZOO[cfg["model_id"]]
     cfg["max_length"] = cfg.get("max_length") or model_cfg["max_length"]
     cfg["dtype"] = cfg.get("dtype") or model_cfg["dtype"]
+
+    # Glottocode
+    glottocode = cfg.get("glottocode", None)
+    if glottocode == "indo1319":
+        refs = [r for r in refs if r.endswith("indo1319") or r == "iecor"]
+    elif glottocode == "atla1278":
+        refs = [r for r in refs if r.endswith("atla1278")]
 
     # Check summary tree file exists
     tree_file = f"{os.path.dirname(cfg_file)}/{output_tree_name}"
