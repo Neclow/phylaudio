@@ -3,21 +3,15 @@
 # nmf_brms.R - Bayesian regression of NMF components on PHOIBLE features
 #
 # Fits one brms model per NMF component (K separate regressions).
+# Predictors: has_{feat} binary indicators + n_phonemes, n_consonants, n_vowels.
 # No phylogenetic covariance — just standard Bayesian linear regression.
 #
 # Usage:
-#   Rscript pipeline/nmf_brms.R <run_id> [dataset] [features]
-#
-# Arguments:
-#   features  Predictor set: "counts", "binary", or "size" (default: counts)
-#     counts    - n_{feat} per feature + n_phonemes covariate
-#     binary    - has_{feat} per feature + n_phonemes, n_consonants, n_vowels
-#     size      - n_phonemes, n_consonants, n_vowels only
+#   Rscript pipeline/nmf_brms.R <run_id> [dataset]
 #
 # Examples:
 #   Rscript pipeline/nmf_brms.R dd20
-#   Rscript pipeline/nmf_brms.R dd20 fleurs-r counts
-#   Rscript pipeline/nmf_brms.R dd20 fleurs-r binary
+#   Rscript pipeline/nmf_brms.R dd20 fleurs-r
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
 
@@ -34,43 +28,25 @@ METADATA_DIR <- "data/metadata"
 
 args <- commandArgs(trailingOnly = TRUE)
 
-VALID_FEATURES <- c("counts", "binary", "size")
-
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset] [features]\n\n"
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\n\n"
   )
   cat("Arguments:\n")
   cat("  run_id    BEAST run UUID, prefix, or full path\n")
   cat("  dataset   Dataset name (default: fleurs-r)\n")
-  cat(
-    "  features  Predictor set: counts, binary, size (default: counts)\n"
-  )
   quit(status = 0)
 }
 
 if (length(args) < 1) {
   stop(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset] [features]\nUse -h or --help for more information",
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\nUse -h or --help for more information",
     call. = FALSE
   )
 }
 
 run_id <- args[1]
 dataset <- ifelse(length(args) >= 2, args[2], "fleurs-r")
-feature_set <- ifelse(length(args) >= 3, args[3], "counts")
-
-if (!feature_set %in% VALID_FEATURES) {
-  stop(
-    sprintf(
-      "Invalid feature set '%s'. Choose from: %s",
-      feature_set,
-      paste(VALID_FEATURES, collapse = ", ")
-    ),
-    call. = FALSE
-  )
-}
-cat(sprintf("Feature set: %s\n", feature_set))
 
 # Resolve run_id to BEAST directory
 if (dir.exists(run_id)) {
@@ -169,40 +145,26 @@ pred_aligned <- pred_agg %>%
   filter(.data[[join_col]] %in% matched_gc) %>%
   arrange(match(.data[[join_col]], matched_gc))
 
-# ─── Select predictor columns based on feature_set ───────────────────────────
+# ─── Select predictor columns ────────────────────────────────────────────────
 
 all_cols <- setdiff(colnames(pred_aligned), "Glottocode")
-
-if (feature_set == "counts") {
-    # n_{feat} columns + n_phonemes as covariate
-    feat_names <- c(
-      "n_phonemes",
-      grep("^n_", all_cols, value = TRUE) %>%
-        setdiff(c("n_phonemes", "n_consonants", "n_vowels"))
-    )
-  } else if (feature_set == "binary") {
-    # has_{feat} columns + inventory size counts
-    feat_names <- c(
-      "n_phonemes",
-      "n_consonants",
-      "n_vowels",
-      grep("^has_", all_cols, value = TRUE)
-    )
-  } else if (feature_set == "size") {
-    # Just inventory size counts
-    feat_names <- c("n_phonemes", "n_consonants", "n_vowels")
-  }
+# has_{feat} binary indicators + inventory size counts
+feat_names <- c(
+  "n_phonemes",
+  "n_consonants",
+  "n_vowels",
+  grep("^has_", all_cols, value = TRUE)
+)
 
 # Drop constant features
 sds <- sapply(pred_aligned[feat_names], sd, na.rm = TRUE)
 variable_feats <- feat_names[sds > 1e-10]
 
 cat(sprintf(
-  "  Matched: %d languages, %d variable features (from %d %s candidates)\n",
+  "  Matched: %d languages, %d variable features (from %d candidates)\n",
   length(matched_idx),
   length(variable_feats),
-  length(feat_names),
-  feature_set
+  length(feat_names)
 ))
 
 # Standardize predictors
@@ -215,10 +177,10 @@ variable_feats_clean <- colnames(X_scaled)
 
 # ─── Output directory ────────────────────────────────────────────────────────
 
-# Output as sibling of nmf/ (e.g. .../0.01_brsupport/brms_phoible_counts/)
+# Output as sibling of nmf/ (e.g. .../0.01_brsupport/brms_phoible/)
 output_dir <- file.path(
   dirname(dirname(nmf_h5)),
-  paste0("brms_phoible_", feature_set)
+  "brms_phoible"
 )
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 

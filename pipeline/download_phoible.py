@@ -1,8 +1,7 @@
 """Download PHOIBLE phoneme inventories and aggregate to one row per language.
 
 Outputs a CSV with columns: Glottocode, n_phonemes, n_consonants, n_vowels,
-plus two representations of each phonological feature:
-  - n_{feat}:   count of segments with [+feat]
+plus a binary indicator per phonological feature:
   - has_{feat}: binary (1 if any segment has [+feat], else 0)
 
 Aggregation: computes features per inventory, then takes the median across
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     # Identify feature columns (from "tone" onward)
     feat_cols = list(data.columns[data.columns.get_loc("tone") :])
 
-    # Aggregate per inventory first, then take median across inventories
+    # Step 1: Compute features per inventory
     def _agg_inventory(group):
         row = {
             "n_phonemes": len(group),
@@ -93,9 +92,7 @@ if __name__ == "__main__":
             "n_vowels": (group["SegmentClass"] == "vowel").sum(),
         }
         for feat in feat_cols:
-            count = (group[feat] == "+").sum()
-            row[f"n_{feat}"] = count
-            row[f"has_{feat}"] = int(count > 0)
+            row[f"has_{feat}"] = int((group[feat] == "+").any())
         return pd.Series(row)
 
     per_inv = data.groupby(["Glottocode", "InventoryID"]).apply(
@@ -108,6 +105,9 @@ if __name__ == "__main__":
         f"median={n_inventories.median():.0f}, max={n_inventories.max()}"
     )
 
+    # Step 2: Median across inventories per language.
+    # For size columns (n_phonemes, etc.) this gives the median count.
+    # For has_{feat} binary indicators this is a majority vote (>50% of inventories).
     agg = per_inv.groupby("Glottocode").median()
 
     # Report coverage
