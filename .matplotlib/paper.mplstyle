@@ -2,7 +2,7 @@
 
 # Use a sans-serif font
 font.family:  sans-serif
-font.sans-serif: Arial, Helvetica, DejaVu Sans
+font.sans-serif: TeX Gyre Heros, Helvetica, DejaVu Sans
 
 # Set the font size
 font.size: 9
