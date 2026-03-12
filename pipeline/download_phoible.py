@@ -29,7 +29,16 @@ SOURCE_PRIORITY = ["ph", "gm", "saphon", "uz", "ea", "er", "spa", "aa", "ra", "u
 GLOTTOCODE_REMAPPINGS = {
     "latv1249": "stan1325",  # Latvian: Standard Latvian in PHOIBLE
     "nucl1276": "nort2646",  # Pashto: Northern Pashto (most spoken variety)
+    "pedi1238": "sout2807",  # Northern Sotho: Sesotho (closest in PHOIBLE)
+    "west2721": "east2652",  # Oromo: Eastern Oromo
+    "uzbe1247": "nort2690",  # Uzbek: Northern Uzbek (UPSID)
 }
+
+# Languages absent from PHOIBLE (not remapped):
+# - Belarusian (bela1254): closest neighbours are Ukrainian (first) and Russian (second), both of which are in PHOIBLE.
+#   Source: https://doi.org/10.1515/9783110542431-007; https://doi.org/10.1017/CBO9780511486807
+# - Bosnian (bosn1245): mutually intelligible with Serbian/Croatian (PHOIBLE has both),
+#   but treated as a separate language in FLEURS.
 
 
 def parse_args():
@@ -62,7 +71,7 @@ if __name__ == "__main__":
     # Download raw PHOIBLE data
     response = requests.get(PHOIBLE_URL, timeout=10)
     response.raise_for_status()
-    raw_data = pd.read_csv(StringIO(response.content.decode("utf-8")))
+    raw_data = pd.read_csv(StringIO(response.content.decode("utf-8")), low_memory=False)
 
     data = raw_data.query("Glottocode.isin(@glottocodes)").copy()
 
@@ -89,11 +98,15 @@ if __name__ == "__main__":
             row[f"has_{feat}"] = int(count > 0)
         return pd.Series(row)
 
-    per_inv = data.groupby(["Glottocode", "InventoryID"]).apply(_agg_inventory)
+    per_inv = data.groupby(["Glottocode", "InventoryID"]).apply(
+        _agg_inventory, include_groups=False
+    )
 
     n_inventories = per_inv.groupby("Glottocode").size()
-    print(f"Inventories per language: min={n_inventories.min()}, "
-          f"median={n_inventories.median():.0f}, max={n_inventories.max()}")
+    print(
+        f"Inventories per language: min={n_inventories.min()}, "
+        f"median={n_inventories.median():.0f}, max={n_inventories.max()}"
+    )
 
     agg = per_inv.groupby("Glottocode").median()
 
