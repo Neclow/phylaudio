@@ -15,7 +15,12 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects.packages import importr
 from tqdm import tqdm
 
-from ..._config import DEFAULT_METADATA_DIR, DEFAULT_PER_SENTENCE_DIR, MIN_LANGUAGES
+from ..._config import (
+    DEFAULT_METADATA_DIR,
+    DEFAULT_METADATA_KEY,
+    DEFAULT_PER_SENTENCE_DIR,
+    MIN_LANGUAGES,
+)
 from ...utils import _count_file_lines
 from .newick import apply_language_mapping_to_newick
 from .tree import (
@@ -39,7 +44,6 @@ DISCRETE_METHODS = {
         "func": make_parsimony_tree,
     },
 }
-
 
 PDIST_METHODS = ("fastme", "nj", "upgma")
 
@@ -75,8 +79,13 @@ class PhyloWriter(ABC):
 
     def start(self):
         """Starter for a nexus file"""
-        full_language_names = " ".join(
-            sorted([v["full"].replace(" ", "_") for v in self.languages.values()])
+        fleurs_language_names = " ".join(
+            sorted(
+                [
+                    v[DEFAULT_METADATA_KEY].replace(" ", "_")
+                    for v in self.languages.values()
+                ]
+            )
         )
 
         with open(self.output_file, "w", encoding="utf-8") as f:
@@ -86,7 +95,7 @@ class PhyloWriter(ABC):
                     #NEXUS
                     Begin TAXA;
                     Dimensions ntax={len(self.languages)};
-                    TaxLabels {full_language_names};
+                    TaxLabels {fleurs_language_names};
                     End;
 
                     BEGIN TREES;
@@ -192,7 +201,7 @@ class DiscretePhyloWriter(PhyloWriter):
             newick = apply_language_mapping_to_newick(
                 newick_file=f"{file}.{self.tree_ext}",
                 languages=self.languages,
-                key="full",
+                key=DEFAULT_METADATA_KEY,
             )
             return f"\tTree {Path(file).stem} = {newick}\n"
         except RRuntimeError as err:
@@ -210,7 +219,7 @@ class DistancePhyloWriter(PhyloWriter):
         self.layer = layer
 
         self.label2language = dict(
-            enumerate([v["full"] for v in self.languages.values()])
+            enumerate([v[DEFAULT_METADATA_KEY] for v in self.languages.values()])
         )
 
     def process(self, file):
