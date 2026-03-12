@@ -113,7 +113,7 @@ def _read_h5(path):
     """Read NMF K-sweep results from HDF5."""
     results = {}
     with h5py.File(path, "r") as f:
-        labels = list(f["labels"].asstr()[()])
+        labels = list(f["labels"].asstr()[()])  # pylint: disable=no-member
         for key in f:
             if not key.startswith("K"):
                 continue
@@ -165,6 +165,8 @@ def main():
         print(f"Saved results to {h5_path}")
 
     k_star = choose_k(results, error_slack=args.error_slack)
+    with h5py.File(h5_path, "a") as f:
+        f.attrs["k_star"] = k_star
     print(f"\n>>> Chosen K = {k_star}\n")
 
     # -- Plots --
