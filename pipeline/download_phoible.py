@@ -4,6 +4,9 @@ Outputs a CSV with columns: Glottocode, n_phonemes, n_consonants, n_vowels,
 plus two representations of each phonological feature:
   - n_{feat}:   count of segments with [+feat]
   - has_{feat}: binary (1 if any segment has [+feat], else 0)
+
+Aggregation: computes features per inventory, then takes the median across
+all inventories per language (following Anderson et al. 2023, J. Lang. Evol.).
 """
 
 import json
@@ -67,25 +70,14 @@ if __name__ == "__main__":
     reverse_map = {v: k for k, v in GLOTTOCODE_REMAPPINGS.items()}
     data["Glottocode"] = data["Glottocode"].replace(reverse_map)
 
-    # Select best inventory per language (source priority hierarchy)
-    priority_map = {s: i for i, s in enumerate(SOURCE_PRIORITY)}
+    # Filter to known sources
     data = data[data["Source"].str.lower().isin(SOURCE_PRIORITY)].copy()
-    data["_priority"] = data["Source"].str.lower().map(priority_map)
-    best_inv = (
-        data.sort_values("_priority")
-        .groupby("Glottocode")[["InventoryID"]]
-        .first()
-        .reset_index()
-    )
-    data = data.drop(columns="_priority").merge(
-        best_inv, on=["Glottocode", "InventoryID"]
-    )
 
     # Identify feature columns (from "tone" onward)
     feat_cols = list(data.columns[data.columns.get_loc("tone") :])
 
-    # Aggregate to one row per Glottocode
-    def _agg(group):
+    # Aggregate per inventory first, then take median across inventories
+    def _agg_inventory(group):
         row = {
             "n_phonemes": len(group),
             "n_consonants": (group["SegmentClass"] == "consonant").sum(),
@@ -97,7 +89,13 @@ if __name__ == "__main__":
             row[f"has_{feat}"] = int(count > 0)
         return pd.Series(row)
 
-    agg = data.groupby("Glottocode").apply(_agg)
+    per_inv = data.groupby(["Glottocode", "InventoryID"]).apply(_agg_inventory)
+
+    n_inventories = per_inv.groupby("Glottocode").size()
+    print(f"Inventories per language: min={n_inventories.min()}, "
+          f"median={n_inventories.median():.0f}, max={n_inventories.max()}")
+
+    agg = per_inv.groupby("Glottocode").median()
 
     # Report coverage
     expected = {v["glottolog"] for v in languages.values()}
