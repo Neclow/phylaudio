@@ -18,6 +18,7 @@ from src._config import (
     DEFAULT_MAPPED_FASTA_FILE,
     DEFAULT_MERGED_FASTA_FILE,
     DEFAULT_METADATA_DIR,
+    DEFAULT_METADATA_KEY,
     DEFAULT_PER_SENTENCE_DIR,
 )
 from src.tasks.phylo.fasta import merge_fastas, to_beast
@@ -61,7 +62,7 @@ def parse_args():
     parser.add_argument(
         "--key",
         type=str,
-        default="iecor",
+        default=DEFAULT_METADATA_KEY,
         help="Reference field in language metadata to use for taxon names",
     )
     return parser.parse_args()
