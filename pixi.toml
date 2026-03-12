@@ -29,6 +29,7 @@ extract_embeddings = "python -m pipeline.extract_embeddings"
 lid = "python -m pipeline.language_identification"
 lid_summary = "python -m pipeline.language_identification_summary"
 network_analysis = "python -m pipeline.network_analysis"
+nmf_brms = "Rscript pipeline/nmf_brms.R"
 nmf_structure = "python -m pipeline.nmf_structure"
 oak = "python -m pipeline.run_oak"
 sentence_discrete = "python -m pipeline.sentence_trees_discrete"
@@ -36,6 +37,7 @@ sentence_distance = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
+squim = "python -m pipeline.squim"
 
 [tasks.beast2]
 cmd = "extern/beast2/bin/beast"
@@ -85,6 +87,8 @@ beagle-lib = { version = ">=4.0.1,<5", channel = "bioconda" }
 black = ">=25.1.0,<26"
 uv = ">=0.8.13,<0.9"
 pre-commit = ">=4.5.0,<5"
+h5py = ">=3.15.1,<4"
+r-hdf5r = ">=1.3.12,<2"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"
@@ -118,6 +122,7 @@ beast_oak = "python -m pipeline.run_oak"
 python = "3.10.12.*"
 plotly = ">=6.5.0,<7"
 seaborn = ">=0.13.2,<0.14"
+bioconductor-ggtree = { version = ">=4.0.4,<5", channel = "bioconda" }
 
 [feature.viz.pypi-dependencies]
 llvmlite = "==0.44.0"
