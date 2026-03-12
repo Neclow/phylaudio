@@ -8,7 +8,6 @@ from sklearn.decomposition import NMF
 from sklearn.preprocessing import normalize
 
 
-
 # -----------------------------
 # Utilities
 # -----------------------------
@@ -166,31 +165,36 @@ def plot_structure(
     STRUCTURE-style stacked bars using normalized W.
     Returns the figure.
     """
-    P = normalize_rows_to_proportions(W)
-    n, k = P.shape
+    P_struct = normalize_rows_to_proportions(W)
+    n_lang, k = P_struct.shape
 
-    order = np.arange(n)
-    if sort_by_component:
-        max_comp = np.argmax(P, axis=1)
-        max_val = P[np.arange(n), max_comp]
-        order = np.lexsort((-max_val, max_comp))
+    max_comp = np.argmax(P_struct, axis=1)
+    max_val = P_struct[np.arange(n_lang), max_comp]
+    order = np.lexsort((-max_val, max_comp))
+    P_struct = P_struct[order]
 
-    P = P[order]
     if labels is not None:
         labels = np.array(labels)[order]
 
-    fig, ax = plt.subplots(figsize=(max(14, n * 0.35), 5))
-    bottom = np.zeros(n)
-    x = np.arange(n)
+    fig, ax = plt.subplots(figsize=(5, 7.5))
+    bottom = np.zeros(n_lang)
+    x = np.arange(n_lang)
     cmap_name = "tab20" if k > 8 else "Set2"
     cmap = mpl.colormaps[cmap_name]
     colors = cmap(np.linspace(0, 1, max(k, 2)))
 
     for j in range(k):
-        ax.bar(x, P[:, j], bottom=bottom, width=1.0, color=colors[j], label=f"{j + 1}")
-        bottom += P[:, j]
+        ax.bar(
+            x,
+            P_struct[:, j],
+            bottom=bottom,
+            width=1.0,
+            color=colors[j],
+            label=f"{j + 1}",
+        )
+        bottom += P_struct[:, j]
 
-    ax.set_xlim(-0.5, n - 0.5)
+    ax.set_xlim(-0.5, n_lang - 0.5)
     ax.set_ylim(0, 1)
     ax.set_ylabel("Component proportion")
     ax.set_xlabel(
@@ -198,7 +202,7 @@ def plot_structure(
     )
     if labels is not None:
         ax.set_xticks(x)
-        ax.set_xticklabels(labels, rotation=90, fontsize=8)
+        ax.set_xticklabels(labels, rotation=45)
     else:
         ax.set_xticks([])
 
