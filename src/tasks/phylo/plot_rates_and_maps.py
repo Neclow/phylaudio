@@ -609,7 +609,7 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
     if geojson_path is None:
         geojson_path = f"{DATA_DIR}/metadata/fleurs-r/dataset.geojson"
 
-    CMAP = "viridis"
+    CMAP = "magma"
     GRID_N_LON_TRAIN, GRID_N_LAT_TRAIN = 150, 100
     GRID_N_LON_PRED, GRID_N_LAT_PRED = 600, 400
     FIXED_NOISE = 1e-2
@@ -798,7 +798,7 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
         ax.scatter(meta["longitude"], meta["latitude"], s=60,
                    c=meta["rate_median"], cmap=cmap, norm=norm,
-                   marker="o", edgecolor="black", linewidth=0.7, zorder=10)
+                   marker="o", edgecolor="white", linewidth=0.6, zorder=10)
 
         threshold = np.percentile(meta["rate_median"], 90)
         for lang, row in meta.iterrows():
@@ -824,7 +824,7 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         sm.set_array([])
         cbar = fig.colorbar(sm, ax=ax, pad=0.02, shrink=0.9)
         cbar.ax.tick_params(labelsize=22)
-        cbar.set_label("Posterior mean", fontsize=22, fontweight="bold")
+        cbar.set_label("Median Bayesian\nPhylogenetic Rate", fontsize=22, fontweight="bold")
 
         plt.tight_layout()
         os.makedirs(output_dir, exist_ok=True)
