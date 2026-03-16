@@ -299,14 +299,14 @@ def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
 
         plt.yscale("log")
         plt.colorbar(sc, label="Log Number of Speakers", pad=0.12)
-        plt.xlabel("Longitude", fontsize=18)
-        plt.ylabel("Log Rate", fontsize=18)
-        plt.tick_params(axis="x", labelsize=16)
-        plt.tick_params(axis="y", labelsize=16)
+        plt.xlabel("Longitude", fontsize=22)
+        plt.ylabel("Log Rate", fontsize=22)
+        plt.tick_params(axis="x", labelsize=22)
+        plt.tick_params(axis="y", labelsize=22)
         plt.grid(True)
 
         os.makedirs(output_dir, exist_ok=True)
-        out_path = f"{output_dir}/rate_vs_longitude_{tree_name}.svg"
+        out_path = f"{output_dir}/rate_vs_longitude_{tree_name}.pdf"
         plt.savefig(out_path, dpi=300)
         plt.close()
         print(f"  Saved: {out_path}")
@@ -366,15 +366,15 @@ def plot_root_age_comparison(
     plot_density(speech_prior,  "#5e5eb5", "Speech prior",  filled=False)
     plot_density(cognate_prior, "#6ab06a", "Cognates prior", filled=False)
 
-    ax.set_xlabel("Root age (ka BP)", fontsize=12)
-    ax.set_ylabel("Density", fontsize=12)
-    ax.legend(loc="upper right", fontsize=9)
+    ax.set_xlabel("Root age (ka BP)", fontsize=22)
+    ax.set_ylabel("Density", fontsize=22)
+    ax.legend(loc="upper right", fontsize=16)
     ax.set_ylim(0, None)
     ax.spines[["top", "right"]].set_visible(False)
 
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    out_path = f"{output_dir}/root_age_comparison_v4.svg"
+    out_path = f"{output_dir}/root_age_comparison_v4.pdf"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close()
     print(f"  Saved: {out_path}")
@@ -520,7 +520,7 @@ def plot_rate_over_time_normalized(trees_cognates, trees_speech, burnin=1000,
 
     fig.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    out_path = f"{output_dir}/rate_over_time_normalized.svg"
+    out_path = f"{output_dir}/rate_over_time_normalized.pdf"
     plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"  Saved: {out_path}")
@@ -583,7 +583,7 @@ def plot_pct_change_over_time(trees_cognates, trees_speech, burnin=1000,
 
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    out_path = f"{output_dir}/pct_change_over_time_alpha.svg"
+    out_path = f"{output_dir}/pct_change_over_time_alpha.pdf"
     plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"  Saved: {out_path}")
@@ -771,11 +771,11 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         meta["rate_mean"] = m_obs.numpy().ravel()
         meta["rate_eff"] = meta["rate_mean"]
 
-        # Color norm
+        # Color norm (use observed rates for dots, like make_figure3_geo.py)
         vals = []
         if np.isfinite(Z_eff).any():
             vals.append(Z_eff[np.isfinite(Z_eff)].ravel())
-        vals.append(meta["rate_eff"].to_numpy())
+        vals.append(meta["rate_median"].to_numpy())
         vals = np.concatenate([v[np.isfinite(v)] for v in vals])
         vmin, vmax = (np.quantile(vals, 0.02), np.quantile(vals, 0.98)) if vals.size > 0 else (0, 1)
 
@@ -797,12 +797,12 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
             ax.pcolormesh(LON, LAT, Z_eff, shading="auto", cmap=cmap, norm=norm, zorder=1)
 
         ax.scatter(meta["longitude"], meta["latitude"], s=60,
-                   c=meta["rate_eff"], cmap=cmap, norm=norm,
+                   c=meta["rate_median"], cmap=cmap, norm=norm,
                    marker="o", edgecolor="black", linewidth=0.7, zorder=10)
 
-        threshold = np.percentile(meta["rate_eff"], 90)
+        threshold = np.percentile(meta["rate_median"], 90)
         for lang, row in meta.iterrows():
-            if row["rate_eff"] > threshold:
+            if row["rate_median"] > threshold:
                 ax.annotate(
                     lang, (row["longitude"], row["latitude"]),
                     xytext=(8, 8), textcoords="offset points", fontsize=9,
@@ -815,20 +815,20 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
         ax.set_xlim(ROI_MINX, ROI_MAXX)
         ax.set_ylim(ROI_MINY, ROI_MAXY)
-        ax.set_xlabel("Longitude", fontsize=18)
-        ax.set_ylabel("Latitude", fontsize=18)
-        ax.tick_params(axis="both", labelsize=18)
+        ax.set_xlabel("Longitude", fontsize=22)
+        ax.set_ylabel("Latitude", fontsize=22)
+        ax.tick_params(axis="both", labelsize=22)
         ax.grid(True, alpha=0.2, linestyle="--", linewidth=0.6)
 
         sm = ScalarMappable(norm=norm, cmap=cmap)
         sm.set_array([])
         cbar = fig.colorbar(sm, ax=ax, pad=0.02, shrink=0.9)
-        cbar.ax.tick_params(labelsize=18)
-        cbar.set_label("Posterior mean", fontsize=18, fontweight="bold")
+        cbar.ax.tick_params(labelsize=22)
+        cbar.set_label("Posterior mean", fontsize=22, fontweight="bold")
 
         plt.tight_layout()
         os.makedirs(output_dir, exist_ok=True)
-        fig_path = os.path.join(output_dir, f"language_polygons_gridtrain_{tree_name}.svg")
+        fig_path = os.path.join(output_dir, f"language_polygons_gridtrain_{tree_name}.pdf")
         fig.savefig(fig_path, dpi=300)
         plt.close()
         print(f"    Saved: {fig_path}")
