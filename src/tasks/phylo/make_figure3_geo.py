@@ -593,13 +593,15 @@ def _fit_gp_surface(meta, geojson_path):
     mean_inside = np.concatenate(mean_all)
 
     Z = np.full(len(grid_pred), np.nan, dtype=float)
-    Z[in_mask] = mean_inside
+    Z[in_mask] = scaler_y.inverse_transform(
+        mean_inside.reshape(-1, 1)).ravel()
     Z = Z.reshape(LON.shape)
 
-    # Obs predictions
+    # Obs predictions (inverse-transform back to raw rate space)
     X_obs = meta_idx[["longitude", "latitude"]].to_numpy()
     m_obs, _ = model.predict_f(scaler_X.transform(X_obs))
-    meta_idx["rate_gp"] = m_obs.numpy().ravel()
+    meta_idx["rate_gp"] = scaler_y.inverse_transform(
+        m_obs.numpy().reshape(-1, 1)).ravel()
 
     # Land for coastlines
     try:
@@ -629,11 +631,11 @@ def make_panel_d(ax, gp_result):
     land = gp_result["land"]
     roi_minx, roi_maxx, roi_miny, roi_maxy = gp_result["roi"]
 
-    # Shared norm from surface + observed rate_gp at obs points
+    # Shared norm from surface + GP predictions at obs points
     vals = []
     if np.isfinite(Z).any():
         vals.append(Z[np.isfinite(Z)].ravel())
-    vals.append(meta["rate_median"].to_numpy())
+    vals.append(meta["rate_gp"].to_numpy())
     vals = np.concatenate([v[np.isfinite(v)] for v in vals])
     shared_norm = Normalize(
         vmin=np.quantile(vals, 0.02) if vals.size > 0 else 0,
@@ -649,7 +651,7 @@ def make_panel_d(ax, gp_result):
 
     # Dots: GP prediction at obs points, same cmap/norm as surface
     ax.scatter(meta["longitude"].values, meta["latitude"].values,
-               c=meta["rate_median"].values,
+               c=meta["rate_gp"].values,
                cmap=MAP_CMAP, norm=shared_norm,
                s=90, marker="o", edgecolor="white", linewidth=0.6, zorder=5)
 

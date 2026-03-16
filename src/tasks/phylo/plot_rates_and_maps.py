@@ -762,20 +762,22 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         mean_inside, _ = predict_in_batches(model, scaler_X, grid_pred_inside)
 
         Z_eff = np.full(len(grid_pred), np.nan, dtype=float)
-        Z_eff[in_language_mask] = mean_inside
+        Z_eff[in_language_mask] = scaler_y.inverse_transform(
+            mean_inside.reshape(-1, 1)).ravel()
         Z_eff = Z_eff.reshape(LON.shape)
 
-        # Observation-point predictions
+        # Observation-point predictions (inverse-transform back to raw rate space)
         X_obs = meta[["longitude", "latitude"]].to_numpy()
         m_obs, _ = model.predict_f(scaler_X.transform(X_obs))
-        meta["rate_mean"] = m_obs.numpy().ravel()
+        meta["rate_mean"] = scaler_y.inverse_transform(
+            m_obs.numpy().reshape(-1, 1)).ravel()
         meta["rate_eff"] = meta["rate_mean"]
 
-        # Color norm (use observed rates for dots, like make_figure3_geo.py)
+        # Color norm
         vals = []
         if np.isfinite(Z_eff).any():
             vals.append(Z_eff[np.isfinite(Z_eff)].ravel())
-        vals.append(meta["rate_median"].to_numpy())
+        vals.append(meta["rate_mean"].to_numpy())
         vals = np.concatenate([v[np.isfinite(v)] for v in vals])
         vmin, vmax = (np.quantile(vals, 0.02), np.quantile(vals, 0.98)) if vals.size > 0 else (0, 1)
 
@@ -797,12 +799,12 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
             ax.pcolormesh(LON, LAT, Z_eff, shading="auto", cmap=cmap, norm=norm, zorder=1)
 
         ax.scatter(meta["longitude"], meta["latitude"], s=60,
-                   c=meta["rate_median"], cmap=cmap, norm=norm,
+                   c=meta["rate_mean"], cmap=cmap, norm=norm,
                    marker="o", edgecolor="white", linewidth=0.6, zorder=10)
 
-        threshold = np.percentile(meta["rate_median"], 90)
+        threshold = np.percentile(meta["rate_mean"], 90)
         for lang, row in meta.iterrows():
-            if row["rate_median"] > threshold:
+            if row["rate_mean"] > threshold:
                 ax.annotate(
                     lang, (row["longitude"], row["latitude"]),
                     xytext=(8, 8), textcoords="offset points", fontsize=9,
@@ -824,7 +826,7 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         sm.set_array([])
         cbar = fig.colorbar(sm, ax=ax, pad=0.02, shrink=0.9)
         cbar.ax.tick_params(labelsize=22)
-        cbar.set_label("Median Bayesian\nPhylogenetic Rate", fontsize=22, fontweight="bold")
+        cbar.set_label("GP Posterior Mean", fontsize=22, fontweight="bold")
 
         plt.tight_layout()
         os.makedirs(output_dir, exist_ok=True)
