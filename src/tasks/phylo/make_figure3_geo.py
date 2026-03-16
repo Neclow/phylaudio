@@ -82,7 +82,7 @@ def load_language_polygons(filepath):
          for n in gdf["name"].unique()], crs=gdf.crs)
 
 # ─── Bold font (Arial has a proper bold TTF on macOS) ─────────────────────────
-_PANEL_FP = FontProperties(family="sans-serif", weight="bold",  size=24)
+_PANEL_FP = FontProperties(family="sans-serif", weight="bold",  size=30)
 _AXIS_FP  = FontProperties(family="sans-serif", weight="normal", size=15)
 
 # ─── Display-name helpers ─────────────────────────────────────────────────────
