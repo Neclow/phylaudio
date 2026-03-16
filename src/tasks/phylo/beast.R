@@ -1,23 +1,141 @@
-# -----------------------------------------------------------------------------
-# Portions of this code are adapted from rBt
-# Original repository: https://github.com/santiagosnchez/rBt
-# Copyright (c) Heinrich Dinkel, 2018
-# Licensed under the GPL-3 license
-# -----------------------------------------------------------------------------
-
-library(ape)
 library(doParallel)
 library(dplyr)
 library(tidyr)
 library(TreeDist)
+library(ape)
+
+extract_beast_metadata <- function(file = "", tree = NULL) {
+  if (!is.null(tree)) {
+    if (!inherits(tree, "phylo")) {
+      stop("argument 'tree' must be of mode 'phylo'")
+    }
+  } else if (file != "") {
+    tree <- read.annot.beast(file)
+  } else {
+    stop("argument 'file' or 'tree' must be provided")
+  }
+
+  is_tip <- tree$edge[, 2] <= length(tree$tip.label)
+  ordered_tips <- tree$edge[is_tip, 2]
+  df <- tree$metadata |>
+    mutate(language = tree$tip.label[ordered_tips[node]]) |>
+    filter(!is.na(language)) |>
+    mutate(across(everything(), ~ type.convert(., as.is = TRUE)))
+
+  df
+}
+
+#' @examples
+#' input_dir <- "data/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/sentence"
+#' pattern <- "*\\_treeannotator_CCD.nex"
+#' cores <- 16
+#' extract_beast_metadata(input_dir, pattern, cores)
+extract_beast_metadata2 <- function(files = "", trees = "", output_file = "", cores = 1) {
+  if (!is.null(trees)) {
+    if (!inherits(trees, "multiPhylo")) {
+      stop("argument 'tree' must be of mode 'phylo'")
+    }
+    obj <- trees
+  } else if (file != "") {
+    obj <- files
+  } else {
+    stop("argument 'file' or 'tree' must be provided")
+  }
+
+  stopifnot(length(obj) > 0)
+
+  registerDoParallel(cores = cores)
+  print(paste("Using", cores, "core(s)", sep = " "))
+
+  result <- foreach(i = seq_along(obj), .combine = rbind) %dopar% {
+    if (inherits(obj[[i]], "phylo")) {
+      extract_beast_metadata(tree = obj[[i]])
+    } else {
+      extract_beast_metadata(file = obj[[i]])
+    }
+  }
+
+  if (output_file != "") {
+    write.csv(result, output_file)
+  } else {
+    result
+  }
+}
+
+extract_beast_dists <- function(input_dir, pattern, cores = 1) {
+  files <- list.files(
+    input_dir,
+    pattern = pattern,
+    full.names = TRUE
+  )
+
+  stopifnot(length(files) > 0)
+  print(paste("Found", length(files), "files", sep = " "))
+
+  registerDoParallel(cores = cores)
+  print(paste("Using", cores, "core(s)", sep = " "))
+
+  print("Reading trees...")
+  trees <- foreach(i = seq_along(files)) %dopar% {
+    read.annot.beast(files[i])
+  }
+
+  dists <- TreeDistance(trees)
+
+  output_file <- file.path(input_dir, "_dists.Rdata")
+
+  save(dists, file = output_file)
+
+  print(paste("Done. View results at", output_file, sep = " "))
+}
+
+
+# Adapted from Sánchez-Ramírez, S. (2018) rBt: Handy functions for dealing with BEAST trees in R
+# https://github.com/santiagosnchez/rBt
+
+#' which.node
+#'
+#' Finds the a node given a vector of tip labels or
+#' tip indices.
+#'
+#' @param phy a \code{phylo} object
+#' @param tips a \code{vector} corresponding to a set tips.
+#'             It can be either type \code{character} or \code{numeric}
+#' @return \code{numeric} object with a node number
+#' @export
+#' @examples
+#' file <- system.file("data/mcc.tre", package = "rBt")
+#' tr <- read.nexus(file)
+#' # find the root node:
+#' rnode <- which.node(tr, tr$tip.label)
+which.node <- function(phy, tips) {
+  if (is.character(tips) == TRUE) {
+    tips_n <- vector("numeric", length(tips))
+    for (i in 1:length(tips)) {
+      tips_n[i] <- which(phy$tip.label == tips[i])
+    }
+    rows <- vector("numeric", length(tips_n))
+    for (i in 1:length(tips_n)) {
+      rows[i] <- which(phy$edge[, 2] == tips_n[i])
+    }
+    nodes <- sort(phy$edge[rows[which.min(rows)]:rows[which.max(rows)], 1])
+    return(nodes[1])
+  } else if (is.numeric(tips) == TRUE) {
+    rows <- vector("numeric", length(tips))
+    for (i in 1:length(tips)) {
+      rows[i] <- which(phy$edge[, 2] == tips[i])
+    }
+    nodes <- sort(phy$edge[rows[which.min(rows)]:rows[which.max(rows)], 1])
+    return(nodes[1])
+  } else if (is.null(tips) == TRUE) {
+    stop("tips vector is empty")
+  }
+}
 
 cldws <- function(b, lst) {
   if (b == "(") {
     lst$currnode <- lst$currnode + 1
-    if (
-      length(grep(paste(lst$currnode), lst$opened)) == 1 |
-        length(grep(paste(lst$currnode), lst$closed)) == 1
-    ) {
+    if (length(grep(paste(lst$currnode), lst$opened)) == 1 | length(grep(paste(lst$currnode), lst$closed)) == 1) {
       return(cldws(b, lst))
     } else {
       lst$opened <- c(lst$opened, lst$currnode)
@@ -47,10 +165,7 @@ process_annot <- function(an) {
       commas <- vector()
       sep_annot <- vector()
       ctmp <- gregexpr(pattern = ",", an[[1]])[[1]]
-      currlybr <- data.frame(
-        st = currlybr[seq(1, length(currlybr), 2)],
-        en = currlybr[seq(2, length(currlybr), 2)]
-      )
+      currlybr <- data.frame(st = currlybr[seq(1, length(currlybr), 2)], en = currlybr[seq(2, length(currlybr), 2)])
       check_comma <- function(b, cm) {
         return(any(apply(currlybr, 1, function(x, y = cm) {
           return(x[1] < y & x[2] > y)
@@ -70,17 +185,11 @@ process_annot <- function(an) {
         for (i in 1:length(commas)) {
           if (i == 1) {
             sep_annot <- c(sep_annot, substr(an, 1, commas[i] - 1))
-            sep_annot <- c(
-              sep_annot,
-              substr(an, commas[i] + 1, commas[i + 1] - 1)
-            )
+            sep_annot <- c(sep_annot, substr(an, commas[i] + 1, commas[i + 1] - 1))
           } else if (i == length(commas)) {
             sep_annot <- c(sep_annot, substr(an, commas[i] + 1, nchar(an)))
           } else {
-            sep_annot <- c(
-              sep_annot,
-              substr(an, commas[i] + 1, commas[i + 1] - 1)
-            )
+            sep_annot <- c(sep_annot, substr(an, commas[i] + 1, commas[i + 1] - 1))
           }
         }
       }
@@ -94,84 +203,24 @@ process_annot <- function(an) {
   }
 }
 
-extract_annot <- function(tr) {
-  edges <- list()
-  annot <- list()
-  for (i in strsplit(tr, ":")[[1]]) {
-    if (
-      substr(i, nchar(i), nchar(i)) == "]" |
-        substr(i, nchar(i) - 1, nchar(i) - 1) == "]"
-    ) {
-      brack <- gregexpr(pattern = "\\[|\\]", i)[[1]]
-      start <- rev(brack)[2]
-      end <- rev(brack)[1]
-      annot <- c(annot, list(substr(i, start, end)))
-      end <- start - 1
-      if (substr(i, 1, 1) == "[") {
-        start <- brack[2] + 1
-      } else {
-        start <- 1
-      }
-      edges <- c(edges, list(substr(i, start, end)))
+# for genealogical sorting index
+get_ancestors <- function(phy, tips) {
+  if (is.character(tips) == TRUE) {
+    tips <- sapply(tips, function(x) which(phy$tip.label == x))
+  }
+  nodes <- vector()
+  mrca <- which.node(phy, tips)
+  for (tip in tips) {
+    x <- 0
+    e <- tip
+    while (x != mrca) {
+      x <- phy$edge[which(phy$edge[, 2] == e), 1]
+      nodes <- append(nodes, x)
+      e <- x
     }
   }
-  nodes <- lapply(edges, function(x) {
-    if (substr(x, nchar(x), nchar(x)) == ")") {
-      return("node")
-    } else {
-      start <- gregexpr(pattern = "[\\(|,][[:alnum:]]+", x)[[1]][1]
-      return(substr(x, start + 1, nchar(x)))
-    }
-  })
-  backbone <- strsplit(tr, "")[[1]][grep("\\(|\\)", strsplit(tr, "")[[1]])]
-  tipsidx <- grep("node", nodes, invert = T)
-  nodesidx <- grep("node", nodes)
-  Ntips <- length(tipsidx)
-  Nnodes <- length(nodesidx)
-  lst <- list(opened = vector(), closed = vector(), currnode = Ntips)
-  for (b in backbone) {
-    lst <- cldws(b, lst)
-  }
-  tips <- vector()
-  tip_num <- 1
-  for (i in 1:length(nodes)) {
-    if (nodes[[i]] != "node") {
-      tips <- c(tips, nodes[[i]])
-      nodes[[i]] <- tip_num
-      tip_num <- tip_num + 1
-    }
-  }
-  nodes[nodesidx] <- lst$closed
-  nodes <- sapply(nodes, as.numeric)
-  annot <- lapply(annot, process_annot)
-  annot_names <- sort(unlist(lapply(annot, function(x) names(x))))
-  annot_names <- annot_names[!duplicated(annot_names)]
-  annot_mat <- data.frame(matrix(
-    NA,
-    ncol = length(annot_names) + 1,
-    nrow = length(nodes)
-  ))
-  colnames(annot_mat) <- c("node", annot_names)
-  annot_mat$node <- nodes
-  for (i in annot_names) {
-    tmp <- lapply(annot, function(x, y = i) x[[paste(y)]])
-    tmp <- lapply(tmp, function(x) {
-      if (is.null(x)) {
-        return(NA)
-      } else {
-        return(x)
-      }
-    })
-    annot_mat[, paste(i)] <- unlist(tmp)
-  }
-  annot_mat <- annot_mat[order(annot_mat[, 1]), ]
-  rownames(annot_mat) <- 1:dim(annot_mat)[1]
-  list(
-    metadata = annot_mat,
-    posterior = as.numeric(annot_mat$posterior[
-      lst$currnode:length(nodes)
-    ])
-  )
+  nodes <- unique(nodes)
+  return(nodes)
 }
 
 #' read.annot.beast
@@ -207,169 +256,157 @@ extract_annot <- function(tr) {
 #' tr$ordered.edges <- order.edges(tr)
 #' plot(tr)
 #' edgelabels(edge = tr$ordered.edges, text = round(tr$posterior, 2), cex = 0.5)
-read.nexus.partial <- function(file) {
-  tryCatch(read.nexus(file), error = function(e) {
-    lines <- readLines(file)
-    last <- trimws(tail(lines, 1))
-    if (!grepl("End;$", last, ignore.case = TRUE)) {
-      tmp <- tempfile(fileext = ".nex")
-      on.exit(unlink(tmp), add = TRUE)
-      writeLines(c(lines, "End;"), tmp)
-      read.nexus(tmp)
-    } else {
-      stop(e)
-    }
-  })
-}
-
-read.annot.beast <- function(file, cores = 1) {
-  tree <- scan(file = file, what = character(), sep = "\n", quiet = TRUE)
+read.annot.beast <- function(file) {
+  tree <- scan(file = file, what = character(), sep = "\n", quiet = T)
   tree <- tree[grep("^[[:space:]]*tree", tree)]
   if (length(tree) > 1) {
-    cat("Multiple trees detected. Reading as 'multiPhylo' object.\n")
-    trs <- read.nexus.partial(file)
-
-    cat("Extracting annotations in parallel with", cores, "cores...\n")
-    registerDoParallel(cores = cores)
-
-    trs <- foreach(itr = seq_along(tree), .packages = c("ape")) %dopar%
-      {
-        tr <- tree[[itr]]
-        tr <- sub("tree.* \\(", "\\(", tr)
-        annots <- extract_annot(tr)
-        trs[[itr]]$metadata <- annots$metadata
-        trs[[itr]]$posterior <- annots$posterior
-
-        trs[[itr]]
+    trs <- read.nexus(file)
+    for (itr in seq_along(tree)) {
+      if ((itr - 1) %% 37 != 0) {
+        next
       }
-
-    class(trs) <- "multiPhylo"
+      tr <- tree[[itr]]
+      tr <- sub("tree.* \\(", "\\(", tr)
+      edges <- list()
+      annot <- list()
+      for (i in strsplit(tr, ":")[[1]]) {
+        if (substr(i, nchar(i), nchar(i)) == "]" | substr(i, nchar(i) - 1, nchar(i) - 1) == "]") {
+          brack <- gregexpr(pattern = "\\[|\\]", i)[[1]]
+          start <- rev(brack)[2]
+          end <- rev(brack)[1]
+          annot <- c(annot, list(substr(i, start, end)))
+          end <- start - 1
+          if (substr(i, 1, 1) == "[") {
+            start <- brack[2] + 1
+          } else {
+            start <- 1
+          }
+          edges <- c(edges, list(substr(i, start, end)))
+        }
+      }
+      nodes <- lapply(edges, function(x) {
+        if (substr(x, nchar(x), nchar(x)) == ")") {
+          return("node")
+        } else {
+          start <- gregexpr(pattern = "[\\(|,][[:alnum:]]+", x)[[1]][1]
+          return(substr(x, start + 1, nchar(x)))
+        }
+      })
+      backbone <- strsplit(tr, "")[[1]][grep("\\(|\\)", strsplit(tr, "")[[1]])]
+      tipsidx <- grep("node", nodes, invert = T)
+      nodesidx <- grep("node", nodes)
+      Ntips <- length(tipsidx)
+      Nnodes <- length(nodesidx)
+      lst <- list(opened = vector(), closed = vector(), currnode = Ntips)
+      for (b in backbone) {
+        lst <- cldws(b, lst)
+      }
+      tips <- vector()
+      tip_num <- 1
+      for (i in 1:length(nodes)) {
+        if (nodes[[i]] != "node") {
+          tips <- c(tips, nodes[[i]])
+          nodes[[i]] <- tip_num
+          tip_num <- tip_num + 1
+        }
+      }
+      nodes[nodesidx] <- lst$closed
+      nodes <- sapply(nodes, as.numeric)
+      annot <- lapply(annot, process_annot)
+      annot_names <- sort(unlist(lapply(annot, function(x) names(x))))
+      annot_names <- annot_names[!duplicated(annot_names)]
+      annot_mat <- data.frame(matrix(NA, ncol = length(annot_names) + 1, nrow = length(nodes)))
+      colnames(annot_mat) <- c("node", annot_names)
+      annot_mat$node <- nodes
+      for (i in annot_names) {
+        tmp <- lapply(annot, function(x, y = i) x[[paste(y)]])
+        tmp <- lapply(tmp, function(x) {
+          if (is.null(x)) {
+            return(NA)
+          } else {
+            return(x)
+          }
+        })
+        annot_mat[, paste(i)] <- unlist(tmp)
+      }
+      annot_mat <- annot_mat[order(annot_mat[, 1]), ]
+      rownames(annot_mat) <- 1:dim(annot_mat)[1]
+      trs[[itr]]$metadata <- annot_mat
+      trs[[itr]]$posterior <- as.numeric(annot_mat$posterior[lst$currnode:length(nodes)])
+      cat("tree #", itr, "\r", sep = "")
+    }
     message(paste("\nRead ", length(trs), " trees"))
     return(trs)
   } else {
     tr <- tree[[1]]
     tr <- sub("^[[:space:]]*tree.* \\(", "\\(", tr)
-    annots <- extract_annot(tr)
-    tr <- read.nexus.partial(file)
-    tr$metadata <- annots$metadata
-    tr$posterior <- annots$posterior
-    return(tr)
-  }
-}
-
-#' @examples
-#' input_dir <- "data/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/sentence"
-#' pattern <- "*\\_treeannotator_CCD.nex"
-#' cores <- 16
-#' extract_beast_metadata(input_dir, pattern, cores)
-extract_beast_metadata <- function(file = "", tree = NULL, cores = 1) {
-  if (!is.null(tree)) {
-    if (!inherits(tree, "phylo")) {
-      stop("argument 'tree' must be of mode 'phylo'")
+    edges <- list()
+    annot <- list()
+    for (i in strsplit(tr, ":")[[1]]) {
+      if (substr(i, nchar(i), nchar(i)) == "]" | substr(i, nchar(i) - 1, nchar(i) - 1) == "]") {
+        brack <- gregexpr(pattern = "\\[|\\]", i)[[1]]
+        start <- rev(brack)[2]
+        end <- rev(brack)[1]
+        annot <- c(annot, list(substr(i, start, end)))
+        end <- start - 1
+        if (substr(i, 1, 1) == "[") {
+          start <- brack[2] + 1
+        } else {
+          start <- 1
+        }
+        edges <- c(edges, list(substr(i, start, end)))
+      }
     }
-  } else if (file != "") {
-    tree <- read.annot.beast(file, cores = cores)
-  } else {
-    stop("argument 'file' or 'tree' must be provided")
-  }
-
-  is_tip <- tree$edge[, 2] <= length(tree$tip.label)
-  ordered_tips <- tree$edge[is_tip, 2]
-  df <- tree$metadata |>
-    mutate(language = tree$tip.label[ordered_tips[node]]) |>
-    filter(!is.na(language)) |>
-    mutate(across(everything(), ~ type.convert(., as.is = TRUE)))
-
-  df
-}
-
-
-extract_beast_metadata2 <- function(
-  files = "",
-  trees = "",
-  output_file = "",
-  cores = 1
-) {
-  if (!is.null(trees)) {
-    if (!inherits(trees, "multiPhylo")) {
-      stop("argument 'trees' must be of mode 'multiPhylo'")
-    }
-    obj <- trees
-  } else if (files != "") {
-    obj <- files
-  } else {
-    stop("argument 'files' or 'trees' must be provided")
-  }
-
-  stopifnot(length(obj) > 0)
-
-  registerDoParallel(cores = cores)
-
-  result <- foreach(i = seq_along(obj), .combine = rbind) %dopar%
-    {
-      if (inherits(obj[[i]], "phylo")) {
-        extract_beast_metadata(tree = obj[[i]])
+    nodes <- lapply(edges, function(x) {
+      if (substr(x, nchar(x), nchar(x)) == ")") {
+        return("node")
       } else {
-        extract_beast_metadata(file = obj[[i]])
+        start <- gregexpr(pattern = "[\\(|,][[:alnum:]]+", x)[[1]][1]
+        return(substr(x, start + 1, nchar(x)))
+      }
+    })
+    backbone <- strsplit(tr, "")[[1]][grep("\\(|\\)", strsplit(tr, "")[[1]])]
+    tipsidx <- grep("node", nodes, invert = T)
+    nodesidx <- grep("node", nodes)
+    Ntips <- length(tipsidx)
+    Nnodes <- length(nodesidx)
+    lst <- list(opened = vector(), closed = vector(), currnode = Ntips)
+    for (b in backbone) {
+      lst <- cldws(b, lst)
+    }
+    tips <- vector()
+    tip_num <- 1
+    for (i in 1:length(nodes)) {
+      if (nodes[[i]] != "node") {
+        tips <- c(tips, nodes[[i]])
+        nodes[[i]] <- tip_num
+        tip_num <- tip_num + 1
       }
     }
-
-  if (output_file != "") {
-    write.csv(result, output_file)
-  } else {
-    result
-  }
-}
-
-get_height <- function(
-  tr,
-  subset = NULL
-) {
-  depths <- node.depth.edgelength(tr)
-  tree_height <- max(depths)
-  if (!is.null(subset)) {
-    mrca <- getMRCA(tr, subset)
-    tree_height <- tree_height - depths[mrca]
-  }
-
-  tree_height
-}
-
-
-extract_beast_heights <- function(
-  file = "",
-  output_file = "",
-  trees = NULL,
-  cores = 1,
-  subset = NULL
-) {
-  if (!is.null(trees)) {
-    if (!inherits(trees, "phylo") && !inherits(trees, "multiPhylo")) {
-      stop("argument 'trees' must be of mode 'phylo' or 'multiPhylo'")
+    nodes[nodesidx] <- lst$closed
+    nodes <- sapply(nodes, as.numeric)
+    annot <- lapply(annot, process_annot)
+    annot_names <- sort(unlist(lapply(annot, function(x) names(x))))
+    annot_names <- annot_names[!duplicated(annot_names)]
+    annot_mat <- data.frame(matrix(NA, ncol = length(annot_names) + 1, nrow = length(nodes)))
+    colnames(annot_mat) <- c("node", annot_names)
+    annot_mat$node <- nodes
+    for (i in annot_names) {
+      tmp <- lapply(annot, function(x, y = i) x[[paste(y)]])
+      tmp <- lapply(tmp, function(x) {
+        if (is.null(x)) {
+          return(NA)
+        } else {
+          return(x)
+        }
+      })
+      annot_mat[, paste(i)] <- unlist(tmp)
     }
-  } else if (file != "") {
-    trees <- read.annot.beast(file, cores = cores)
-  } else {
-    stop("argument 'file' or 'trees' must be provided")
-  }
-
-  height_fn <- function(tr) get_height(tr, subset = subset)
-
-  if (length(trees) > 1) {
-    registerDoParallel(cores = cores)
-
-    heights <- foreach(i = seq_along(trees), .combine = rbind) %dopar%
-      {
-        height_fn(trees[[i]])
-      }
-    heights
-  } else {
-    heights <- height_fn(trees)
-  }
-
-  if (output_file != "") {
-    write.csv(heights, output_file)
-  } else {
-    heights
+    annot_mat <- annot_mat[order(annot_mat[, 1]), ]
+    rownames(annot_mat) <- 1:dim(annot_mat)[1]
+    tr <- read.nexus(file)
+    tr$metadata <- annot_mat
+    tr$posterior <- as.numeric(annot_mat$posterior[lst$currnode:length(nodes)])
+    return(tr)
   }
 }
