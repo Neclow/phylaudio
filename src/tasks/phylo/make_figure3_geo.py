@@ -82,8 +82,8 @@ def load_language_polygons(filepath):
          for n in gdf["name"].unique()], crs=gdf.crs)
 
 # ─── Bold font (Arial has a proper bold TTF on macOS) ─────────────────────────
-_PANEL_FP = FontProperties(family="DejaVu Sans", weight="bold",  size=20)
-_AXIS_FP  = FontProperties(family="DejaVu Sans", weight="normal", size=15)
+_PANEL_FP = FontProperties(family="sans-serif", weight="bold",  size=24)
+_AXIS_FP  = FontProperties(family="sans-serif", weight="normal", size=15)
 
 # ─── Display-name helpers ─────────────────────────────────────────────────────
 _VAR_DISPLAY = {
@@ -188,7 +188,7 @@ def load_results(tree):
 def apply_style():
     mpl.rcParams.update({
         "font.family":        "sans-serif",
-        "font.sans-serif":    ["DejaVu Sans", "Arial", "Helvetica Neue", "Helvetica"],
+        "font.sans-serif":    ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
         "font.size":          15,
         "axes.spines.top":    False,
         "axes.spines.right":  False,

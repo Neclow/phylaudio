@@ -167,6 +167,7 @@ This produces `IECoR_..._combined_prunedtomodern.trees` in `data/trees/beast/`, 
 ### Publication figures
 
 ```bash
+pixi run -e viz viz_figure2_rates        # Figure 2 panel B (rate over time with CI bands)
 pixi run -e viz viz_figure3_geo          # Figure 3 (regression panels)
 pixi run -e viz viz_plot_rates_and_maps  # rate scatter, GP maps, root age, rate-over-time
 ```
