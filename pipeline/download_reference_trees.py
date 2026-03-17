@@ -411,17 +411,90 @@ REFERENCE_TREES = {
     },
 }
 
-EXTRA_IECOR_TREES = {
-    "posterior": {
+EXTRA_IECOR_DATA = {
+    "posterior_trees": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined.trees",
         "file": f"{DEFAULT_BEAST_DIR}/iecor/raw.trees",
     },
-    "prior": {
+    "posterior_log": {
+        "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined.log",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/raw.log",
+    },
+    "prior_trees": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.trees",
         "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.trees",
     },
+    "prior_log": {
+        "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.log",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.log",
+    },
 }
 # pylint: enable=line-too-long
+
+
+def _prune_one_tree(tr, labels):
+    """Prune a single tree to only retain taxa with the given labels."""
+    pruned = tr.clone(depth=2)
+    pruned.retain_taxa_with_labels(labels)
+    pruned.suppress_unifurcations()
+    return pruned
+
+
+def prune_iecor_posterior(input_path, output_path, overwrite=False):
+    """Prune historical (non-modern) taxa from IECoR posterior trees.
+
+    Modern taxa are identified as those whose tip-to-root distance equals the
+    maximum (i.e. they are sampled at present time).
+    """
+    import concurrent.futures
+    from functools import partial
+
+    import dendropy
+
+    if os.path.exists(output_path) and not overwrite:
+        print(f"Pruned posterior {output_path} already exists. Skipping.")
+        return
+
+    if not os.path.exists(input_path):
+        print(f"Posterior trees {input_path} not found. Skipping pruning.")
+        return
+
+    print(f"Loading posterior trees from {input_path} (this may take several minutes)...")
+    trees = dendropy.TreeList.get(
+        path=input_path,
+        schema="nexus",
+        preserve_underscores=True,
+    )
+    print(f"  Loaded {len(trees)} trees.")
+
+    # Identify modern taxa from the first tree (tip distance == max distance)
+    ref_tree = trees[0]
+    leaf_distances = {
+        leaf.taxon.label: leaf.distance_from_root()
+        for leaf in ref_tree.leaf_node_iter()
+    }
+    max_dist = max(leaf_distances.values())
+    labels_to_keep = {
+        label for label, dist in leaf_distances.items()
+        if (max_dist - dist) <= 1e-6
+    }
+    n_removed = len(leaf_distances) - len(labels_to_keep)
+    print(f"  Removing {n_removed} historical taxa, keeping {len(labels_to_keep)} modern taxa.")
+
+    task = partial(_prune_one_tree, labels=labels_to_keep)
+    num_workers = min(64, max(1, os.cpu_count() - 4))
+    print(f"  Pruning with {num_workers} workers...")
+    pruned_list = []
+    n_trees = len(trees)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
+        for i, result in enumerate(executor.map(task, trees, chunksize=100)):
+            pruned_list.append(result)
+            if (i + 1) % 500 == 0 or (i + 1) == n_trees:
+                print(f"    {i + 1}/{n_trees} trees pruned", flush=True)
+
+    pruned_trees = dendropy.TreeList(pruned_list)
+    pruned_trees.write(path=output_path, schema="nexus")
+    print(f"  Written to {output_path}")
 
 
 def parse_args():
@@ -505,8 +578,9 @@ if __name__ == "__main__":
             preserve_branch_length=args.preserve_branch_length,
         )
 
-    for key, extra_iecor_info in EXTRA_IECOR_TREES.items():
-        print(f"Downloading extra IECoR trees: {key}...")
+    for key, extra_iecor_info in EXTRA_IECOR_DATA.items():
+        print(f"Downloading extra IECoR data: {key}...")
+        os.makedirs(os.path.dirname(extra_iecor_info["file"]), exist_ok=True)
         if os.path.exists(extra_iecor_info["file"]) and not args.overwrite:
             print(
                 f"Target file {extra_iecor_info['file']} already exists. Skipping download."
@@ -518,5 +592,12 @@ if __name__ == "__main__":
             response.raise_for_status()
             with open(extra_iecor_info["file"], "wb") as f:
                 f.write(response.content)
+
+    # Prune IECoR posterior trees to modern (contemporary) taxa only
+    prune_iecor_posterior(
+        input_path=EXTRA_IECOR_DATA["posterior_trees"]["file"],
+        output_path=f"{DEFAULT_BEAST_DIR}/iecor/prunedtomodern.trees",
+        overwrite=args.overwrite,
+    )
 
     print("Downloaded reference trees.")

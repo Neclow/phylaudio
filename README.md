@@ -88,28 +88,30 @@ pixi install -e regression
 
 ### Required files
 
-Before running regression or plotting, the following files must be present in `data/trees/beast/`:
+Before running regression or plotting, the following files must be present:
 
-| File | Source |
-|---|---|
-| `input_v12_combined_resampled.mcc` | Already in repo (speech MCC tree) |
-| `input_v12_combined_resampled.log` | Already in repo (speech BEAST log) |
-| `input_v12_combined_resampled.trees` | Already in repo (speech posterior trees) |
-| `IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_mcc.tree` | `pixi run download_iecor_trees` |
-| `IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined.log` | `pixi run download_iecor_trees` |
-| `IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined.trees` | `pixi run download_iecor_trees` |
-| `priors/prior_v12_1.log` | Already in repo (speech prior log) |
-| `priors/IECoR_..._combined_PRIOR.log` | `pixi run download_iecor_trees` |
+| File                                                  | Source                                                    |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| `data/trees/beast/input_v12_combined_resampled.mcc`   | Already in repo (speech MCC tree)                         |
+| `data/trees/beast/input_v12_combined_resampled.log`   | Already in repo (speech BEAST log)                        |
+| `data/trees/beast/input_v12_combined_resampled.trees` | Already in repo (speech posterior trees)                  |
+| `data/trees/beast/priors/prior_v12_1.log`             | Already in repo (speech prior log)                        |
+| `data/trees/references/raw/iecor.nex`                 | `pixi run download_reference_trees` (IECoR MCC tree)      |
+| `data/trees/beast/iecor/raw.trees`                    | `pixi run download_reference_trees` (IECoR posterior)     |
+| `data/trees/beast/iecor/raw.log`                      | `pixi run download_reference_trees` (IECoR posterior log) |
+| `data/trees/beast/iecor/prior/raw.log`                | `pixi run download_reference_trees` (IECoR prior log)     |
+| `data/trees/beast/iecor/prunedtomodern.trees`         | `pixi run download_reference_trees` (auto-pruned)         |
 
-Download the IECoR files:
+Download all reference and IECoR files:
 
 ```bash
-pixi run download_iecor_trees
+pixi run download_reference_trees
 ```
 
 ### Prepare regression data
 
-Generates metadata CSVs (with and without phoneme inventory) for both speech and cognate trees. Reads MCC trees from `data/trees/beast/`:
+Generates metadata CSVs (with and without phoneme inventory) for both speech and
+cognate trees. Reads MCC trees from `data/trees/beast/`:
 
 ```bash
 pixi run -e regression prepare_regression_data
@@ -155,14 +157,6 @@ at: <https://neclow.github.io/phylaudio/>
 ```bash
 pixi run download_geojson        # download language polygon data (Glottography)
 ```
-
-### Prune IECoR trees (for rate-over-time plots)
-
-```bash
-pixi run -e viz prune_iecor_trees  # prune historical taxa from IECoR posterior trees (slow)
-```
-
-This produces `IECoR_..._combined_prunedtomodern.trees` in `data/trees/beast/`, required by the rate-over-time plots.
 
 ### Publication figures
 

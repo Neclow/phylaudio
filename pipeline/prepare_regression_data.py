@@ -2,19 +2,21 @@ import pandas as pd
 import json
 import re
 
+from src.tasks.phylo.splitstree import extract_delta
+
 base = "data/metadata/fleurs-r"
 mcc_speech = "data/trees/beast/input_v12_combined_resampled.mcc"
-mcc_cognate = "data/trees/beast/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_mcc.tree"
+mcc_cognate = "data/trees/references/raw/iecor.nex"
 
 TREE_CONFIG = {
     "input_v12_combined_resampled": {
         "nex": mcc_speech,
-        "delta": "data/metadata/splitstree/speech_delta.csv",
+        "stree6": "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/__merged_splitstree.stree6",
         "name_col": "fleurs",
     },
     "heggarty2024_raw": {
         "nex": mcc_cognate,
-        "delta": "data/metadata/splitstree/iecor_delta.csv",
+        "stree6": "data/trees/beast/iecor/__merged_splitstree.stree6",
         "name_col": "iecor",
     },
 }
@@ -191,7 +193,8 @@ for tree_name, (stem, df_no_inv, df_inv) in datasets.items():
     cfg = TREE_CONFIG[tree_name]
 
     rates = extract_beast_rates(cfg["nex"])
-    delta_map = dict(zip(*[pd.read_csv(cfg["delta"])[c] for c in ["name", "delta.score"]]))
+    delta_df = extract_delta(cfg["stree6"])
+    delta_map = delta_df["delta.score"].to_dict()
 
     # ── Version without inventory (pre-PHOIBLE) ──
     df_no_inv = df_no_inv.copy()

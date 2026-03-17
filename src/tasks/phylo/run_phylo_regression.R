@@ -302,7 +302,7 @@ source("src/tasks/phylo/beast.R")
 
 tree_mcc <- list(
     input_v12_combined_resampled = "data/trees/beast/input_v12_combined_resampled.mcc",
-    heggarty2024_raw             = "data/trees/beast/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_mcc.tree"
+    heggarty2024_raw             = "data/trees/references/raw/iecor.nex"
 )
 tree_path <- tree_mcc[[tree_name]]
 if (is.null(tree_path)) stop(sprintf("Unknown tree name: %s", tree_name))
