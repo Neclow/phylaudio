@@ -51,13 +51,8 @@ def parse_args():
     parser.add_argument(
         "--by",
         type=str,
-        default="clock",
+        default="brsupport",
         help="Criterion to select trees",
-    )
-    parser.add_argument(
-        "--descending",
-        action="store_true",
-        help="Sort in descending order",
     )
     parser.add_argument(
         "--key",
@@ -72,6 +67,14 @@ def main():
     args = parse_args()
 
     assert 0 < args.p <= 1.0
+
+    # Higher is better for brsupport/stemmy; lower is better for clock (CoV)
+    ascending_by = {"brsupport": False, "stemmy": False, "clock": True}
+    if args.by not in ascending_by:
+        raise ValueError(
+            f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
+        )
+    ascending = ascending_by[args.by]
 
     if not os.path.isdir(args.run_id):
         potential_run_dirs = glob(f"{DEFAULT_PER_SENTENCE_DIR}/*/{args.run_id}")
@@ -94,7 +97,7 @@ def main():
 
     print(f"Using run directory: {run_dir}")
     df = pd.read_csv(f"{run_dir}/_stats.csv", index_col=0)
-    sub_df = df.sort_values(by=args.by, ascending=not args.descending).iloc[
+    sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
         : int(args.p * df.shape[0])
     ]
     print(sub_df.describe())
