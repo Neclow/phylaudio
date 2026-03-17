@@ -78,6 +78,63 @@ pixi run treeannotator -topology CCD0 ./data/trees/beast/eab44e7f-54cc-4469-87d1
 pixi run network_analysis data/trees/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25/input.xml
 ```
 
+## Phylogenetic regression
+
+Install the regression environment:
+
+```bash
+pixi install -e regression
+```
+
+### Required files
+
+Before running regression or plotting, the following files must be present:
+
+| File                                                  | Source                                                    |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| `data/trees/beast/input_v12_combined_resampled.mcc`   | Already in repo (speech MCC tree)                         |
+| `data/trees/beast/input_v12_combined_resampled.log`   | Already in repo (speech BEAST log)                        |
+| `data/trees/beast/input_v12_combined_resampled.trees` | Already in repo (speech posterior trees)                  |
+| `data/trees/beast/priors/prior_v12_1.log`             | Already in repo (speech prior log)                        |
+| `data/trees/references/raw/iecor.nex`                 | `pixi run download_reference_trees` (IECoR MCC tree)      |
+| `data/trees/beast/iecor/raw.trees`                    | `pixi run download_reference_trees` (IECoR posterior)     |
+| `data/trees/beast/iecor/raw.log`                      | `pixi run download_reference_trees` (IECoR posterior log) |
+| `data/trees/beast/iecor/prior/raw.log`                | `pixi run download_reference_trees` (IECoR prior log)     |
+| `data/trees/beast/iecor/prunedtomodern.trees`         | `pixi run download_reference_trees` (auto-pruned)         |
+
+Download all reference and IECoR files:
+
+```bash
+pixi run download_reference_trees
+```
+
+### Prepare regression data
+
+Generates metadata CSVs (with and without phoneme inventory) for both speech and
+cognate trees. Reads MCC trees from `data/trees/beast/`:
+
+```bash
+pixi run -e regression prepare_regression_data
+```
+
+This writes 4 files to `data/phyloregression/`.
+
+### Linear regression (brms)
+
+```bash
+pixi run -e regression beast_phylolm -- --model_type linear_geo --tree input_v12_combined_resampled --variant with_inventory
+pixi run -e regression beast_phylolm -- --model_type linear_geo --tree heggarty2024_raw --variant with_inventory
+```
+
+### GP regression (cmdstanr)
+
+```bash
+pixi run -e regression beast_phylolm -- --model_type gp_geo --tree input_v12_combined_resampled --variant with_inventory
+pixi run -e regression beast_phylolm -- --model_type gp_geo --tree heggarty2024_raw --variant with_inventory
+```
+
+Results are written to `data/phyloregression/<variant>/`.
+
 ## Plots
 
 To install visualization dependencies, run:
@@ -94,3 +151,17 @@ pixi install -e viz_embeddings_pca
 
 Currently, you can visualize embeddings from XLS-R (fine-tuned on VoxLingua 107)
 at: <https://neclow.github.io/phylaudio/>
+
+### Download auxiliary data
+
+```bash
+pixi run download_geojson        # download language polygon data (Glottography)
+```
+
+### Publication figures
+
+```bash
+pixi run -e viz viz_figure2_rates        # Figure 2 panel B (rate over time with CI bands)
+pixi run -e viz viz_figure3_geo          # Figure 3 (regression panels)
+pixi run -e viz viz_plot_rates_and_maps  # rate scatter, GP maps, root age, rate-over-time
+```

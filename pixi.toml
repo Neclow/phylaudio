@@ -1,7 +1,7 @@
 [workspace]
 authors = [
     "Neclow <neil.clow@sund.ku.dk>",
-    "Harrison Zhu <harrison.zhu@sund.ku.dk>",
+    "Harrison Bo Hua Zhu <harrison.zhu@sund.ku.dk>",
     "David Duchêne <david.duchene@sund.ku.dk>",
 ]
 channels = ["conda-forge", "bioconda"]
@@ -21,7 +21,6 @@ download_models = "python -m pipeline.download_models data/models"
 download_reference_trees = "python -m pipeline.download_reference_trees fleurs-r --preserve-branch-length"
 download_speakerpop = "python -m pipeline.download_speakerpop fleurs-r"
 download_fleurs_metadata = "python -m pipeline.download_fleurs_metadata fleurs-r"
-beast_phylolm = "Rscript pipeline/beast_phylolm.R"
 beast_generate_xml = "python -m pipeline.beast_generate_xml"
 beazt = "bash pipeline/run_beast.sh"
 ccd0 = "extern/beast2/bin/treeannotator -topology CCD0"
@@ -31,13 +30,13 @@ lid_summary = "python -m pipeline.language_identification_summary"
 network_analysis = "python -m pipeline.network_analysis"
 nmf_brms = "Rscript pipeline/nmf_brms.R"
 nmf_structure = "python -m pipeline.nmf_structure"
-oak = "python -m pipeline.run_oak"
 sentence_discrete = "python -m pipeline.sentence_trees_discrete"
 sentence_distance = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
 squim = "python -m pipeline.squim"
+download_geojson = "bash pipeline/download_geojson.sh"
 
 [tasks.beast2]
 cmd = "extern/beast2/bin/beast"
@@ -77,9 +76,12 @@ r-dplyr = ">=1.1.4,<2"
 r-phangorn = ">=2.12.1,<3"
 r-treedist = ">=2.11.1,<3"
 r-base = ">=4.4.3,<4.5"
+r-ape = ">=5.8,<6"
+r-tibble = ">=3.2.1,<4"
 r-doparallel = ">=1.0.17,<2"
 r-tidyr = ">=1.3.1,<2"
 # Phylogenetics
+dendropy = ">=5.0,<6"
 iqtree = ">=3.0.1,<4"
 aster = { version = ">=1.23,<2", channel = "bioconda" }
 beagle-lib = { version = ">=4.0.1,<5", channel = "bioconda" }
@@ -102,27 +104,40 @@ pypdf = ">=6.5.0, <7"
 
 [environments]
 default = { solve-group = "default" }
-oak = { features = ["oak"], solve-group = "oak" }
+regression = { features = ["regression"], solve-group = "regression", no-default-feature = true }
 viz = { features = ["viz"], solve-group = "viz" }
 
-[feature.oak.dependencies]
+[feature.regression.dependencies]
 python = "3.10.12.*"
-numpy = "<2.0"
-ipykernel = ">7.0,<8"
+pandas = ">=2.3.2,<3"
+r-base = ">=4.5,<4.6"
+r-ape = ">=5.8,<6"
+r-dplyr = ">=1.1.4,<2"
+r-tibble = ">=3.2.1,<4"
+r-tidyr = ">=1.3.1,<2"
+r-doparallel = ">=1.0.17,<2"
+r-treedist = ">=2.11.1,<3"
+r-bh = ">=1.75.0"
+r-brms = ">=2.23.0,<3"
+r-cmdstanr = ">=0.9.0,<1"
 
-[feature.oak.pypi-dependencies]
-tensorflow = "==2.11.0"
-tensorflow-probability = "==0.19.0"
-gpflow = "==2.2.1"
-
-[feature.oak.tasks]
-beast_oak = "python -m pipeline.run_oak"
+[feature.regression.tasks]
+prepare_regression_data = "python -m pipeline.prepare_regression_data"
+beast_phylolm = "Rscript pipeline/beast_phylolm.R"
 
 [feature.viz.dependencies]
 python = "3.10.12.*"
 plotly = ">=6.5.0,<7"
 seaborn = ">=0.13.2,<0.14"
 bioconductor-ggtree = { version = ">=4.0.4,<5", channel = "bioconda" }
+scipy = ">=1.15.2,<2"
+geopandas = ">=1.0,<2"
+gpflow = ">=2.9,<3"
+tensorflow = ">=2.16,<3"
+tf-keras = ">=2.16,<3"
+dendropy = ">=5.0,<6"
+scikit-learn = ">=1.5,<2"
+matplotlib-base = ">=3.9,<4"
 
 [feature.viz.pypi-dependencies]
 llvmlite = "==0.44.0"
@@ -132,6 +147,6 @@ numba = "==0.61.2"
 viz_acc_vs_brsupport = "python -m plots.acc_vs_brsupport"
 viz_embeddings_pca = "python -m plots.embeddings_pca"
 viz_beast_tree_heights = "python -m plots.beast_tree_heights"
-# viz_phyloylm = "python -m plots.phylolm_effects"
-# viz_sobol = "python -m plots.oak_sobol"
-viz_phylolm = "python -m plots.phylolm_effects"
+viz_figure3_geo = "python src/tasks/phylo/make_figure3_geo.py"
+viz_plot_rates_and_maps = "python src/tasks/phylo/plot_rates_and_maps.py"
+viz_figure2_rates = "python src/tasks/phylo/plot_figure2_rates.py"
