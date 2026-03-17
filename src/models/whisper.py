@@ -44,14 +44,14 @@ class WhisperFeatureExtractor(BaseFeatureExtractor):
         if cache_dir is not None:
             cache_dir = f"{cache_dir}/whisper"
 
-        self.load(cache_dir)
+        self.load(cache_dir, device)
 
         self.tokenizer = whisper.tokenizer.get_tokenizer(
             self.feature_extractor.is_multilingual,
             num_languages=self.feature_extractor.num_languages,
         )
 
-    def load(self, cache_dir=None):
+    def load(self, cache_dir=None, device="cpu"):
         model_size = self.model_id.split("-")[-1]
 
         if "turbo" in model_size:
@@ -59,7 +59,9 @@ class WhisperFeatureExtractor(BaseFeatureExtractor):
         else:
             self.n_mels = 80
 
-        self.feature_extractor = whisper.load_model(model_size, download_root=cache_dir)
+        self.feature_extractor = whisper.load_model(
+            model_size, download_root=cache_dir, device=device
+        )
 
         self.emb_dim = self.feature_extractor.decoder.ln.weight.shape[0]
 
