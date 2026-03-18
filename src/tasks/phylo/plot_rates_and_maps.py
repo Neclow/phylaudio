@@ -461,12 +461,24 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
         im.set_clip_path(band.get_paths()[0], transform=ax.transData)
 
     if draw_mean:
+        from matplotlib.colors import to_rgba
         mean = np.nanmean(mat, axis=0)
         mean_valid = np.isfinite(mean)
-        ax.plot(t_grid[mean_valid], mean[mean_valid], lw=4, color="white",
-                zorder=zorder + 1.4)
-        ax.plot(t_grid[mean_valid], mean[mean_valid], lw=2, color=base_color,
-                label=f"{label} mean", zorder=zorder + 1.5)
+        # Draw mean line as segments that fade with sample density
+        t_v = t_grid[mean_valid]
+        m_v = mean[mean_valid]
+        c_v = cnt[mean_valid]
+        c_max = np.nanmax(c_v) if np.nanmax(c_v) > 0 else 1.0
+        for k in range(len(t_v) - 1):
+            alpha_k = float(np.clip(c_v[k] / c_max, 0.05, 1.0))
+            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=2.5,
+                    color=(*to_rgba("white")[:3], alpha_k),
+                    zorder=zorder + 1.4, solid_capstyle="round")
+            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=1.2,
+                    color=(*to_rgba(base_color)[:3], alpha_k),
+                    zorder=zorder + 1.5, solid_capstyle="round")
+        # Invisible line for legend
+        ax.plot([], [], lw=1.5, color=base_color, label=f"{label}")
     return im
 
 
