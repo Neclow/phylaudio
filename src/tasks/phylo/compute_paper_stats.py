@@ -5,22 +5,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from src.tasks.phylo.constants import COGNATE_TO_SPEECH
+
 RESULTS_DIR = "data/phyloregression/with_inventory"
 REGRESSION_DIR = "data/phyloregression"
 SPEECH_TREE = "input_v12_combined_resampled"
 COGNATE_TREE = "heggarty2024_raw"
-
-# Map cognate language names to speech language names
-COGNATE_TO_SPEECH = {
-    "ArmenianEastern": "Armenian",
-    "GaelicIrish": "Irish",
-    "KurdishCJafi": "Sorani-Kurdish",
-    "NorwegianBokmal": "Norwegian",
-    "PersianTehran": "Persian",
-    "SerboCroatian": "Serbian",
-    "Slovene": "Slovenian",
-    "WelshNorth": "Welsh",
-}
 
 
 def report_coef_ci(tree):

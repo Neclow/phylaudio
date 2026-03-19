@@ -17,6 +17,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+from src.tasks.phylo.constants import COGNATE_TO_SPEECH, EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
+
 # only need CPU
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -134,31 +136,6 @@ FAMILY_COLORS = {
     "celtic": "#d4e8d4ff",
 }
 
-EXCLUDE_LANGUAGES = {
-    "Turkish", "Finnish", "Hungarian",
-    "Breton", "Cornish",
-    "Scottish Gaelic", "Gaelic", "Manx",
-}
-
-# Maps a geojson "name" to ALL metadata language names it should match.
-# Single-entry lists handle simple renames; multi-entry lists expand one polygon
-# into multiple rows so it can match both Speech and Cognate metadata files.
-GEOJSON_EXPANSION = {
-    # Simple renames (geojson name differs from metadata name)
-    "Belarusian (Belorussian)": ["Belarusian"],
-    "Punjabi (Panjabi)":        ["Punjabi"],
-    "Netherlandic":             ["Dutch"],       # merged with direct 'Dutch' entry
-    # Languages named differently in Speech vs Cognate metadata
-    "Slovene":                  ["Slovene", "Slovenian"],
-    "Norwegian":                ["Norwegian", "NorwegianBokmal"],
-    "Persian (Farsi)":          ["Persian", "PersianTehran"],
-    "Armenian":                 ["Armenian", "ArmenianEastern"],
-    "Kurdish":                  ["KurdishCJafi", "Sorani-Kurdish"],
-    "Welsh":                    ["Welsh", "WelshNorth"],
-    "Irish":                    ["Irish", "GaelicIrish"],
-    # Split polygon: Serbian/Croatian/Bosnian shared territory
-    "Serbian / Croatian / Bosnian": ["Serbian", "Croatian", "Bosnian", "SerboCroatian"],
-}
 
 
 # ─── Shared Utilities ────────────────────────────────────────────────────────
@@ -847,18 +824,6 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 # ═════════════════════════════════════════════════════════════════════════════
 # Speech vs Cognate Rate Scatter (Extended Data Fig. 6)
 # ═════════════════════════════════════════════════════════════════════════════
-
-COGNATE_TO_SPEECH = {
-    "ArmenianEastern": "Armenian",
-    "GaelicIrish": "Irish",
-    "KurdishCJafi": "Sorani-Kurdish",
-    "NorwegianBokmal": "Norwegian",
-    "PersianTehran": "Persian",
-    "SerboCroatian": "Serbian",
-    "Slovene": "Slovenian",
-    "WelshNorth": "Welsh",
-}
-
 
 def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
     """Scatter of speech vs cognate median rates for matched languages."""

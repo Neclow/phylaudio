@@ -10,6 +10,7 @@ resolves to the same file for all weights, making bold unavailable.
 
 import os, warnings
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+from src.tasks.phylo.constants import EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -44,21 +45,6 @@ MODEL        = "linear_geo"
 SCMAP        = "viridis"   # panel c dots
 MAP_CMAP     = "magma"     # panel d surface + dots
 RATE_CMAP    = "plasma"    # unused (legacy)
-
-# ─── GeoJSON ──────────────────────────────────────────────────────────────────
-GEOJSON_EXPANSION = {
-    "Belarusian (Belorussian)": ["Belarusian"], "Punjabi (Panjabi)": ["Punjabi"],
-    "Netherlandic": ["Dutch"], "Slovene": ["Slovene", "Slovenian"],
-    "Norwegian": ["Norwegian", "NorwegianBokmal"],
-    "Persian (Farsi)": ["Persian", "PersianTehran"],
-    "Armenian": ["Armenian", "ArmenianEastern"],
-    "Kurdish": ["KurdishCJafi", "Sorani-Kurdish"],
-    "Welsh": ["Welsh", "WelshNorth"], "Irish": ["Irish", "GaelicIrish"],
-    "Serbian / Croatian / Bosnian": ["Serbian", "Croatian", "Bosnian", "SerboCroatian"],
-}
-EXCLUDE_LANGUAGES = {"Turkish", "Finnish", "Hungarian",
-                     "Breton", "Cornish", "Scottish Gaelic", "Gaelic", "Manx"}
-
 
 def load_language_polygons(filepath):
     gdf = gpd.read_file(filepath)
