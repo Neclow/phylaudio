@@ -866,7 +866,33 @@ COGNATE_TO_SPEECH = {
 
 def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
     """Scatter of speech vs cognate median rates for matched languages."""
+    import matplotlib as mpl
     from scipy import stats
+
+    # Apply figure3-style rcParams
+    mpl.rcParams.update({
+        "font.family":        "sans-serif",
+        "font.sans-serif":    ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
+        "font.size":          15,
+        "axes.linewidth":     0.9,
+        "axes.edgecolor":     "#333333",
+        "axes.labelsize":     17,
+        "axes.labelpad":      10,
+        "axes.titlesize":     20,
+        "axes.titleweight":   "bold",
+        "grid.color":         "#dddddd",
+        "grid.linewidth":     0.5,
+        "xtick.major.size":   4.5,
+        "ytick.major.size":   4.5,
+        "xtick.major.pad":    6,
+        "ytick.major.pad":    6,
+        "xtick.labelsize":    14,
+        "ytick.labelsize":    14,
+        "legend.fontsize":    13,
+        "legend.framealpha":  0.92,
+        "legend.edgecolor":   "#cccccc",
+        "figure.dpi":         150,
+    })
 
     speech = pd.read_csv(f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv")
     cognate = pd.read_csv(f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv")
@@ -879,34 +905,42 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
     c = cognate[["language", "rate_median"]].rename(
         columns={"rate_median": "cognate_rate"})
     merged = s.merge(c, on="language")
-    merged["family"] = merged["language"].map(
-        lambda x: FAMILY_LOOKUP.get(x, "other"))
-
     rho, pval = stats.spearmanr(merged["speech_rate"], merged["cognate_rate"])
 
     fig, ax = plt.subplots(figsize=(7, 6))
 
-    for fam in sorted(merged["family"].unique()):
-        sub = merged[merged["family"] == fam]
-        ax.scatter(sub["speech_rate"], sub["cognate_rate"],
-                   c=FAMILY_COLORS.get(fam, "#cccccc"),
-                   marker=FAMILY_MARKERS.get(fam, "o"),
-                   s=80, edgecolor="black", linewidth=0.5,
-                   label=fam.capitalize(), zorder=4)
+    ax.scatter(merged["speech_rate"], merged["cognate_rate"],
+               c="#555555", s=50, edgecolors="none", zorder=4)
 
     for _, row in merged.iterrows():
         ax.annotate(row["language"],
                     (row["speech_rate"], row["cognate_rate"]),
                     xytext=(4, 4), textcoords="offset points",
-                    fontsize=8, color="#333333")
+                    fontsize=10, color="#333333", clip_on=False)
 
-    ax.set_xlabel("Speech rate (median)", fontsize=22)
-    ax.set_ylabel("Cognate rate (median)", fontsize=22)
-    ax.tick_params(axis="both", labelsize=22)
-    ax.spines[["top", "right"]].set_visible(False)
-    ax.legend(fontsize=12, frameon=False)
-    ax.set_title(f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
-                 fontsize=16, style="italic")
+    # Tight axis limits with small padding
+    x_vals = merged["speech_rate"].values
+    y_vals = merged["cognate_rate"].values
+    x_pad = (x_vals.max() - x_vals.min()) * 0.05
+    y_pad = (y_vals.max() - y_vals.min()) * 0.06
+    ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
+    ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
+
+    ax.set_xlabel("Median Bayesian Phylogenetic Rate (Speech)")
+    ax.set_ylabel("Median Bayesian Phylogenetic Rate (Cognate)")
+    ax.text(0.98, 0.02, f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
+            transform=ax.transAxes, ha="right", va="bottom",
+            fontsize=13, style="italic", color="#333333")
+
+    # bw_box style: all four spines, inward ticks, white bg, grid
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color("#333333")
+        spine.set_linewidth(0.9)
+    ax.set_facecolor("white")
+    ax.tick_params(top=True, right=True, which="both",
+                   direction="in", length=4.5, width=0.7)
+    ax.grid(True, color="#dddddd", linewidth=0.5, zorder=0)
 
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
