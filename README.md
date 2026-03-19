@@ -158,6 +158,12 @@ at: <https://neclow.github.io/phylaudio/>
 pixi run download_geojson        # download language polygon data (Glottography)
 ```
 
+### Compute some paper stats
+
+```bash
+pixi run python src/tasks/phylo/compute_paper_stats.py
+```
+
 ### Publication figures
 
 ```bash

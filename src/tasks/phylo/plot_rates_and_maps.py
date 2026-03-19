@@ -849,6 +849,74 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
 
 # ═════════════════════════════════════════════════════════════════════════════
+# Speech vs Cognate Rate Scatter (Extended Data Fig. 6)
+# ═════════════════════════════════════════════════════════════════════════════
+
+COGNATE_TO_SPEECH = {
+    "ArmenianEastern": "Armenian",
+    "GaelicIrish": "Irish",
+    "KurdishCJafi": "Sorani-Kurdish",
+    "NorwegianBokmal": "Norwegian",
+    "PersianTehran": "Persian",
+    "SerboCroatian": "Serbian",
+    "Slovene": "Slovenian",
+    "WelshNorth": "Welsh",
+}
+
+
+def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
+    """Scatter of speech vs cognate median rates for matched languages."""
+    from scipy import stats
+
+    speech = pd.read_csv(f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv")
+    cognate = pd.read_csv(f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv")
+
+    cognate["language"] = cognate["language"].map(
+        lambda x: COGNATE_TO_SPEECH.get(x, x))
+
+    s = speech[["language", "rate_median"]].rename(
+        columns={"rate_median": "speech_rate"})
+    c = cognate[["language", "rate_median"]].rename(
+        columns={"rate_median": "cognate_rate"})
+    merged = s.merge(c, on="language")
+    merged["family"] = merged["language"].map(
+        lambda x: FAMILY_LOOKUP.get(x, "other"))
+
+    rho, pval = stats.spearmanr(merged["speech_rate"], merged["cognate_rate"])
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    for fam in sorted(merged["family"].unique()):
+        sub = merged[merged["family"] == fam]
+        ax.scatter(sub["speech_rate"], sub["cognate_rate"],
+                   c=FAMILY_COLORS.get(fam, "#cccccc"),
+                   marker=FAMILY_MARKERS.get(fam, "o"),
+                   s=80, edgecolor="black", linewidth=0.5,
+                   label=fam.capitalize(), zorder=4)
+
+    for _, row in merged.iterrows():
+        ax.annotate(row["language"],
+                    (row["speech_rate"], row["cognate_rate"]),
+                    xytext=(4, 4), textcoords="offset points",
+                    fontsize=8, color="#333333")
+
+    ax.set_xlabel("Speech rate (median)", fontsize=22)
+    ax.set_ylabel("Cognate rate (median)", fontsize=22)
+    ax.tick_params(axis="both", labelsize=22)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.legend(fontsize=12, frameon=False)
+    ax.set_title(f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
+                 fontsize=16, style="italic")
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    out_path = f"{output_dir}/speech_vs_cognate_rates.pdf"
+    fig.savefig(out_path, dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"  Saved: {out_path}")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
 # Main
 # ═════════════════════════════════════════════════════════════════════════════
 
@@ -897,6 +965,12 @@ if __name__ == "__main__":
             print(f"  GeoJSON not found: {geojson}")
 
         print()
+
+    # ── Speech vs Cognate rate scatter ──────────────────────────────────────
+    print("=" * 60)
+    print("Speech vs Cognate rate scatter")
+    print("=" * 60)
+    plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR)
 
     # ── Root age comparison — same for both variants ───────────────────────
     print("=" * 60)
