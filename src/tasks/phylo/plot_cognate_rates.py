@@ -14,7 +14,7 @@ from matplotlib.colors import Normalize, LinearSegmentedColormap, to_rgba
 import matplotlib.cm as cm
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-TREES_FILE = "data/trees/beast/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_prunedtomodern.trees"
+TREES_FILE = "data/trees/beast/iecor/prunedtomodern.trees"
 OUTPUT_DIR = "data/phyloregression/figures"
 BURNIN = 1000
 NTIMES = 200
