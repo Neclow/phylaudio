@@ -112,13 +112,13 @@ def make_raxml_tree(
 
 def make_iqtree_tree(
     fasta_path,
-    iqtree_alias="iqtree2",
+    iqtree_alias="iqtree",
     model="MFP",
     n_threads=DEFAULT_THREADS_TREE,
     bootstrap=False,
     **kwargs,
 ):
-    command = f"{iqtree_alias} -s {fasta_path} -m {model} -T {n_threads} --seed {RANDOM_STATE}"
+    command = f"{iqtree_alias} -s {fasta_path} -m {model} -T {n_threads} --seed {RANDOM_STATE} --undo"
 
     if bootstrap:
         command += " -B 1000 -bnni"

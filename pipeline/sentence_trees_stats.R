@@ -1,6 +1,7 @@
 library(dplyr)
 
 PER_SENTENCE_DIR <- "data/trees/per_sentence"
+OUTPUT_FILE <- "_stats.csv"
 
 source("src/tasks/phylo/stats.R")
 
@@ -42,7 +43,7 @@ get_iqtree_stats <- function(run_dir, pattern = "*.treefile") {
   # Sort by clock-likeness (lower = more clock-like)
   result <- as.data.frame(tree_stats) %>% arrange(clock)
 
-  output_file <- file.path(run_dir, "_stats.csv")
+  output_file <- file.path(run_dir, OUTPUT_FILE)
 
   write.csv(result, output_file)
 
@@ -55,51 +56,71 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check for help flag
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
-  cat("Usage: Rscript sentence_trees_stats.R <run_dir> [pattern]\n\n")
+  cat("Usage: Rscript sentence_trees_stats.R <dirname> [pattern]\n\n")
   cat("Arguments:\n")
-  cat("  run_dir    Path to the directory containing tree files\n")
+  cat(
+    "  dirname    Name of the subdirectory in ",
+    PER_SENTENCE_DIR,
+    "\n",
+    sep = ""
+  )
   cat("  pattern    File extension to match (default: treefile)\n")
   cat("             Will be automatically prefixed with '*.' if not present\n")
+  cat("\nOptions:\n")
+  cat("  --overwrite  Overwrite existing ", OUTPUT_FILE, " files\n", sep = "")
+  cat("\nExample:\n")
+  cat("  Rscript sentence_trees_stats.R discrete\n")
   quit(status = 0)
 }
 
 if (length(args) < 1) {
   stop(
-    "Usage: Rscript sentence_trees_stats.R <run_dir> [pattern]\nUse -h or --help for more information",
+    "Usage: Rscript sentence_trees_stats.R <dirname> [pattern]\nUse -h or --help for more information",
     call. = FALSE
   )
 }
 
-run_dir <- args[1]
-pattern <- ifelse(length(args) >= 2, args[2], "treefile")
+# Parse arguments
+overwrite <- "--overwrite" %in% args
+positional_args <- args[!grepl("^--", args)]
+
+dirname <- positional_args[1]
+pattern <- ifelse(length(positional_args) >= 2, positional_args[2], "treefile")
 
 # If pattern doesn't start with "*.", prepend it
 if (!grepl("^\\*\\.", pattern)) {
   pattern <- paste0("*.", pattern)
 }
 
-# Resolve run_dir: if not a directory, try to find it in PER_SENTENCE_DIR
-if (!dir.exists(run_dir)) {
-  potential_dirs <- Sys.glob(file.path(PER_SENTENCE_DIR, "*", run_dir))
+# Resolve dirname to full path under PER_SENTENCE_DIR
+input_dir <- file.path(PER_SENTENCE_DIR, dirname)
 
-  if (length(potential_dirs) == 0) {
-    stop(paste("Directory not found:", run_dir), call. = FALSE)
-  } else if (length(potential_dirs) > 1) {
-    stop(
-      paste(
-        "Multiple directories found for run_dir '",
-        run_dir,
-        "':\n  ",
-        paste(potential_dirs, collapse = "\n  "),
-        sep = ""
-      ),
-      call. = FALSE
-    )
-  }
-
-  run_dir <- potential_dirs[1]
-  cat(paste("Using run directory:", run_dir, "\n"))
+if (!dir.exists(input_dir)) {
+  stop(paste("Directory not found:", input_dir), call. = FALSE)
 }
 
-# Run the function
-get_iqtree_stats(run_dir, pattern)
+# Find all subdirectories (UUID run dirs)
+run_dirs <- list.dirs(input_dir, recursive = FALSE, full.names = TRUE)
+
+if (length(run_dirs) == 0) {
+  stop(paste("No subdirectories found in", input_dir), call. = FALSE)
+}
+
+cat(paste("Found", length(run_dirs), "run directories in", input_dir, "\n"))
+
+# Run stats on each subdirectory
+for (i in seq_along(run_dirs)) {
+  run_dir <- run_dirs[i]
+  cat(paste0("\n[", i, "/", length(run_dirs), "] ", basename(run_dir), "\n"))
+
+  # Skip if output already exists
+  if (!overwrite && file.exists(file.path(run_dir, OUTPUT_FILE))) {
+    cat(paste("  ", OUTPUT_FILE, "already exists. Skipping...\n"))
+    next
+  }
+
+  tryCatch(
+    get_iqtree_stats(run_dir, pattern),
+    error = function(e) cat(paste("  Skipped:", e$message, "\n"))
+  )
+}

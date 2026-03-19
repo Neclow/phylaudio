@@ -58,13 +58,6 @@ def parse_args(with_base_args=True):
         help="IQTree substitution model",
     )
 
-    parser.add_argument(
-        "-B",
-        "--iqtree-bootstrap",
-        action="store_true",
-        help="If True, run IQTree with bootstrapping",
-    )
-
     return parser.parse_args()
 
 
@@ -140,10 +133,7 @@ def main():
 
     # Tree inference
     writer = DiscretePhyloWriter(
-        inputs.run_id,
-        dtype=dtype,
-        model=args.iqtree_model,
-        bootstrap=args.iqtree_bootstrap,
+        inputs.run_id, dtype=dtype, model=args.iqtree_model, bootstrap=True
     )
     writer.write(export_trees=True)
 
