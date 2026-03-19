@@ -161,13 +161,14 @@ pixi run download_geojson        # download language polygon data (Glottography)
 ### Compute some paper stats
 
 ```bash
-pixi run python src/tasks/phylo/compute_paper_stats.py
+pixi run python -m src.tasks.phylo.compute_paper_stats
 ```
 
 ### Publication figures
 
 ```bash
-pixi run -e viz viz_figure2_rates        # Figure 2 panel B (rate over time with CI bands)
+pixi run -e viz viz_figure2_rates        # Figure 2 panel B (speech rate over time with CI bands)
+pixi run -e viz viz_cognate_rates        # Cognate rate over time (same style as Figure 2 panel B)
 pixi run -e viz viz_figure3_geo          # Figure 3 (regression panels)
 pixi run -e viz viz_plot_rates_and_maps  # rate scatter, GP maps, root age, rate-over-time
 ```

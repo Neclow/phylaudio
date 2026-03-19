@@ -8,11 +8,8 @@ whereas Helvetica / HelveticaNeue ship as .ttc collections that matplotlib
 resolves to the same file for all weights, making bold unavailable.
 """
 
-import os, sys, warnings
+import os, warnings
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-# Remove script directory from sys.path to avoid shadowing the 'tree' package
-# with src/tasks/phylo/tree.py
-sys.path[:] = [p for p in sys.path if not p.endswith("src/tasks/phylo")]
 import numpy as np
 import pandas as pd
 import matplotlib as mpl

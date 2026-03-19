@@ -11,10 +11,6 @@ Sections:
 """
 
 import os
-import sys
-# Remove script directory from sys.path to avoid shadowing the 'tree' package
-# with src/tasks/phylo/tree.py
-sys.path[:] = [p for p in sys.path if not p.endswith("src/tasks/phylo")]
 import glob
 import numpy as np
 import pandas as pd
@@ -965,7 +961,6 @@ if __name__ == "__main__":
     try:
         import gpflow  # noqa: F811
         import tensorflow  # noqa: F401
-        sys.path.insert(0, "..")
         _gpflow_ok = True
     except ImportError as e:
         print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
