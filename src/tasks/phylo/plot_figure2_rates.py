@@ -6,10 +6,7 @@ computes rates through time with 95% CI bands.
 """
 
 import os
-import sys
-# Remove script directory from sys.path to avoid shadowing the 'tree' package
-# with src/tasks/phylo/tree.py
-sys.path[:] = [p for p in sys.path if not p.endswith("src/tasks/phylo")]
+
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")

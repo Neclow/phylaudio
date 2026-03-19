@@ -8,11 +8,9 @@ whereas Helvetica / HelveticaNeue ship as .ttc collections that matplotlib
 resolves to the same file for all weights, making bold unavailable.
 """
 
-import os, sys, warnings
+import os, warnings
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-# Remove script directory from sys.path to avoid shadowing the 'tree' package
-# with src/tasks/phylo/tree.py
-sys.path[:] = [p for p in sys.path if not p.endswith("src/tasks/phylo")]
+from src.tasks.phylo.constants import EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -47,21 +45,6 @@ MODEL        = "linear_geo"
 SCMAP        = "viridis"   # panel c dots
 MAP_CMAP     = "magma"     # panel d surface + dots
 RATE_CMAP    = "plasma"    # unused (legacy)
-
-# ─── GeoJSON ──────────────────────────────────────────────────────────────────
-GEOJSON_EXPANSION = {
-    "Belarusian (Belorussian)": ["Belarusian"], "Punjabi (Panjabi)": ["Punjabi"],
-    "Netherlandic": ["Dutch"], "Slovene": ["Slovene", "Slovenian"],
-    "Norwegian": ["Norwegian", "NorwegianBokmal"],
-    "Persian (Farsi)": ["Persian", "PersianTehran"],
-    "Armenian": ["Armenian", "ArmenianEastern"],
-    "Kurdish": ["KurdishCJafi", "Sorani-Kurdish"],
-    "Welsh": ["Welsh", "WelshNorth"], "Irish": ["Irish", "GaelicIrish"],
-    "Serbian / Croatian / Bosnian": ["Serbian", "Croatian", "Bosnian", "SerboCroatian"],
-}
-EXCLUDE_LANGUAGES = {"Turkish", "Finnish", "Hungarian",
-                     "Breton", "Cornish", "Scottish Gaelic", "Gaelic", "Manx"}
-
 
 def load_language_polygons(filepath):
     gdf = gpd.read_file(filepath)
