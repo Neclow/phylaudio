@@ -11,15 +11,13 @@ Sections:
 """
 
 import os
-import sys
-# Remove script directory from sys.path to avoid shadowing the 'tree' package
-# with src/tasks/phylo/tree.py
-sys.path[:] = [p for p in sys.path if not p.endswith("src/tasks/phylo")]
 import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+
+from src.tasks.phylo.constants import COGNATE_TO_SPEECH, EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
 
 # only need CPU
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -138,31 +136,6 @@ FAMILY_COLORS = {
     "celtic": "#d4e8d4ff",
 }
 
-EXCLUDE_LANGUAGES = {
-    "Turkish", "Finnish", "Hungarian",
-    "Breton", "Cornish",
-    "Scottish Gaelic", "Gaelic", "Manx",
-}
-
-# Maps a geojson "name" to ALL metadata language names it should match.
-# Single-entry lists handle simple renames; multi-entry lists expand one polygon
-# into multiple rows so it can match both Speech and Cognate metadata files.
-GEOJSON_EXPANSION = {
-    # Simple renames (geojson name differs from metadata name)
-    "Belarusian (Belorussian)": ["Belarusian"],
-    "Punjabi (Panjabi)":        ["Punjabi"],
-    "Netherlandic":             ["Dutch"],       # merged with direct 'Dutch' entry
-    # Languages named differently in Speech vs Cognate metadata
-    "Slovene":                  ["Slovene", "Slovenian"],
-    "Norwegian":                ["Norwegian", "NorwegianBokmal"],
-    "Persian (Farsi)":          ["Persian", "PersianTehran"],
-    "Armenian":                 ["Armenian", "ArmenianEastern"],
-    "Kurdish":                  ["KurdishCJafi", "Sorani-Kurdish"],
-    "Welsh":                    ["Welsh", "WelshNorth"],
-    "Irish":                    ["Irish", "GaelicIrish"],
-    # Split polygon: Serbian/Croatian/Bosnian shared territory
-    "Serbian / Croatian / Bosnian": ["Serbian", "Croatian", "Bosnian", "SerboCroatian"],
-}
 
 
 # ─── Shared Utilities ────────────────────────────────────────────────────────
@@ -461,12 +434,24 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
         im.set_clip_path(band.get_paths()[0], transform=ax.transData)
 
     if draw_mean:
+        from matplotlib.colors import to_rgba
         mean = np.nanmean(mat, axis=0)
         mean_valid = np.isfinite(mean)
-        ax.plot(t_grid[mean_valid], mean[mean_valid], lw=4, color="white",
-                zorder=zorder + 1.4)
-        ax.plot(t_grid[mean_valid], mean[mean_valid], lw=2, color=base_color,
-                label=f"{label} mean", zorder=zorder + 1.5)
+        # Draw mean line as segments that fade with sample density
+        t_v = t_grid[mean_valid]
+        m_v = mean[mean_valid]
+        c_v = cnt[mean_valid]
+        c_max = np.nanmax(c_v) if np.nanmax(c_v) > 0 else 1.0
+        for k in range(len(t_v) - 1):
+            alpha_k = float(np.clip(c_v[k] / c_max, 0.05, 1.0))
+            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=2.5,
+                    color=(*to_rgba("white")[:3], alpha_k),
+                    zorder=zorder + 1.4, solid_capstyle="round")
+            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=1.2,
+                    color=(*to_rgba(base_color)[:3], alpha_k),
+                    zorder=zorder + 1.5, solid_capstyle="round")
+        # Invisible line for legend
+        ax.plot([], [], lw=1.5, color=base_color, label=f"{label}")
     return im
 
 
@@ -837,6 +822,96 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
 
 # ═════════════════════════════════════════════════════════════════════════════
+# Speech vs Cognate Rate Scatter (Extended Data Fig. 6)
+# ═════════════════════════════════════════════════════════════════════════════
+
+def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
+    """Scatter of speech vs cognate median rates for matched languages."""
+    import matplotlib as mpl
+    from scipy import stats
+
+    # Apply figure3-style rcParams
+    mpl.rcParams.update({
+        "font.family":        "sans-serif",
+        "font.sans-serif":    ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
+        "font.size":          15,
+        "axes.linewidth":     0.9,
+        "axes.edgecolor":     "#333333",
+        "axes.labelsize":     17,
+        "axes.labelpad":      10,
+        "axes.titlesize":     20,
+        "axes.titleweight":   "bold",
+        "grid.color":         "#dddddd",
+        "grid.linewidth":     0.5,
+        "xtick.major.size":   4.5,
+        "ytick.major.size":   4.5,
+        "xtick.major.pad":    6,
+        "ytick.major.pad":    6,
+        "xtick.labelsize":    14,
+        "ytick.labelsize":    14,
+        "legend.fontsize":    13,
+        "legend.framealpha":  0.92,
+        "legend.edgecolor":   "#cccccc",
+        "figure.dpi":         150,
+    })
+
+    speech = pd.read_csv(f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv")
+    cognate = pd.read_csv(f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv")
+
+    cognate["language"] = cognate["language"].map(
+        lambda x: COGNATE_TO_SPEECH.get(x, x))
+
+    s = speech[["language", "rate_median"]].rename(
+        columns={"rate_median": "speech_rate"})
+    c = cognate[["language", "rate_median"]].rename(
+        columns={"rate_median": "cognate_rate"})
+    merged = s.merge(c, on="language")
+    rho, pval = stats.spearmanr(merged["speech_rate"], merged["cognate_rate"])
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    ax.scatter(merged["speech_rate"], merged["cognate_rate"],
+               c="#555555", s=50, edgecolors="none", zorder=4)
+
+    for _, row in merged.iterrows():
+        ax.annotate(row["language"],
+                    (row["speech_rate"], row["cognate_rate"]),
+                    xytext=(4, 4), textcoords="offset points",
+                    fontsize=10, color="#333333", clip_on=False)
+
+    # Tight axis limits with small padding
+    x_vals = merged["speech_rate"].values
+    y_vals = merged["cognate_rate"].values
+    x_pad = (x_vals.max() - x_vals.min()) * 0.05
+    y_pad = (y_vals.max() - y_vals.min()) * 0.06
+    ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
+    ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
+
+    ax.set_xlabel("Median Bayesian Phylogenetic Rate (Speech)")
+    ax.set_ylabel("Median Bayesian Phylogenetic Rate (Cognate)")
+    ax.text(0.98, 0.02, f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
+            transform=ax.transAxes, ha="right", va="bottom",
+            fontsize=13, style="italic", color="#333333")
+
+    # bw_box style: all four spines, inward ticks, white bg, grid
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color("#333333")
+        spine.set_linewidth(0.9)
+    ax.set_facecolor("white")
+    ax.tick_params(top=True, right=True, which="both",
+                   direction="in", length=4.5, width=0.7)
+    ax.grid(True, color="#dddddd", linewidth=0.5, zorder=0)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    out_path = f"{output_dir}/speech_vs_cognate_rates.pdf"
+    fig.savefig(out_path, dpi=300, bbox_inches="tight")
+    plt.close()
+    print(f"  Saved: {out_path}")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
 # Main
 # ═════════════════════════════════════════════════════════════════════════════
 
@@ -851,7 +926,6 @@ if __name__ == "__main__":
     try:
         import gpflow  # noqa: F811
         import tensorflow  # noqa: F401
-        sys.path.insert(0, "..")
         _gpflow_ok = True
     except ImportError as e:
         print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
@@ -885,6 +959,12 @@ if __name__ == "__main__":
             print(f"  GeoJSON not found: {geojson}")
 
         print()
+
+    # ── Speech vs Cognate rate scatter ──────────────────────────────────────
+    print("=" * 60)
+    print("Speech vs Cognate rate scatter")
+    print("=" * 60)
+    plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR)
 
     # ── Root age comparison — same for both variants ───────────────────────
     print("=" * 60)
