@@ -190,6 +190,11 @@ data/eval/*
 
 # Embeddings
 data/embeddings/*
+!data/embeddings/fleurs-r/
+data/embeddings/fleurs-r/*
+!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/
+data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/*
+!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/README.md
 
 # Tree data (except README and template)
 data/trees/*
@@ -204,6 +209,9 @@ data/trees/per_sentence/discrete/*
 data/trees/beast/*
 !data/trees/beast/template.xml
 !data/trees/beast/speech/
+!data/trees/beast/iecor/
+data/trees/beast/iecor/*
+!data/trees/beast/iecor/README.md
 
 # My drafts
 tmp/

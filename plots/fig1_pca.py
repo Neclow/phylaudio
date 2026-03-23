@@ -15,7 +15,7 @@ from src.tasks.feature_extraction._decomposition import decompose, fit_decompose
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 IMG_DIR = "img/fig1"
-EMB_DIR = "data/embeddings/fleurs-r/16fa4383-40db-492c-8420-72488cc60562"
+EMB_DIR = "data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m"
 
 PALETTE_MAP = {
     "germanic": "Reds_r",
