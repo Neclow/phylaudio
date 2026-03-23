@@ -35,7 +35,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 HERE = Path(__file__).resolve().parent
-BASE = HERE.parent.parent.parent  # src/tasks/phylo -> repo root
+BASE = HERE.parent  # src/tasks/phylo -> repo root
 OUT_DIR = BASE / "data/phyloregression/figures"
 
 RESULTS_DIR = BASE / "data/phyloregression/with_inventory"
@@ -516,15 +516,43 @@ def make_panel_c(ax, dat, gp_result):
         zorder=4,
     )
 
-    for lang in langs:
-        ax.annotate(
-            lang,
-            (meta.loc[lang, "delta"], meta.loc[lang, "log_rate"]),
-            xytext=(4, 4),
-            textcoords="offset points",
-            fontsize=10,
-            color="#333333",
-            clip_on=False,
+    # Label only non-overlapping points: keep those far from neighbours
+    from scipy.spatial import cKDTree
+
+    xs = meta.loc[langs, "delta"].values
+    ys = meta.loc[langs, "log_rate"].values
+
+    # Normalise to axis range so x/y distances are comparable
+    x_range = xs.max() - xs.min() or 1
+    y_range = ys.max() - ys.min() or 1
+    coords = np.column_stack([xs / x_range, ys / y_range])
+    tree = cKDTree(coords)
+    dists, _ = tree.query(coords, k=2)  # k=2: nearest neighbour (not self)
+    nn_dist = dists[:, 1]
+
+    # Label threshold: top ~40% most isolated points
+    threshold = np.percentile(nn_dist, 60)
+    label_mask = nn_dist >= threshold
+
+    texts = []
+    for i, lang in enumerate(langs):
+        if not label_mask[i]:
+            continue
+        # Push labels inward when near axis edges to avoid clipping
+        x_frac = (xs[i] - xs.min()) / (x_range or 1)
+        y_frac = (ys[i] - ys.min()) / (y_range or 1)
+        dx = -8 if x_frac > 0.85 else (4 if x_frac < 0.15 else 5)
+        dy = -10 if y_frac > 0.90 else (6 if y_frac < 0.10 else 5)
+        texts.append(
+            ax.annotate(
+                lang,
+                (xs[i], ys[i]),
+                xytext=(dx, dy),
+                textcoords="offset points",
+                fontsize=11,
+                color="#333333",
+                clip_on=True,
+            )
         )
 
     # Inset colorbar
@@ -535,10 +563,10 @@ def make_panel_c(ax, dat, gp_result):
     # Tight axis limits with small padding
     x_vals = meta.loc[langs, "delta"].values
     y_vals = meta.loc[langs, "log_rate"].values
-    x_pad = (x_vals.max() - x_vals.min()) * 0.05
-    y_pad = (y_vals.max() - y_vals.min()) * 0.06
-    ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
-    ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
+    x_span = x_vals.max() - x_vals.min()
+    y_span = y_vals.max() - y_vals.min()
+    ax.set_xlim(x_vals.min() - x_span * 0.08, x_vals.max() + x_span * 0.18)
+    ax.set_ylim(y_vals.min() - y_span * 0.08, y_vals.max() + y_span * 0.08)
 
     ax.set_xlabel("Network signal (\u03b4)")
     ax.set_ylabel("Log Median Bayesian Phylogenetic Rate")

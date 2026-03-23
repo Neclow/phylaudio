@@ -194,7 +194,7 @@ def main():
     ax.set_xlim(t_grid.max(), t_grid.min())
     ax.set_ylim(ylow_p, yhigh_p)
     ax.set_ylabel("% change in rate\n(relative to present)", fontsize=8)
-    ax.set_xlabel("Time (ka BP)", fontsize=8)
+    ax.set_xlabel("Thousand years before present", fontsize=8)
     ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     ax.spines[["top", "right"]].set_visible(False)
 

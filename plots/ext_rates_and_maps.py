@@ -365,23 +365,28 @@ def plot_root_age_comparison(
                 label=label,
             )
 
-    plot_density(speech_post, "#5e5eb5", "Speech posterior", filled=True)
-    plot_density(cognate_post, "#6ab06a", "Cognates posterior", filled=True)
-    plot_density(speech_prior, "#5e5eb5", "Speech prior", filled=False)
-    plot_density(cognate_prior, "#6ab06a", "Cognates prior", filled=False)
+    plot_density(speech_post, "#414487", "Speech posterior", filled=True)
+    plot_density(cognate_post, "#7ad151", "Cognates posterior", filled=True)
+    plot_density(speech_prior, "#414487", "Speech prior", filled=False)
+    plot_density(cognate_prior, "#7ad151", "Cognates prior", filled=False)
 
-    ax.set_xlabel("Root age (ka BP)", fontsize=22)
+    ax.invert_xaxis()
+    ax.set_xlabel("Thousand years before present", fontsize=22)
     ax.set_ylabel("Density", fontsize=22)
-    ax.legend(loc="upper right", fontsize=16)
+    ax.legend(loc="upper left", fontsize=16)
     ax.set_ylim(0, None)
     ax.spines[["top", "right"]].set_visible(False)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
-    out_path = f"{output_dir}/root_age_comparison_v4.pdf"
+    os.makedirs(output_dir, exist_ok=True)  
+    out_path = f"{output_dir}/root_age_comparison.pdf"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
+    # save as svg
+    out_path_svg = f"{output_dir}/root_age_comparison.svg"
+    plt.savefig(out_path_svg, dpi=300, bbox_inches="tight")
     plt.close()
     print(f"  Saved: {out_path}")
+    print(f"  Saved: {out_path_svg}")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -1091,52 +1096,52 @@ if __name__ == "__main__":
         "heggarty2024_raw": "Cognates",
     }
 
-    # ── Pre-load GP libraries once (used in loop below) ──────────────────────
-    _gpflow_ok = False
-    try:
-        import gpflow  # noqa: F811
-        import tensorflow  # noqa: F401
+    # # ── Pre-load GP libraries once (used in loop below) ──────────────────────
+    # _gpflow_ok = False
+    # try:
+    #     import gpflow  # noqa: F811
+    #     import tensorflow  # noqa: F401
 
-        _gpflow_ok = True
-    except ImportError as e:
-        print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
+    #     _gpflow_ok = True
+    # except ImportError as e:
+    #     print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
 
-    geojson = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
+    # geojson = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
 
-    for variant, mpaths in TREE_META_PATHS.items():
-        out_dir = os.path.join(OUTPUT_DIR, variant)
-        os.makedirs(out_dir, exist_ok=True)
-        # Regression CSVs live in a variant-specific subdir of RESULTS_DIR
-        results_dir_v = os.path.join(RESULTS_DIR, variant)
-        if not os.path.isdir(results_dir_v):
-            results_dir_v = RESULTS_DIR
+    # for variant, mpaths in TREE_META_PATHS.items():
+    #     out_dir = os.path.join(OUTPUT_DIR, variant)
+    #     os.makedirs(out_dir, exist_ok=True)
+    #     # Regression CSVs live in a variant-specific subdir of RESULTS_DIR
+    #     results_dir_v = os.path.join(RESULTS_DIR, variant)
+    #     if not os.path.isdir(results_dir_v):
+    #         results_dir_v = RESULTS_DIR
 
-        print("=" * 60)
-        print(f"Rate vs longitude scatter  [{variant}]")
-        print("=" * 60)
-        plot_rate_vs_longitude(output_dir=out_dir, meta_paths=mpaths)
+    #     print("=" * 60)
+    #     print(f"Rate vs longitude scatter  [{variant}]")
+    #     print("=" * 60)
+    #     plot_rate_vs_longitude(output_dir=out_dir, meta_paths=mpaths)
 
-        print()
-        print("=" * 60)
-        print(f"Continuous GP maps  [{variant}]")
-        print("=" * 60)
-        if _gpflow_ok and os.path.exists(geojson):
-            print("  Grid-trained GP maps...")
-            plot_continuous_map_grid(
-                output_dir=out_dir, geojson_path=geojson, meta_paths=mpaths
-            )
-        elif not _gpflow_ok:
-            print("  Skipping (gpflow unavailable).")
-        else:
-            print(f"  GeoJSON not found: {geojson}")
+    #     print()
+    #     print("=" * 60)
+    #     print(f"Continuous GP maps  [{variant}]")
+    #     print("=" * 60)
+    #     if _gpflow_ok and os.path.exists(geojson):
+    #         print("  Grid-trained GP maps...")
+    #         plot_continuous_map_grid(
+    #             output_dir=out_dir, geojson_path=geojson, meta_paths=mpaths
+    #         )
+    #     elif not _gpflow_ok:
+    #         print("  Skipping (gpflow unavailable).")
+    #     else:
+    #         print(f"  GeoJSON not found: {geojson}")
 
-        print()
+    #     print()
 
-    # ── Speech vs Cognate rate scatter ──────────────────────────────────────
-    print("=" * 60)
-    print("Speech vs Cognate rate scatter")
-    print("=" * 60)
-    plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR)
+    # # ── Speech vs Cognate rate scatter ──────────────────────────────────────
+    # print("=" * 60)
+    # print("Speech vs Cognate rate scatter")
+    # print("=" * 60)
+    # plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR)
 
     # ── Root age comparison — same for both variants ───────────────────────
     print("=" * 60)
@@ -1144,33 +1149,33 @@ if __name__ == "__main__":
     print("=" * 60)
     plot_root_age_comparison(output_dir=OUTPUT_DIR)
 
-    # ── Rate-over-time — same for both variants ────────────────────────────
-    speech_trees_path = f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees"
-    cognate_trees_path = f"{DATA_DIR}/trees/beast/iecor/prunedtomodern.trees"
-    if os.path.exists(speech_trees_path) and os.path.exists(cognate_trees_path):
-        try:
-            import dendropy
+    # # ── Rate-over-time — same for both variants ────────────────────────────
+    # speech_trees_path = f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees"
+    # cognate_trees_path = f"{DATA_DIR}/trees/beast/iecor/prunedtomodern.trees"
+    # if os.path.exists(speech_trees_path) and os.path.exists(cognate_trees_path):
+    #     try:
+    #         import dendropy
 
-            trees_cognates_rated = dendropy.TreeList.get(
-                path=cognate_trees_path,
-                schema="nexus",
-                preserve_underscores=True,
-                extract_comment_metadata=True,
-            )
-            trees_speech_rated = dendropy.TreeList.get(
-                path=speech_trees_path,
-                schema="nexus",
-                preserve_underscores=True,
-                extract_comment_metadata=True,
-            )
-            plot_rate_over_time_normalized(
-                trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
-            )
-            plot_pct_change_over_time(
-                trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
-            )
-        except ImportError:
-            print("  dendropy not installed; skipping.")
+    #         trees_cognates_rated = dendropy.TreeList.get(
+    #             path=cognate_trees_path,
+    #             schema="nexus",
+    #             preserve_underscores=True,
+    #             extract_comment_metadata=True,
+    #         )
+    #         trees_speech_rated = dendropy.TreeList.get(
+    #             path=speech_trees_path,
+    #             schema="nexus",
+    #             preserve_underscores=True,
+    #             extract_comment_metadata=True,
+    #         )
+    #         plot_rate_over_time_normalized(
+    #             trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
+    #         )
+    #         plot_pct_change_over_time(
+    #             trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
+    #         )
+    #     except ImportError:
+    #         print("  dendropy not installed; skipping.")
 
     print()
     print("Done.")
