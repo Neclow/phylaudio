@@ -151,7 +151,7 @@ def main():
     ax.set_xlim(tmax, 0.0)
     ax.set_ylim(ylow, yhigh)
     ax.set_ylabel("Standardised rate (z-score)", fontsize=8)
-    ax.set_xlabel("Time (ka BP)", fontsize=8)
+    ax.set_xlabel("Thousand years before present", fontsize=8)
     ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     ax.spines[["top", "right"]].set_visible(False)
 
