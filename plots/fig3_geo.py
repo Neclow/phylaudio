@@ -8,72 +8,90 @@ whereas Helvetica / HelveticaNeue ship as .ttc collections that matplotlib
 resolves to the same file for all weights, making bold unavailable.
 """
 
-import os, warnings
+import os
+import warnings
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-from src.tasks.phylo.constants import EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
-import numpy as np
-import pandas as pd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
-from matplotlib.cm import ScalarMappable
-from matplotlib.font_manager import FontProperties
 from pathlib import Path
-from scipy import stats
 
 import geopandas as gpd
-from shapely.geometry import Point, box as shapely_box
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
+from matplotlib.font_manager import FontProperties
+from scipy import stats
+from shapely.geometry import Point
+from shapely.geometry import box as shapely_box
 from shapely.prepared import prep
+
+from src.tasks.phylo.constants import EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
-HERE    = Path(__file__).resolve().parent
-BASE    = HERE.parent.parent.parent  # src/tasks/phylo -> repo root
+HERE = Path(__file__).resolve().parent
+BASE = HERE.parent.parent.parent  # src/tasks/phylo -> repo root
 OUT_DIR = BASE / "data/phyloregression/figures"
 
-RESULTS_DIR  = BASE / "data/phyloregression/with_inventory"
-DATA_DIR     = BASE / "data"
+RESULTS_DIR = BASE / "data/phyloregression/with_inventory"
+DATA_DIR = BASE / "data"
 GEOJSON_PATH = DATA_DIR / "metadata/fleurs-r/dataset.geojson"
 
 # ─── Model config ─────────────────────────────────────────────────────────────
-SPEECH_TREE  = "input_v12_combined_resampled"
+SPEECH_TREE = "input_v12_combined_resampled"
 COGNATE_TREE = "heggarty2024_raw"
-MODEL        = "linear_geo"
-SCMAP        = "viridis"   # panel c dots
-MAP_CMAP     = "magma"     # panel d surface + dots
-RATE_CMAP    = "plasma"    # unused (legacy)
+MODEL = "linear_geo"
+SCMAP = "viridis"  # panel c dots
+MAP_CMAP = "magma"  # panel d surface + dots
+RATE_CMAP = "plasma"  # unused (legacy)
+
 
 def load_language_polygons(filepath):
     gdf = gpd.read_file(filepath)
-    merged = [{"name": n, "geometry": gdf[gdf["name"] == n].geometry.union_all()}
-              for n in gdf["name"].unique()]
+    merged = [
+        {"name": n, "geometry": gdf[gdf["name"] == n].geometry.union_all()}
+        for n in gdf["name"].unique()
+    ]
     gdf = gpd.GeoDataFrame(merged, crs=gdf.crs)
     expand_mask = gdf["name"].isin(GEOJSON_EXPANSION)
     expanded = []
     for _, row in gdf[expand_mask].iterrows():
         for new_name in GEOJSON_EXPANSION[row["name"]]:
-            r = row.copy(); r["name"] = new_name; expanded.append(r)
+            r = row.copy()
+            r["name"] = new_name
+            expanded.append(r)
     if expanded:
-        gdf = pd.concat([gdf[~expand_mask],
-                         gpd.GeoDataFrame(expanded, crs=gdf.crs)],
-                        ignore_index=True)
+        gdf = pd.concat(
+            [gdf[~expand_mask], gpd.GeoDataFrame(expanded, crs=gdf.crs)],
+            ignore_index=True,
+        )
     return gpd.GeoDataFrame(
-        [{"name": n, "geometry": gdf[gdf["name"] == n].geometry.union_all()}
-         for n in gdf["name"].unique()], crs=gdf.crs)
+        [
+            {"name": n, "geometry": gdf[gdf["name"] == n].geometry.union_all()}
+            for n in gdf["name"].unique()
+        ],
+        crs=gdf.crs,
+    )
+
 
 # ─── Bold font (Arial has a proper bold TTF on macOS) ─────────────────────────
-_PANEL_FP = FontProperties(family="sans-serif", weight="bold",  size=30)
-_AXIS_FP  = FontProperties(family="sans-serif", weight="normal", size=15)
+_PANEL_FP = FontProperties(family="sans-serif", weight="bold", size=30)
+_AXIS_FP = FontProperties(family="sans-serif", weight="normal", size=15)
 
 # ─── Display-name helpers ─────────────────────────────────────────────────────
 _VAR_DISPLAY = {
-    "longitude": "Longitude", "latitude": "Latitude",
-    "log_n_speakers": "log_n_speakers", "n_phonemes": "n_phonemes",
+    "longitude": "Longitude",
+    "latitude": "Latitude",
+    "log_n_speakers": "log_n_speakers",
+    "n_phonemes": "n_phonemes",
     "delta": "delta",
 }
+
 
 def _coef_suffix_to_display(suffix):
     known = _VAR_DISPLAY
@@ -81,10 +99,11 @@ def _coef_suffix_to_display(suffix):
         return known[suffix]
     for v1 in sorted(known, key=len, reverse=True):
         if suffix.startswith(v1 + "_"):
-            rest = suffix[len(v1) + 1:]
+            rest = suffix[len(v1) + 1 :]
             if rest in known:
                 return f"{known[v1]}×{known[rest]}"
     return None
+
 
 def _extract_coefficient_data(summ_df):
     rows = []
@@ -103,25 +122,47 @@ def _extract_coefficient_data(summ_df):
                 continue
             est, lo, hi = float(row[col]), float(row[lo_col]), float(row[hi_col])
             if pd.notna(est):
-                rows.append(dict(coefficient=display, estimate=est,
-                                 ci_lower=lo, ci_upper=hi,
-                                 _n_vars=1 if "×" not in display else 2))
+                rows.append(
+                    dict(
+                        coefficient=display,
+                        estimate=est,
+                        ci_lower=lo,
+                        ci_upper=hi,
+                        _n_vars=1 if "×" not in display else 2,
+                    )
+                )
     return pd.DataFrame(rows)
+
 
 # ─── Variance decomposition ───────────────────────────────────────────────────
 VARIANCE_COMPONENT_ORDER = [
-    "Longitude", "Latitude", "log_n_speakers", "n_phonemes", "delta",
-    "Longitude×Latitude", "Longitude×log_n_speakers", "Longitude×delta",
-    "Latitude×log_n_speakers", "Latitude×delta",
-    "Phylogenetic", "Cov(Fixed, Phylo)", "Residual",
+    "Longitude",
+    "Latitude",
+    "log_n_speakers",
+    "n_phonemes",
+    "delta",
+    "Longitude×Latitude",
+    "Longitude×log_n_speakers",
+    "Longitude×delta",
+    "Latitude×log_n_speakers",
+    "Latitude×delta",
+    "Phylogenetic",
+    "Cov(Fixed, Phylo)",
+    "Residual",
 ]
 VARIANCE_COLORS = {
-    "Longitude": "#1f77b4", "Latitude": "#ff7f0e",
-    "log_n_speakers": "#2ca02c", "n_phonemes": "#17becf", "delta": "#bcbd22",
-    "Longitude×Latitude": "#d62728", "Longitude×log_n_speakers": "#9467bd",
-    "Longitude×delta": "#ff9896", "Latitude×log_n_speakers": "#e377c2",
+    "Longitude": "#1f77b4",
+    "Latitude": "#ff7f0e",
+    "log_n_speakers": "#2ca02c",
+    "n_phonemes": "#17becf",
+    "delta": "#bcbd22",
+    "Longitude×Latitude": "#d62728",
+    "Longitude×log_n_speakers": "#9467bd",
+    "Longitude×delta": "#ff9896",
+    "Latitude×log_n_speakers": "#e377c2",
     "Latitude×delta": "#ffbb78",
-    "Phylogenetic": "#8c564b", "Cov(Fixed, Phylo)": "#c8b8b0",
+    "Phylogenetic": "#8c564b",
+    "Cov(Fixed, Phylo)": "#c8b8b0",
     "Residual": "#7f7f7f",
 }
 CSV_TO_DISPLAY = {
@@ -141,8 +182,10 @@ CSV_TO_DISPLAY = {
 }
 # "delta" renders as "Network signal" everywhere in the figure
 PUBLICATION_LABELS = {
-    "Longitude": "Longitude", "Latitude": "Latitude",
-    "log_n_speakers": "Log(speakers)", "n_phonemes": "Inventory size",
+    "Longitude": "Longitude",
+    "Latitude": "Latitude",
+    "log_n_speakers": "Log(speakers)",
+    "n_phonemes": "Inventory size",
     "delta": "Network signal (\u03b4)",
     "Longitude×Latitude": "Longitude \u00d7 Latitude",
     "Longitude×log_n_speakers": "Longitude \u00d7 Log(speakers)",
@@ -153,47 +196,52 @@ PUBLICATION_LABELS = {
 
 
 def load_results(tree):
-    suffix    = f"{MODEL}_{tree}"
+    suffix = f"{MODEL}_{tree}"
     gp_suffix = f"gp_geo_{tree}"
-    meta_file = ("speech_metadata_with_inventory.csv" if tree == SPEECH_TREE
-                 else "cognate_metadata_with_inventory.csv")
+    meta_file = (
+        "speech_metadata_with_inventory.csv"
+        if tree == SPEECH_TREE
+        else "cognate_metadata_with_inventory.csv"
+    )
     result = dict(
-        meta    = pd.read_csv(DATA_DIR / "phyloregression" / meta_file),
-        coef    = pd.read_csv(RESULTS_DIR / f"coef_samples_{suffix}.csv"),
-        variance= pd.read_csv(RESULTS_DIR / f"variance_samples_{suffix}.csv"),
-        summary = pd.read_csv(RESULTS_DIR / f"phylolm_{suffix}.csv"),
-        gp_variance = pd.read_csv(RESULTS_DIR / f"variance_samples_{gp_suffix}.csv"),
+        meta=pd.read_csv(DATA_DIR / "phyloregression" / meta_file),
+        coef=pd.read_csv(RESULTS_DIR / f"coef_samples_{suffix}.csv"),
+        variance=pd.read_csv(RESULTS_DIR / f"variance_samples_{suffix}.csv"),
+        summary=pd.read_csv(RESULTS_DIR / f"phylolm_{suffix}.csv"),
+        gp_variance=pd.read_csv(RESULTS_DIR / f"variance_samples_{gp_suffix}.csv"),
     )
     return result
 
 
 # ─── Style ────────────────────────────────────────────────────────────────────
 def apply_style():
-    mpl.rcParams.update({
-        "font.family":        "sans-serif",
-        "font.sans-serif":    ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
-        "font.size":          15,
-        "axes.spines.top":    False,
-        "axes.spines.right":  False,
-        "axes.linewidth":     0.9,
-        "axes.edgecolor":     "#333333",
-        "axes.labelsize":     17,
-        "axes.labelpad":      10,
-        "axes.titlesize":     20,
-        "axes.titleweight":   "bold",
-        "grid.color":         "#dddddd",
-        "grid.linewidth":     0.5,
-        "xtick.major.size":   4.5,
-        "ytick.major.size":   4.5,
-        "xtick.major.pad":    6,
-        "ytick.major.pad":    6,
-        "xtick.labelsize":    14,
-        "ytick.labelsize":    14,
-        "legend.fontsize":    13,
-        "legend.framealpha":  0.92,
-        "legend.edgecolor":   "#cccccc",
-        "figure.dpi":         150,
-    })
+    mpl.rcParams.update(
+        {
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
+            "font.size": 15,
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.linewidth": 0.9,
+            "axes.edgecolor": "#333333",
+            "axes.labelsize": 17,
+            "axes.labelpad": 10,
+            "axes.titlesize": 20,
+            "axes.titleweight": "bold",
+            "grid.color": "#dddddd",
+            "grid.linewidth": 0.5,
+            "xtick.major.size": 4.5,
+            "ytick.major.size": 4.5,
+            "xtick.major.pad": 6,
+            "ytick.major.pad": 6,
+            "xtick.labelsize": 14,
+            "ytick.labelsize": 14,
+            "legend.fontsize": 13,
+            "legend.framealpha": 0.92,
+            "legend.edgecolor": "#cccccc",
+            "figure.dpi": 150,
+        }
+    )
 
 
 def _bw_box(ax):
@@ -203,8 +251,9 @@ def _bw_box(ax):
         spine.set_color("#333333")
         spine.set_linewidth(0.9)
     ax.set_facecolor("white")
-    ax.tick_params(top=True, right=True, which="both",
-                   direction="in", length=4.5, width=0.7)
+    ax.tick_params(
+        top=True, right=True, which="both", direction="in", length=4.5, width=0.7
+    )
     ax.grid(True, color="#dddddd", linewidth=0.5, zorder=0)
 
 
@@ -215,8 +264,10 @@ def _panel_title(ax, letter):
 
 def _inset_cbar(ax, sm, label, loc="lower right"):
     """Compact horizontal colorbar inset inside ax."""
-    rect = [0.55, 0.10, 0.42, 0.06] if loc == "lower right" else [0.03, 0.10, 0.42, 0.06]
-    cax  = ax.inset_axes(rect)
+    rect = (
+        [0.55, 0.10, 0.42, 0.06] if loc == "lower right" else [0.03, 0.10, 0.42, 0.06]
+    )
+    cax = ax.inset_axes(rect)
     cbar = plt.colorbar(sm, cax=cax, orientation="horizontal")
     cbar.set_label(label, fontsize=12, labelpad=3)
     cbar.ax.tick_params(labelsize=11, length=3, pad=3)
@@ -232,7 +283,7 @@ def _inset_cbar(ax, sm, label, loc="lower right"):
 def _shared_component_order(dat):
     """Return a list of display names present in the data, mains then interactions."""
     eff_df = _extract_coefficient_data(dat["summary"])
-    mains  = sorted(eff_df[eff_df["_n_vars"] == 1]["coefficient"].unique())
+    mains = sorted(eff_df[eff_df["_n_vars"] == 1]["coefficient"].unique())
     inters = sorted(eff_df[eff_df["_n_vars"] == 2]["coefficient"].unique())
     return mains + inters
 
@@ -244,7 +295,7 @@ def make_panel_a(ax, dat, comp_order):
     coef_df = dat["coef"]
     n = len(comp_order)
     display_to_y = {d: i for i, d in enumerate(comp_order)}
-    term_colors  = {d: VARIANCE_COLORS.get(d, "#888888") for d in comp_order}
+    term_colors = {d: VARIANCE_COLORS.get(d, "#888888") for d in comp_order}
 
     def col_to_display(col):
         return _coef_suffix_to_display(col.replace("_norm", "").replace(".", "_"))
@@ -259,13 +310,14 @@ def make_panel_a(ax, dat, comp_order):
         if len(samples) < 10:
             continue
         y_base = display_to_y[disp]
-        kde    = stats.gaussian_kde(samples, bw_method="scott")
-        xs     = np.linspace(np.percentile(samples, 0.5),
-                             np.percentile(samples, 99.5), 300)
-        dens   = kde(xs); dens = dens / dens.max() * 0.40
-        color  = term_colors[disp]
-        ax.fill_between(xs, y_base - dens, y_base + dens,
-                        color=color, alpha=0.50, linewidth=0)
+        kde = stats.gaussian_kde(samples, bw_method="scott")
+        xs = np.linspace(np.percentile(samples, 0.5), np.percentile(samples, 99.5), 300)
+        dens = kde(xs)
+        dens = dens / dens.max() * 0.40
+        color = term_colors[disp]
+        ax.fill_between(
+            xs, y_base - dens, y_base + dens, color=color, alpha=0.50, linewidth=0
+        )
         ax.plot(xs, y_base - dens, color=color, alpha=0.55, linewidth=0.4)
         ax.plot(xs, y_base + dens, color=color, alpha=0.55, linewidth=0.4)
 
@@ -275,10 +327,24 @@ def make_panel_a(ax, dat, comp_order):
         if disp not in eff.index:
             continue
         est, lo, hi = eff.loc[disp, ["estimate", "ci_lower", "ci_upper"]]
-        ax.plot([lo, hi], [y, y], color="#1a1a1a", linewidth=1.3,
-                solid_capstyle="round", zorder=4)
-        ax.plot(est, y, "o", color="white", markersize=6,
-                markeredgecolor="#1a1a1a", markeredgewidth=1.0, zorder=5)
+        ax.plot(
+            [lo, hi],
+            [y, y],
+            color="#1a1a1a",
+            linewidth=1.3,
+            solid_capstyle="round",
+            zorder=4,
+        )
+        ax.plot(
+            est,
+            y,
+            "o",
+            color="white",
+            markersize=6,
+            markeredgecolor="#1a1a1a",
+            markeredgewidth=1.0,
+            zorder=5,
+        )
 
     ax.axvline(0, color="#888888", linewidth=0.8, linestyle="--", zorder=1)
     ax.set_yticks(range(n))
@@ -294,17 +360,18 @@ def make_panel_a(ax, dat, comp_order):
 # Panel b — GP Shapley variance attribution violins
 # =============================================================================
 _GP_SHAPLEY_COLS = {
-    "shapley_longitude_norm":                       "Longitude",
-    "shapley_latitude_norm":                        "Latitude",
-    "shapley_log_n_speakers_norm":                  "log_n_speakers",
-    "shapley_n_phonemes_norm":                      "n_phonemes",
-    "shapley_delta_norm":                           "delta",
-    "shapley_longitude_norm_latitude_norm":          "Longitude×Latitude",
-    "shapley_longitude_norm_log_n_speakers_norm":    "Longitude×log_n_speakers",
-    "shapley_longitude_norm_delta_norm":             "Longitude×delta",
-    "shapley_latitude_norm_log_n_speakers_norm":     "Latitude×log_n_speakers",
-    "shapley_latitude_norm_delta_norm":              "Latitude×delta",
+    "shapley_longitude_norm": "Longitude",
+    "shapley_latitude_norm": "Latitude",
+    "shapley_log_n_speakers_norm": "log_n_speakers",
+    "shapley_n_phonemes_norm": "n_phonemes",
+    "shapley_delta_norm": "delta",
+    "shapley_longitude_norm_latitude_norm": "Longitude×Latitude",
+    "shapley_longitude_norm_log_n_speakers_norm": "Longitude×log_n_speakers",
+    "shapley_longitude_norm_delta_norm": "Longitude×delta",
+    "shapley_latitude_norm_log_n_speakers_norm": "Latitude×log_n_speakers",
+    "shapley_latitude_norm_delta_norm": "Latitude×delta",
 }
+
 
 def make_panel_b_violin(ax, dat, comp_order):
     gp_var = dat["gp_variance"]
@@ -321,23 +388,37 @@ def make_panel_b_violin(ax, dat, comp_order):
             continue
         y_base = display_to_y[disp]
         kde = stats.gaussian_kde(samples, bw_method="scott")
-        xs = np.linspace(np.percentile(samples, 0.5),
-                         np.percentile(samples, 99.5), 300)
+        xs = np.linspace(np.percentile(samples, 0.5), np.percentile(samples, 99.5), 300)
         dens = kde(xs)
         dens = dens / dens.max() * 0.40
         color = VARIANCE_COLORS.get(disp, "#888888")
-        ax.fill_between(xs, y_base - dens, y_base + dens,
-                        color=color, alpha=0.50, linewidth=0)
+        ax.fill_between(
+            xs, y_base - dens, y_base + dens, color=color, alpha=0.50, linewidth=0
+        )
         ax.plot(xs, y_base - dens, color=color, alpha=0.55, linewidth=0.4)
         ax.plot(xs, y_base + dens, color=color, alpha=0.55, linewidth=0.4)
 
         # Median + 95% CI line
         med = np.median(samples)
         lo, hi = np.percentile(samples, [2.5, 97.5])
-        ax.plot([lo, hi], [y_base, y_base], color="#1a1a1a", linewidth=1.3,
-                solid_capstyle="round", zorder=4)
-        ax.plot(med, y_base, "o", color="white", markersize=6,
-                markeredgecolor="#1a1a1a", markeredgewidth=1.0, zorder=5)
+        ax.plot(
+            [lo, hi],
+            [y_base, y_base],
+            color="#1a1a1a",
+            linewidth=1.3,
+            solid_capstyle="round",
+            zorder=4,
+        )
+        ax.plot(
+            med,
+            y_base,
+            "o",
+            color="white",
+            markersize=6,
+            markeredgecolor="#1a1a1a",
+            markeredgewidth=1.0,
+            zorder=5,
+        )
 
     ax.axvline(0, color="#888888", linewidth=0.8, linestyle="--", zorder=1)
     ax.set_yticks(range(n))
@@ -360,19 +441,20 @@ def make_panel_c(ax, dat, gp_result):
     meta = meta.set_index("language")
 
     # Regression line from posterior delta coefficient
-    mu_delta = meta["delta"].mean(); sd_delta = meta["delta"].std(ddof=1)
-    b_int    = coef_df["Intercept"].values
-    b_del    = coef_df["delta_norm"].values
-    delta_seq = np.linspace(meta["delta"].min() - 0.02,
-                            meta["delta"].max() + 0.02, 300)
-    delta_n   = (delta_seq - mu_delta) / sd_delta
+    mu_delta = meta["delta"].mean()
+    sd_delta = meta["delta"].std(ddof=1)
+    b_int = coef_df["Intercept"].values
+    b_del = coef_df["delta_norm"].values
+    delta_seq = np.linspace(meta["delta"].min() - 0.02, meta["delta"].max() + 0.02, 300)
+    delta_n = (delta_seq - mu_delta) / sd_delta
     preds = b_int[:, None] + b_del[:, None] * delta_n[None, :]
-    med   = np.median(preds, axis=0)
-    lo95  = np.percentile(preds, 2.5,  axis=0)
-    hi95  = np.percentile(preds, 97.5, axis=0)
+    med = np.median(preds, axis=0)
+    lo95 = np.percentile(preds, 2.5, axis=0)
+    hi95 = np.percentile(preds, 97.5, axis=0)
 
-    ax.fill_between(delta_seq, lo95, hi95,
-                    color="#aaaaaa", alpha=0.30, linewidth=0, zorder=2)
+    ax.fill_between(
+        delta_seq, lo95, hi95, color="#aaaaaa", alpha=0.30, linewidth=0, zorder=2
+    )
     ax.plot(delta_seq, med, color="#555555", linewidth=1.4, zorder=3)
 
     # Colour dots by mean fitted log rate from linear model (posterior mean of X @ beta)
@@ -385,8 +467,15 @@ def make_panel_c(ax, dat, gp_result):
 
     lon_n = _z("longitude")
     lat_n = _z("latitude")
-    lns_n = _z("log_n_speakers") if "log_n_speakers" in meta.columns else \
-            (np.log(meta.loc[langs, "n_speakers"].values) - np.log(meta["n_speakers"]).mean()) / np.log(meta["n_speakers"]).std(ddof=1)
+    lns_n = (
+        _z("log_n_speakers")
+        if "log_n_speakers" in meta.columns
+        else (
+            np.log(meta.loc[langs, "n_speakers"].values)
+            - np.log(meta["n_speakers"]).mean()
+        )
+        / np.log(meta["n_speakers"]).std(ddof=1)
+    )
     del_n = _z("delta")
     pho_n = _z("n_phonemes") if "n_phonemes" in meta.columns else None
 
@@ -407,21 +496,36 @@ def make_panel_c(ax, dat, gp_result):
         X_dict["n_phonemes_norm"] = pho_n
 
     # Only use columns present in coef_df
-    cols = [c for c in coef_df.columns if c in X_dict and c != "sample_id" and c != "tree"]
-    X = np.column_stack([X_dict[c] for c in cols])            # (n_langs, p)
-    B = coef_df[cols].values                                   # (n_samples, p)
-    fitted = (B.mean(axis=0)[None, :] * X).sum(axis=1)        # posterior-mean fitted log rate
+    cols = [
+        c for c in coef_df.columns if c in X_dict and c != "sample_id" and c != "tree"
+    ]
+    X = np.column_stack([X_dict[c] for c in cols])  # (n_langs, p)
+    B = coef_df[cols].values  # (n_samples, p)
+    fitted = (B.mean(axis=0)[None, :] * X).sum(axis=1)  # posterior-mean fitted log rate
 
     dot_norm = Normalize(vmin=np.nanmin(fitted), vmax=np.nanmax(fitted))
 
-    ax.scatter(meta.loc[langs, "delta"], meta.loc[langs, "log_rate"],
-               c=fitted, cmap=SCMAP, norm=dot_norm,
-               s=130, edgecolors="none", zorder=4)
+    ax.scatter(
+        meta.loc[langs, "delta"],
+        meta.loc[langs, "log_rate"],
+        c=fitted,
+        cmap=SCMAP,
+        norm=dot_norm,
+        s=130,
+        edgecolors="none",
+        zorder=4,
+    )
 
     for lang in langs:
-        ax.annotate(lang, (meta.loc[lang, "delta"], meta.loc[lang, "log_rate"]),
-                    xytext=(4, 4), textcoords="offset points",
-                    fontsize=10, color="#333333", clip_on=False)
+        ax.annotate(
+            lang,
+            (meta.loc[lang, "delta"], meta.loc[lang, "log_rate"]),
+            xytext=(4, 4),
+            textcoords="offset points",
+            fontsize=10,
+            color="#333333",
+            clip_on=False,
+        )
 
     # Inset colorbar
     sm_dot = ScalarMappable(norm=dot_norm, cmap=SCMAP)
@@ -431,8 +535,8 @@ def make_panel_c(ax, dat, gp_result):
     # Tight axis limits with small padding
     x_vals = meta.loc[langs, "delta"].values
     y_vals = meta.loc[langs, "log_rate"].values
-    x_pad  = (x_vals.max() - x_vals.min()) * 0.05
-    y_pad  = (y_vals.max() - y_vals.min()) * 0.06
+    x_pad = (x_vals.max() - x_vals.min()) * 0.05
+    y_pad = (y_vals.max() - y_vals.min()) * 0.06
     ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
     ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
 
@@ -446,23 +550,28 @@ def make_panel_c(ax, dat, gp_result):
 # Panel d — GP regression surface map (replaces old spline surface)
 # =============================================================================
 _GP_MAP_CONSTANTS = dict(
-    GRID_N_LON_TRAIN=150, GRID_N_LAT_TRAIN=100,
-    GRID_N_LON_PRED=600, GRID_N_LAT_PRED=400,
-    FIXED_NOISE=1e-2, PAD_DEG=15,
+    GRID_N_LON_TRAIN=150,
+    GRID_N_LAT_TRAIN=100,
+    GRID_N_LON_PRED=600,
+    GRID_N_LAT_PRED=400,
+    FIXED_NOISE=1e-2,
+    PAD_DEG=15,
 )
+
 
 def _fit_gp_surface(meta, geojson_path):
     """Fit a gpflow GP to polygon-gridded training data and return prediction arrays."""
+    import gpflow
     from shapely.strtree import STRtree
     from sklearn.preprocessing import StandardScaler
-    import gpflow
 
     c = _GP_MAP_CONSTANTS
 
     gdf_language = load_language_polygons(str(geojson_path))
 
     world = gpd.read_file(
-        "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip")
+        "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
+    )
     if "NAME" in world.columns and "name" not in world.columns:
         world = world.rename(columns={"NAME": "name"})
     ire = world.loc[world["name"] == "Ireland"].total_bounds
@@ -485,7 +594,8 @@ def _fit_gp_surface(meta, geojson_path):
     gdf_clipped = gdf_clipped.dropna(subset=["rate"]).reset_index(drop=True)
 
     # Build training grid
-    from collections import defaultdict, Counter
+    from collections import Counter, defaultdict
+
     lon_grid = np.linspace(roi_box.bounds[0], roi_box.bounds[2], c["GRID_N_LON_TRAIN"])
     lat_grid = np.linspace(roi_box.bounds[1], roi_box.bounds[3], c["GRID_N_LAT_TRAIN"])
     LON_tr, LAT_tr = np.meshgrid(lon_grid, lat_grid)
@@ -546,12 +656,14 @@ def _fit_gp_surface(meta, geojson_path):
     kernel = gpflow.kernels.Matern32(lengthscales=1.0, variance=1.0)
     model = gpflow.models.GPR(
         data=(X_scaled, y_scaled.reshape(-1, 1)),
-        kernel=kernel, mean_function=None,
+        kernel=kernel,
+        mean_function=None,
     )
     model.likelihood.variance.assign(c["FIXED_NOISE"])
     gpflow.set_trainable(model.likelihood.variance, False)
     gpflow.optimizers.Scipy().minimize(
-        model.training_loss, variables=model.trainable_variables,
+        model.training_loss,
+        variables=model.trainable_variables,
         options=dict(maxiter=500),
     )
 
@@ -563,40 +675,48 @@ def _fit_gp_surface(meta, geojson_path):
 
     language_union = gdf_clipped.unary_union
     language_union_prep = prep(language_union)
-    in_mask = np.array([language_union_prep.contains(Point(p[0], p[1])) for p in grid_pred])
+    in_mask = np.array(
+        [language_union_prep.contains(Point(p[0], p[1])) for p in grid_pred]
+    )
 
     grid_inside = grid_pred[in_mask]
     # Predict in batches
     mean_all = []
     for i in range(0, len(grid_inside), 5000):
-        batch = grid_inside[i:i + 5000]
+        batch = grid_inside[i : i + 5000]
         Xg = scaler_X.transform(batch)
         m, _ = model.predict_f(Xg)
         mean_all.append(m.numpy().ravel())
     mean_inside = np.concatenate(mean_all)
 
     Z = np.full(len(grid_pred), np.nan, dtype=float)
-    Z[in_mask] = scaler_y.inverse_transform(
-        mean_inside.reshape(-1, 1)).ravel()
+    Z[in_mask] = scaler_y.inverse_transform(mean_inside.reshape(-1, 1)).ravel()
     Z = Z.reshape(LON.shape)
 
     # Obs predictions (inverse-transform back to raw rate space)
     X_obs = meta_idx[["longitude", "latitude"]].to_numpy()
     m_obs, _ = model.predict_f(scaler_X.transform(X_obs))
     meta_idx["rate_gp"] = scaler_y.inverse_transform(
-        m_obs.numpy().reshape(-1, 1)).ravel()
+        m_obs.numpy().reshape(-1, 1)
+    ).ravel()
 
     # Land for coastlines
     try:
         import geodatasets
+
         _land = gpd.read_file(geodatasets.get_path("naturalearth.land"))
     except Exception:
         _land = gpd.read_file(
-            "https://naciscdn.org/naturalearth/50m/physical/ne_50m_land.zip")
+            "https://naciscdn.org/naturalearth/50m/physical/ne_50m_land.zip"
+        )
     land = gpd.clip(_land, roi_box)
 
     return dict(
-        LON=LON, LAT=LAT, Z=Z, meta=meta_idx, land=land,
+        LON=LON,
+        LAT=LAT,
+        Z=Z,
+        meta=meta_idx,
+        land=land,
         roi=(roi_minx, roi_maxx, roi_miny, roi_maxy),
     )
 
@@ -604,8 +724,16 @@ def _fit_gp_surface(meta, geojson_path):
 def make_panel_d(ax, gp_result):
     """GP regression surface (viridis); dots = observed rate (same scale)."""
     if gp_result is None:
-        ax.text(0.5, 0.5, "GP surface unavailable", transform=ax.transAxes,
-                ha="center", va="center", fontsize=14, color="#888")
+        ax.text(
+            0.5,
+            0.5,
+            "GP surface unavailable",
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=14,
+            color="#888",
+        )
         _panel_title(ax, "d")
         return
 
@@ -622,21 +750,30 @@ def make_panel_d(ax, gp_result):
     vals = np.concatenate([v[np.isfinite(v)] for v in vals])
     shared_norm = Normalize(
         vmin=np.quantile(vals, 0.02) if vals.size > 0 else 0,
-        vmax=np.quantile(vals, 0.98) if vals.size > 0 else 1)
+        vmax=np.quantile(vals, 0.98) if vals.size > 0 else 1,
+    )
 
     ax.set_facecolor("#d5e9ff")
-    land.plot(ax=ax, color="#f0f0f0", edgecolor="#999999",
-              linewidth=0.45, zorder=1)
+    land.plot(ax=ax, color="#f0f0f0", edgecolor="#999999", linewidth=0.45, zorder=1)
 
     if np.isfinite(Z).any():
-        ax.pcolormesh(LON, LAT, Z,
-                      shading="auto", cmap=MAP_CMAP, norm=shared_norm, zorder=2)
+        ax.pcolormesh(
+            LON, LAT, Z, shading="auto", cmap=MAP_CMAP, norm=shared_norm, zorder=2
+        )
 
     # Dots: GP prediction at obs points, same cmap/norm as surface
-    ax.scatter(meta["longitude"].values, meta["latitude"].values,
-               c=meta["rate_gp"].values,
-               cmap=MAP_CMAP, norm=shared_norm,
-               s=90, marker="o", edgecolor="white", linewidth=0.6, zorder=5)
+    ax.scatter(
+        meta["longitude"].values,
+        meta["latitude"].values,
+        c=meta["rate_gp"].values,
+        cmap=MAP_CMAP,
+        norm=shared_norm,
+        s=90,
+        marker="o",
+        edgecolor="white",
+        linewidth=0.6,
+        zorder=5,
+    )
 
     sm = ScalarMappable(norm=shared_norm, cmap=MAP_CMAP)
     sm.set_array([])
@@ -667,10 +804,15 @@ def make_figure(dat, out_stem, tree, geojson_path=None):
 
     fig = plt.figure(figsize=(16, 14))
     gs = fig.add_gridspec(
-        2, 2,
+        2,
+        2,
         height_ratios=[1.0, 1.0],
-        hspace=0.26, wspace=0.38,
-        left=0.16, right=0.96, top=0.95, bottom=0.08,
+        hspace=0.26,
+        wspace=0.38,
+        left=0.16,
+        right=0.96,
+        top=0.95,
+        bottom=0.08,
     )
     ax_a = fig.add_subplot(gs[0, 0])
     ax_b = fig.add_subplot(gs[0, 1])

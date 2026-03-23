@@ -11,13 +11,16 @@ Sections:
 """
 
 import os
-import glob
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
 
-from src.tasks.phylo.constants import COGNATE_TO_SPEECH, EXCLUDE_LANGUAGES, GEOJSON_EXPANSION
+from src.tasks.phylo.constants import (
+    COGNATE_TO_SPEECH,
+    EXCLUDE_LANGUAGES,
+    GEOJSON_EXPANSION,
+)
 
 # only need CPU
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -137,14 +140,17 @@ FAMILY_COLORS = {
 }
 
 
-
 # ─── Shared Utilities ────────────────────────────────────────────────────────
+
 
 def tidy_meta(meta: pd.DataFrame) -> pd.DataFrame:
     """Clean metadata CSV: split 'lo,hi' columns, drop extras, set language index."""
     meta = meta.rename(columns={"level_0": "language_true"})
     for col in list(meta.columns):
-        if pd.api.types.is_string_dtype(meta[col]) and meta[col].astype(str).str.contains(",", na=False).any():
+        if (
+            pd.api.types.is_string_dtype(meta[col])
+            and meta[col].astype(str).str.contains(",", na=False).any()
+        ):
             new_cols = meta[col].astype(str).str.split(",", expand=True)
             meta[f"{col}_lo"] = pd.to_numeric(new_cols[0], errors="coerce")
             meta[f"{col}_hi"] = pd.to_numeric(new_cols[1], errors="coerce")
@@ -230,7 +236,10 @@ def load_language_polygons(filepath):
 def _get_world_gdf():
     """Load world country boundaries (110m Natural Earth)."""
     import geopandas as gpd
-    url = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
+
+    url = (
+        "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
+    )
     world = gpd.read_file(url)
     # Normalise to lowercase 'name' used throughout the code
     if "NAME" in world.columns and "name" not in world.columns:
@@ -241,6 +250,7 @@ def _get_world_gdf():
 def _get_land_gdf():
     """Load Natural Earth land polygons (coastlines only, no country borders)."""
     import geopandas as gpd
+
     url = "https://naciscdn.org/naturalearth/50m/physical/ne_50m_land.zip"
     return gpd.read_file(url)
 
@@ -248,6 +258,7 @@ def _get_land_gdf():
 # ═════════════════════════════════════════════════════════════════════════════
 # Rate vs Longitude Scatter
 # ═════════════════════════════════════════════════════════════════════════════
+
 
 def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
     if meta_paths is None:
@@ -263,12 +274,20 @@ def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
         y = meta["rate_median"].to_numpy().reshape(-1, 1)
 
         fig = plt.figure(figsize=(10, 6))
-        sc = plt.scatter(meta["longitude"], y, c=meta["n_speakers"], cmap="viridis", s=50)
+        sc = plt.scatter(
+            meta["longitude"], y, c=meta["n_speakers"], cmap="viridis", s=50
+        )
 
         for lang, row in meta.iterrows():
-            plt.annotate(lang, (row["longitude"], row["rate_median"]),
-                         textcoords="offset points", xytext=(5, 5),
-                         fontsize=8, color="black", alpha=0.5)
+            plt.annotate(
+                lang,
+                (row["longitude"], row["rate_median"]),
+                textcoords="offset points",
+                xytext=(5, 5),
+                fontsize=8,
+                color="black",
+                alpha=0.5,
+            )
 
         plt.yscale("log")
         plt.colorbar(sc, label="Log Number of Speakers", pad=0.12)
@@ -288,6 +307,7 @@ def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
 # ═════════════════════════════════════════════════════════════════════════════
 # Root Age Comparison
 # ═════════════════════════════════════════════════════════════════════════════
+
 
 def _read_log_tree_height(log_path, burnin=0):
     """Read TreeHeight.t:tree column from a BEAST log file, skipping burnin rows."""
@@ -309,17 +329,21 @@ def plot_root_age_comparison(
 ):
     from scipy import stats
 
-    speech_post  = _read_log_tree_height(speech_log,  burnin=0)
+    speech_post = _read_log_tree_height(speech_log, burnin=0)
     cognate_post = _read_log_tree_height(cognate_log, burnin=burnin)
-    speech_prior  = _read_log_tree_height(speech_prior_log,  burnin=0)
+    speech_prior = _read_log_tree_height(speech_prior_log, burnin=0)
     cognate_prior = _read_log_tree_height(cognate_prior_log, burnin=0)
 
-    for label, arr in [("Speech posterior",  speech_post),
-                       ("Cognate posterior", cognate_post),
-                       ("Speech prior",      speech_prior),
-                       ("Cognate prior",     cognate_prior)]:
-        print(f"  {label}: mean={arr.mean():.3f} kya, "
-              f"95% CI=[{np.percentile(arr, 2.5):.3f}, {np.percentile(arr, 97.5):.3f}]")
+    for label, arr in [
+        ("Speech posterior", speech_post),
+        ("Cognate posterior", cognate_post),
+        ("Speech prior", speech_prior),
+        ("Cognate prior", cognate_prior),
+    ]:
+        print(
+            f"  {label}: mean={arr.mean():.3f} kya, "
+            f"95% CI=[{np.percentile(arr, 2.5):.3f}, {np.percentile(arr, 97.5):.3f}]"
+        )
 
     fig, ax = plt.subplots(figsize=(8, 4))
 
@@ -331,12 +355,19 @@ def plot_root_age_comparison(
             ax.fill_between(x_range, density, alpha=0.45, color=color)
             ax.plot(x_range, density, color=color, linewidth=1.8, label=label)
         else:
-            ax.plot(x_range, density, color=color, linewidth=1.5,
-                    linestyle="--", alpha=0.7, label=label)
+            ax.plot(
+                x_range,
+                density,
+                color=color,
+                linewidth=1.5,
+                linestyle="--",
+                alpha=0.7,
+                label=label,
+            )
 
-    plot_density(speech_post,  "#5e5eb5", "Speech posterior",  filled=True)
+    plot_density(speech_post, "#5e5eb5", "Speech posterior", filled=True)
     plot_density(cognate_post, "#6ab06a", "Cognates posterior", filled=True)
-    plot_density(speech_prior,  "#5e5eb5", "Speech prior",  filled=False)
+    plot_density(speech_prior, "#5e5eb5", "Speech prior", filled=False)
     plot_density(cognate_prior, "#6ab06a", "Cognates prior", filled=False)
 
     ax.set_xlabel("Root age (ka BP)", fontsize=22)
@@ -356,6 +387,7 @@ def plot_root_age_comparison(
 # ═════════════════════════════════════════════════════════════════════════════
 # Rate Over Time (standardized & % change)
 # ═════════════════════════════════════════════════════════════════════════════
+
 
 def _extract_segments(tree):
     """Extract per-branch [child_age, parent_age, rate]."""
@@ -402,14 +434,26 @@ def _global_tmax(*groups):
 
 def _alpha_cmap(base_color, max_alpha=0.6):
     from matplotlib.colors import LinearSegmentedColormap, to_rgba
+
     return LinearSegmentedColormap.from_list(
         f"alpha_{base_color}",
         [to_rgba(base_color, 0.0), to_rgba(base_color, max_alpha)],
     )
 
 
-def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
-                    ylow, yhigh, draw_mean=True, zorder=1):
+def _add_alpha_band(
+    ax,
+    t_grid,
+    mat,
+    counts,
+    base_color,
+    label,
+    norm_counts,
+    ylow,
+    yhigh,
+    draw_mean=True,
+    zorder=1,
+):
     """95% CI band with alpha encoding sample density."""
     q_lo = np.nanpercentile(mat, 2.5, axis=0)
     q_hi = np.nanpercentile(mat, 97.5, axis=0)
@@ -426,15 +470,18 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
     im = ax.imshow(
         cnt_img,
         extent=(t_grid.min(), t_grid.max(), ylow, yhigh),
-        origin="lower", aspect="auto",
+        origin="lower",
+        aspect="auto",
         cmap=_alpha_cmap(base_color),
-        norm=norm_counts, zorder=zorder,
+        norm=norm_counts,
+        zorder=zorder,
     )
     if len(band.get_paths()) > 0:
         im.set_clip_path(band.get_paths()[0], transform=ax.transData)
 
     if draw_mean:
         from matplotlib.colors import to_rgba
+
         mean = np.nanmean(mat, axis=0)
         mean_valid = np.isfinite(mean)
         # Draw mean line as segments that fade with sample density
@@ -444,22 +491,33 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
         c_max = np.nanmax(c_v) if np.nanmax(c_v) > 0 else 1.0
         for k in range(len(t_v) - 1):
             alpha_k = float(np.clip(c_v[k] / c_max, 0.05, 1.0))
-            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=2.5,
-                    color=(*to_rgba("white")[:3], alpha_k),
-                    zorder=zorder + 1.4, solid_capstyle="round")
-            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=1.2,
-                    color=(*to_rgba(base_color)[:3], alpha_k),
-                    zorder=zorder + 1.5, solid_capstyle="round")
+            ax.plot(
+                t_v[k : k + 2],
+                m_v[k : k + 2],
+                lw=2.5,
+                color=(*to_rgba("white")[:3], alpha_k),
+                zorder=zorder + 1.4,
+                solid_capstyle="round",
+            )
+            ax.plot(
+                t_v[k : k + 2],
+                m_v[k : k + 2],
+                lw=1.2,
+                color=(*to_rgba(base_color)[:3], alpha_k),
+                zorder=zorder + 1.5,
+                solid_capstyle="round",
+            )
         # Invisible line for legend
         ax.plot([], [], lw=1.5, color=base_color, label=f"{label}")
     return im
 
 
-def plot_rate_over_time_normalized(trees_cognates, trees_speech, burnin=1000,
-                                   ntimes=200, output_dir=OUTPUT_DIR):
+def plot_rate_over_time_normalized(
+    trees_cognates, trees_speech, burnin=1000, ntimes=200, output_dir=OUTPUT_DIR
+):
     """Standardized rate over time with alpha-density bands."""
-    from matplotlib.colors import Normalize
     import matplotlib.cm as cm
+    from matplotlib.colors import Normalize
 
     cog = trees_cognates[burnin:]
     # spe = trees_speech[burnin:]
@@ -473,8 +531,12 @@ def plot_rate_over_time_normalized(trees_cognates, trees_speech, burnin=1000,
     rates_A = _rates_over_time_slices(cog, t_grid)
     rates_B = _rates_over_time_slices(spe, t_grid)
 
-    norm_A = (rates_A - np.nanmean(rates_A, axis=1, keepdims=True)) / np.nanstd(rates_A, axis=1, keepdims=True, ddof=1)
-    norm_B = (rates_B - np.nanmean(rates_B, axis=1, keepdims=True)) / np.nanstd(rates_B, axis=1, keepdims=True, ddof=1)
+    norm_A = (rates_A - np.nanmean(rates_A, axis=1, keepdims=True)) / np.nanstd(
+        rates_A, axis=1, keepdims=True, ddof=1
+    )
+    norm_B = (rates_B - np.nanmean(rates_B, axis=1, keepdims=True)) / np.nanstd(
+        rates_B, axis=1, keepdims=True, ddof=1
+    )
 
     fig, ax = plt.subplots(figsize=(8, 4))
     color_A, color_B = "#7ad151", "#414487"
@@ -485,10 +547,30 @@ def plot_rate_over_time_normalized(trees_cognates, trees_speech, burnin=1000,
     ylow, yhigh = -3, 3
     ax.set_ylim(ylow, yhigh)
 
-    _add_alpha_band(ax, t_grid, norm_A, counts_A, color_A, "Cognates",
-                    norm_counts, ylow, yhigh, zorder=1)
-    _add_alpha_band(ax, t_grid, norm_B, counts_B, color_B, "Speech",
-                    norm_counts, ylow, yhigh, zorder=3)
+    _add_alpha_band(
+        ax,
+        t_grid,
+        norm_A,
+        counts_A,
+        color_A,
+        "Cognates",
+        norm_counts,
+        ylow,
+        yhigh,
+        zorder=1,
+    )
+    _add_alpha_band(
+        ax,
+        t_grid,
+        norm_B,
+        counts_B,
+        color_B,
+        "Speech",
+        norm_counts,
+        ylow,
+        yhigh,
+        zorder=3,
+    )
 
     ax.axhline(0, color="black", lw=0.8)
     ax.set_xlim(tmax, 0.0)
@@ -513,15 +595,15 @@ def plot_rate_over_time_normalized(trees_cognates, trees_speech, burnin=1000,
     return t_grid, norm_A, norm_B
 
 
-def plot_pct_change_over_time(trees_cognates, trees_speech, burnin=1000,
-                              ntimes=200, output_dir=OUTPUT_DIR):
+def plot_pct_change_over_time(
+    trees_cognates, trees_speech, burnin=1000, ntimes=200, output_dir=OUTPUT_DIR
+):
     """% change in rate relative to present, with alpha-density bands."""
-    from matplotlib.colors import Normalize
     import matplotlib.cm as cm
+    from matplotlib.colors import Normalize
 
     cog = trees_cognates[burnin:]
-    
-    
+
     # spe = trees_speech[burnin:]
     # no burn in for speech
     spe = trees_speech
@@ -547,10 +629,30 @@ def plot_pct_change_over_time(trees_cognates, trees_speech, burnin=1000,
     norm_counts = Normalize(vmin=0, vmax=100)
     ylow, yhigh = -100, 100
 
-    _add_alpha_band(ax, t_grid, pct_cog, counts_cog, color_cog, "Cognates",
-                    norm_counts, ylow, yhigh, zorder=1)
-    _add_alpha_band(ax, t_grid, pct_speech, counts_speech, color_speech, "Speech",
-                    norm_counts, ylow, yhigh, zorder=3)
+    _add_alpha_band(
+        ax,
+        t_grid,
+        pct_cog,
+        counts_cog,
+        color_cog,
+        "Cognates",
+        norm_counts,
+        ylow,
+        yhigh,
+        zorder=1,
+    )
+    _add_alpha_band(
+        ax,
+        t_grid,
+        pct_speech,
+        counts_speech,
+        color_speech,
+        "Speech",
+        norm_counts,
+        ylow,
+        yhigh,
+        zorder=3,
+    )
 
     ax.axhline(0, color="black", lw=0.8)
     ax.set_xlim(t_grid.max(), t_grid.min())
@@ -574,22 +676,23 @@ def plot_pct_change_over_time(trees_cognates, trees_speech, burnin=1000,
     print(f"  Saved: {out_path}")
 
 
-
 # ═════════════════════════════════════════════════════════════════════════════
 # Continuous GP Maps (grid-trained on polygons)
 # ═════════════════════════════════════════════════════════════════════════════
 
-def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
-                             geojson_path=None, meta_paths=None):
+
+def plot_continuous_map_grid(
+    results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR, geojson_path=None, meta_paths=None
+):
     """GP-interpolated rate map trained on polygon-interior grid points."""
     if meta_paths is None:
         meta_paths = TREE_META_PATHS["with_inventory"]
     import geopandas as gpd
+    import gpflow
     from shapely.geometry import Point, box
     from shapely.prepared import prep
     from shapely.strtree import STRtree
     from sklearn.preprocessing import StandardScaler
-    import gpflow
 
     if geojson_path is None:
         geojson_path = f"{DATA_DIR}/metadata/fleurs-r/dataset.geojson"
@@ -613,8 +716,9 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
     gdf_language = load_language_polygons(geojson_path)
 
-    def create_polygon_grid_training_data(gdf_lang, meta, roi_box, n_lon, n_lat,
-                                          n_min_per_lang=20):
+    def create_polygon_grid_training_data(
+        gdf_lang, meta, roi_box, n_lon, n_lat, n_min_per_lang=20
+    ):
         gdf_clipped = gpd.clip(gdf_lang, roi_box)
         gdf_clipped = gdf_clipped[gdf_clipped["name"].isin(meta.index)].copy()
         gdf_clipped["rate"] = gdf_clipped["name"].map(meta["rate_median"])
@@ -628,8 +732,9 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         geometries = gdf_clipped.geometry.values
         tree = STRtree(geometries)
 
-        from collections import defaultdict, Counter
-        point_rates  = defaultdict(list)
+        from collections import Counter, defaultdict
+
+        point_rates = defaultdict(list)
         point_labels = defaultdict(list)
         for lon, lat in grid_points:
             pt = Point(lon, lat)
@@ -649,14 +754,14 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
                 continue
             geom = row.geometry
             minx, miny, maxx, maxy = geom.bounds
-            bbox_area  = max((maxx - minx) * (maxy - miny), 1e-6)
-            fill_rate  = max(geom.area / bbox_area, 0.01)  # cap at 1 % floor
-            n_needed   = n_min_per_lang - lang_count.get(lang, 0)
+            bbox_area = max((maxx - minx) * (maxy - miny), 1e-6)
+            fill_rate = max(geom.area / bbox_area, 0.01)  # cap at 1 % floor
+            n_needed = n_min_per_lang - lang_count.get(lang, 0)
             # candidates = needed / fill_rate * safety factor of 3
             target = max(int(np.ceil(n_needed / fill_rate * 3)), 100)
-            ratio  = (maxx - minx) / max(maxy - miny, 1e-6)
-            n_lo   = max(int(np.ceil(np.sqrt(target * ratio))), 5)
-            n_la   = max(int(np.ceil(np.sqrt(target / max(ratio, 1e-6)))), 5)
+            ratio = (maxx - minx) / max(maxy - miny, 1e-6)
+            n_lo = max(int(np.ceil(np.sqrt(target * ratio))), 5)
+            n_la = max(int(np.ceil(np.sqrt(target / max(ratio, 1e-6)))), 5)
             for lo in np.linspace(minx, maxx, n_lo):
                 for la in np.linspace(miny, maxy, n_la):
                     key = (lo, la)
@@ -673,16 +778,18 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
                     if lang in point_labels[key]:
                         lang_count[lang] = lang_count.get(lang, 0) + 1
 
-        X_train    = np.array(list(point_rates.keys()))
-        y_train    = np.array([np.mean(v) for v in point_rates.values()])
-        lang_labels = [labels[0] if len(labels) == 1 else f"overlap({','.join(labels)})"
-                       for labels in point_labels.values()]
+        X_train = np.array(list(point_rates.keys()))
+        y_train = np.array([np.mean(v) for v in point_rates.values()])
+        lang_labels = [
+            labels[0] if len(labels) == 1 else f"overlap({','.join(labels)})"
+            for labels in point_labels.values()
+        ]
         return X_train, y_train, lang_labels, gdf_clipped
 
     def predict_in_batches(model, scaler_X, grid_points, batch_size=5000):
         mean_all, var_all = [], []
         for i in range(0, len(grid_points), batch_size):
-            batch = grid_points[i:i + batch_size]
+            batch = grid_points[i : i + batch_size]
             Xg = scaler_X.transform(batch)
             m, v = model.predict_f(Xg)
             mean_all.append(m.numpy().ravel())
@@ -704,7 +811,8 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         # Training data from polygon grid
         print("    Creating polygon-based training grid...")
         X_train, y_train, _, gdf_clipped = create_polygon_grid_training_data(
-            gdf_language, meta, ROI_BOX, GRID_N_LON_TRAIN, GRID_N_LAT_TRAIN)
+            gdf_language, meta, ROI_BOX, GRID_N_LON_TRAIN, GRID_N_LAT_TRAIN
+        )
         if len(X_train) == 0:
             print("    No training points generated; skipping.")
             continue
@@ -719,12 +827,14 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
         kernel = gpflow.kernels.Matern32(lengthscales=1.0, variance=1.0)
         model = gpflow.models.GPR(
             data=(X_scaled, y_scaled.reshape(-1, 1)),
-            kernel=kernel, mean_function=None,
+            kernel=kernel,
+            mean_function=None,
         )
         model.likelihood.variance.assign(FIXED_NOISE)
         gpflow.set_trainable(model.likelihood.variance, False)
         gpflow.optimizers.Scipy().minimize(
-            model.training_loss, variables=model.trainable_variables,
+            model.training_loss,
+            variables=model.trainable_variables,
             options=dict(maxiter=500),
         )
 
@@ -748,14 +858,16 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
         Z_eff = np.full(len(grid_pred), np.nan, dtype=float)
         Z_eff[in_language_mask] = scaler_y.inverse_transform(
-            mean_inside.reshape(-1, 1)).ravel()
+            mean_inside.reshape(-1, 1)
+        ).ravel()
         Z_eff = Z_eff.reshape(LON.shape)
 
         # Observation-point predictions (inverse-transform back to raw rate space)
         X_obs = meta[["longitude", "latitude"]].to_numpy()
         m_obs, _ = model.predict_f(scaler_X.transform(X_obs))
         meta["rate_mean"] = scaler_y.inverse_transform(
-            m_obs.numpy().reshape(-1, 1)).ravel()
+            m_obs.numpy().reshape(-1, 1)
+        ).ravel()
         meta["rate_eff"] = meta["rate_mean"]
 
         # Color norm
@@ -764,10 +876,15 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
             vals.append(Z_eff[np.isfinite(Z_eff)].ravel())
         vals.append(meta["rate_mean"].to_numpy())
         vals = np.concatenate([v[np.isfinite(v)] for v in vals])
-        vmin, vmax = (np.quantile(vals, 0.02), np.quantile(vals, 0.98)) if vals.size > 0 else (0, 1)
+        vmin, vmax = (
+            (np.quantile(vals, 0.02), np.quantile(vals, 0.98))
+            if vals.size > 0
+            else (0, 1)
+        )
 
-        from matplotlib.colors import Normalize
         from matplotlib.cm import ScalarMappable
+        from matplotlib.colors import Normalize
+
         cmap = plt.get_cmap(CMAP)
         norm = Normalize(vmin=vmin, vmax=vmax)
 
@@ -781,23 +898,47 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
         in_language_mask_2d = in_language_mask.reshape(LON.shape)
         if np.isfinite(Z_eff).any():
-            ax.pcolormesh(LON, LAT, Z_eff, shading="auto", cmap=cmap, norm=norm, zorder=1)
+            ax.pcolormesh(
+                LON, LAT, Z_eff, shading="auto", cmap=cmap, norm=norm, zorder=1
+            )
 
-        ax.scatter(meta["longitude"], meta["latitude"], s=60,
-                   c=meta["rate_mean"], cmap=cmap, norm=norm,
-                   marker="o", edgecolor="white", linewidth=0.6, zorder=10)
+        ax.scatter(
+            meta["longitude"],
+            meta["latitude"],
+            s=60,
+            c=meta["rate_mean"],
+            cmap=cmap,
+            norm=norm,
+            marker="o",
+            edgecolor="white",
+            linewidth=0.6,
+            zorder=10,
+        )
 
         threshold = np.percentile(meta["rate_mean"], 90)
         for lang, row in meta.iterrows():
             if row["rate_mean"] > threshold:
                 ax.annotate(
-                    lang, (row["longitude"], row["latitude"]),
-                    xytext=(8, 8), textcoords="offset points", fontsize=9,
-                    bbox=dict(boxstyle="round,pad=0.4", facecolor="white",
-                              edgecolor="black", alpha=0.8, linewidth=0.5),
+                    lang,
+                    (row["longitude"], row["latitude"]),
+                    xytext=(8, 8),
+                    textcoords="offset points",
+                    fontsize=9,
+                    bbox=dict(
+                        boxstyle="round,pad=0.4",
+                        facecolor="white",
+                        edgecolor="black",
+                        alpha=0.8,
+                        linewidth=0.5,
+                    ),
                     zorder=11,
-                    arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0.3",
-                                    color="black", lw=0.5, alpha=0.6),
+                    arrowprops=dict(
+                        arrowstyle="->",
+                        connectionstyle="arc3,rad=0.3",
+                        color="black",
+                        lw=0.5,
+                        alpha=0.6,
+                    ),
                 )
 
         ax.set_xlim(ROI_MINX, ROI_MAXX)
@@ -815,7 +956,9 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 
         plt.tight_layout()
         os.makedirs(output_dir, exist_ok=True)
-        fig_path = os.path.join(output_dir, f"language_polygons_gridtrain_{tree_name}.pdf")
+        fig_path = os.path.join(
+            output_dir, f"language_polygons_gridtrain_{tree_name}.pdf"
+        )
         fig.savefig(fig_path, dpi=300)
         plt.close()
         print(f"    Saved: {fig_path}")
@@ -825,59 +968,74 @@ def plot_continuous_map_grid(results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR,
 # Speech vs Cognate Rate Scatter (Extended Data Fig. 6)
 # ═════════════════════════════════════════════════════════════════════════════
 
+
 def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
     """Scatter of speech vs cognate median rates for matched languages."""
     import matplotlib as mpl
     from scipy import stats
 
     # Apply figure3-style rcParams
-    mpl.rcParams.update({
-        "font.family":        "sans-serif",
-        "font.sans-serif":    ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
-        "font.size":          15,
-        "axes.linewidth":     0.9,
-        "axes.edgecolor":     "#333333",
-        "axes.labelsize":     17,
-        "axes.labelpad":      10,
-        "axes.titlesize":     20,
-        "axes.titleweight":   "bold",
-        "grid.color":         "#dddddd",
-        "grid.linewidth":     0.5,
-        "xtick.major.size":   4.5,
-        "ytick.major.size":   4.5,
-        "xtick.major.pad":    6,
-        "ytick.major.pad":    6,
-        "xtick.labelsize":    14,
-        "ytick.labelsize":    14,
-        "legend.fontsize":    13,
-        "legend.framealpha":  0.92,
-        "legend.edgecolor":   "#cccccc",
-        "figure.dpi":         150,
-    })
+    mpl.rcParams.update(
+        {
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Helvetica Neue", "Helvetica", "DejaVu Sans"],
+            "font.size": 15,
+            "axes.linewidth": 0.9,
+            "axes.edgecolor": "#333333",
+            "axes.labelsize": 17,
+            "axes.labelpad": 10,
+            "axes.titlesize": 20,
+            "axes.titleweight": "bold",
+            "grid.color": "#dddddd",
+            "grid.linewidth": 0.5,
+            "xtick.major.size": 4.5,
+            "ytick.major.size": 4.5,
+            "xtick.major.pad": 6,
+            "ytick.major.pad": 6,
+            "xtick.labelsize": 14,
+            "ytick.labelsize": 14,
+            "legend.fontsize": 13,
+            "legend.framealpha": 0.92,
+            "legend.edgecolor": "#cccccc",
+            "figure.dpi": 150,
+        }
+    )
 
     speech = pd.read_csv(f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv")
     cognate = pd.read_csv(f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv")
 
-    cognate["language"] = cognate["language"].map(
-        lambda x: COGNATE_TO_SPEECH.get(x, x))
+    cognate["language"] = cognate["language"].map(lambda x: COGNATE_TO_SPEECH.get(x, x))
 
     s = speech[["language", "rate_median"]].rename(
-        columns={"rate_median": "speech_rate"})
+        columns={"rate_median": "speech_rate"}
+    )
     c = cognate[["language", "rate_median"]].rename(
-        columns={"rate_median": "cognate_rate"})
+        columns={"rate_median": "cognate_rate"}
+    )
     merged = s.merge(c, on="language")
     rho, pval = stats.spearmanr(merged["speech_rate"], merged["cognate_rate"])
 
     fig, ax = plt.subplots(figsize=(7, 6))
 
-    ax.scatter(merged["speech_rate"], merged["cognate_rate"],
-               c="#555555", s=50, edgecolors="none", zorder=4)
+    ax.scatter(
+        merged["speech_rate"],
+        merged["cognate_rate"],
+        c="#555555",
+        s=50,
+        edgecolors="none",
+        zorder=4,
+    )
 
     for _, row in merged.iterrows():
-        ax.annotate(row["language"],
-                    (row["speech_rate"], row["cognate_rate"]),
-                    xytext=(4, 4), textcoords="offset points",
-                    fontsize=10, color="#333333", clip_on=False)
+        ax.annotate(
+            row["language"],
+            (row["speech_rate"], row["cognate_rate"]),
+            xytext=(4, 4),
+            textcoords="offset points",
+            fontsize=10,
+            color="#333333",
+            clip_on=False,
+        )
 
     # Tight axis limits with small padding
     x_vals = merged["speech_rate"].values
@@ -889,9 +1047,17 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
 
     ax.set_xlabel("Median Bayesian Phylogenetic Rate (Speech)")
     ax.set_ylabel("Median Bayesian Phylogenetic Rate (Cognate)")
-    ax.text(0.98, 0.02, f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
-            transform=ax.transAxes, ha="right", va="bottom",
-            fontsize=13, style="italic", color="#333333")
+    ax.text(
+        0.98,
+        0.02,
+        f"Spearman $\\rho$ = {rho:.3f}, p = {pval:.2f}",
+        transform=ax.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=13,
+        style="italic",
+        color="#333333",
+    )
 
     # bw_box style: all four spines, inward ticks, white bg, grid
     for spine in ax.spines.values():
@@ -899,8 +1065,9 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
         spine.set_color("#333333")
         spine.set_linewidth(0.9)
     ax.set_facecolor("white")
-    ax.tick_params(top=True, right=True, which="both",
-                   direction="in", length=4.5, width=0.7)
+    ax.tick_params(
+        top=True, right=True, which="both", direction="in", length=4.5, width=0.7
+    )
     ax.grid(True, color="#dddddd", linewidth=0.5, zorder=0)
 
     plt.tight_layout()
@@ -918,14 +1085,18 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
 if __name__ == "__main__":
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    tree_order  = ["input_v12_combined_resampled", "heggarty2024_raw"]
-    tree_labels = {"input_v12_combined_resampled": "Speech", "heggarty2024_raw": "Cognates"}
+    tree_order = ["input_v12_combined_resampled", "heggarty2024_raw"]
+    tree_labels = {
+        "input_v12_combined_resampled": "Speech",
+        "heggarty2024_raw": "Cognates",
+    }
 
     # ── Pre-load GP libraries once (used in loop below) ──────────────────────
     _gpflow_ok = False
     try:
         import gpflow  # noqa: F811
         import tensorflow  # noqa: F401
+
         _gpflow_ok = True
     except ImportError as e:
         print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
@@ -952,7 +1123,8 @@ if __name__ == "__main__":
         if _gpflow_ok and os.path.exists(geojson):
             print("  Grid-trained GP maps...")
             plot_continuous_map_grid(
-                output_dir=out_dir, geojson_path=geojson, meta_paths=mpaths)
+                output_dir=out_dir, geojson_path=geojson, meta_paths=mpaths
+            )
         elif not _gpflow_ok:
             print("  Skipping (gpflow unavailable).")
         else:
@@ -978,16 +1150,25 @@ if __name__ == "__main__":
     if os.path.exists(speech_trees_path) and os.path.exists(cognate_trees_path):
         try:
             import dendropy
+
             trees_cognates_rated = dendropy.TreeList.get(
-                path=cognate_trees_path, schema="nexus",
-                preserve_underscores=True, extract_comment_metadata=True)
+                path=cognate_trees_path,
+                schema="nexus",
+                preserve_underscores=True,
+                extract_comment_metadata=True,
+            )
             trees_speech_rated = dendropy.TreeList.get(
-                path=speech_trees_path, schema="nexus",
-                preserve_underscores=True, extract_comment_metadata=True)
-            plot_rate_over_time_normalized(trees_cognates_rated, trees_speech_rated,
-                                           output_dir=OUTPUT_DIR)
-            plot_pct_change_over_time(trees_cognates_rated, trees_speech_rated,
-                                      output_dir=OUTPUT_DIR)
+                path=speech_trees_path,
+                schema="nexus",
+                preserve_underscores=True,
+                extract_comment_metadata=True,
+            )
+            plot_rate_over_time_normalized(
+                trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
+            )
+            plot_pct_change_over_time(
+                trees_cognates_rated, trees_speech_rated, output_dir=OUTPUT_DIR
+            )
         except ImportError:
             print("  dendropy not installed; skipping.")
 

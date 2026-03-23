@@ -7,12 +7,13 @@ computes rates through time with 95% CI bands.
 
 import os
 
-import numpy as np
 import matplotlib
+import numpy as np
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize, LinearSegmentedColormap, to_rgba
 import matplotlib.cm as cm
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 TREES_FILE = "data/trees/beast/input_v12_combined_resampled.trees"
@@ -23,23 +24,62 @@ MAX_TREES = 2000  # cap for speed; use None for all post-burnin trees
 
 # Modern taxa to keep (same set as Panel A)
 KEEP_TAXA = {
-    "Assamese", "Bengali", "Oriya", "Nepali", "Gujarati", "Marathi",
-    "Punjabi", "Sindhi", "Urdu", "Hindi",
-    "Pashto", "Tajik", "PersianTehran", "ArmenianEastern", "Sorani-Kurdish",
+    "Assamese",
+    "Bengali",
+    "Oriya",
+    "Nepali",
+    "Gujarati",
+    "Marathi",
+    "Punjabi",
+    "Sindhi",
+    "Urdu",
+    "Hindi",
+    "Pashto",
+    "Tajik",
+    "PersianTehran",
+    "ArmenianEastern",
+    "Sorani-Kurdish",
     "Greek",
-    "French", "Occitan", "Galician", "Asturian", "Spanish", "Catalan",
-    "Romanian", "Italian", "Portuguese", "Kabuverdianu",
-    "English", "GaelicIrish", "WelshNorth",
-    "Dutch", "Afrikaans", "Luxembourgish", "German",
-    "Danish", "Icelandic", "Swedish", "NorwegianBokmal",
-    "Latvian", "Lithuanian",
-    "Macedonian", "Bulgarian", "Slovene", "Serbian", "Bosnian", "Croatian",
-    "Slovak", "Czech", "Polish",
-    "Ukrainian", "Russian", "Belarusian",
+    "French",
+    "Occitan",
+    "Galician",
+    "Asturian",
+    "Spanish",
+    "Catalan",
+    "Romanian",
+    "Italian",
+    "Portuguese",
+    "Kabuverdianu",
+    "English",
+    "GaelicIrish",
+    "WelshNorth",
+    "Dutch",
+    "Afrikaans",
+    "Luxembourgish",
+    "German",
+    "Danish",
+    "Icelandic",
+    "Swedish",
+    "NorwegianBokmal",
+    "Latvian",
+    "Lithuanian",
+    "Macedonian",
+    "Bulgarian",
+    "Slovene",
+    "Serbian",
+    "Bosnian",
+    "Croatian",
+    "Slovak",
+    "Czech",
+    "Polish",
+    "Ukrainian",
+    "Russian",
+    "Belarusian",
 }
 
 
 # ── Utility functions (from final_plots.py) ───────────────────────────────────
+
 
 def smooth_nan_1d(x, window=15):
     """NaN-safe moving average."""
@@ -110,8 +150,19 @@ def _alpha_cmap(base_color, max_alpha=0.6):
     )
 
 
-def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
-                    ylow, yhigh, draw_mean=True, zorder=1):
+def _add_alpha_band(
+    ax,
+    t_grid,
+    mat,
+    counts,
+    base_color,
+    label,
+    norm_counts,
+    ylow,
+    yhigh,
+    draw_mean=True,
+    zorder=1,
+):
     """95% CI band with alpha encoding sample density."""
     q_lo = np.nanpercentile(mat, 2.5, axis=0)
     q_hi = np.nanpercentile(mat, 97.5, axis=0)
@@ -128,15 +179,18 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
     im = ax.imshow(
         cnt_img,
         extent=(t_grid.min(), t_grid.max(), ylow, yhigh),
-        origin="lower", aspect="auto",
+        origin="lower",
+        aspect="auto",
         cmap=_alpha_cmap(base_color),
-        norm=norm_counts, zorder=zorder,
+        norm=norm_counts,
+        zorder=zorder,
     )
     if len(band.get_paths()) > 0:
         im.set_clip_path(band.get_paths()[0], transform=ax.transData)
 
     if draw_mean:
         from matplotlib.colors import to_rgba
+
         mean = np.nanmean(mat, axis=0)
         mean_valid = np.isfinite(mean)
         # Draw mean line as segments that fade with sample density
@@ -146,12 +200,22 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
         c_max = np.nanmax(c_v) if np.nanmax(c_v) > 0 else 1.0
         for k in range(len(t_v) - 1):
             alpha_k = float(np.clip(c_v[k] / c_max, 0.05, 1.0))
-            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=2.5,
-                    color=(*to_rgba("white")[:3], alpha_k),
-                    zorder=zorder + 1.4, solid_capstyle="round")
-            ax.plot(t_v[k:k+2], m_v[k:k+2], lw=1.2,
-                    color=(*to_rgba(base_color)[:3], alpha_k),
-                    zorder=zorder + 1.5, solid_capstyle="round")
+            ax.plot(
+                t_v[k : k + 2],
+                m_v[k : k + 2],
+                lw=2.5,
+                color=(*to_rgba("white")[:3], alpha_k),
+                zorder=zorder + 1.4,
+                solid_capstyle="round",
+            )
+            ax.plot(
+                t_v[k : k + 2],
+                m_v[k : k + 2],
+                lw=1.2,
+                color=(*to_rgba(base_color)[:3], alpha_k),
+                zorder=zorder + 1.5,
+                solid_capstyle="round",
+            )
         # Invisible line for legend
         ax.plot([], [], lw=1.5, color=base_color, label=f"{label}")
     return im
@@ -159,13 +223,16 @@ def _add_alpha_band(ax, t_grid, mat, counts, base_color, label, norm_counts,
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
+
 def main():
     import dendropy
 
     print("Reading trees (this may take several minutes)...")
     trees = dendropy.TreeList.get(
-        path=TREES_FILE, schema="nexus",
-        preserve_underscores=True, extract_comment_metadata=True,
+        path=TREES_FILE,
+        schema="nexus",
+        preserve_underscores=True,
+        extract_comment_metadata=True,
     )
     print(f"  Read {len(trees)} trees")
 
@@ -197,20 +264,23 @@ def main():
     pct = (raw_rates - ref_rate) / ref_rate * 100
 
     # ── Panel B option 2: Standardized rate ────────────────────────────────
-    norm_rates = (raw_rates - np.nanmean(raw_rates, axis=1, keepdims=True)) / \
-                 np.nanstd(raw_rates, axis=1, keepdims=True, ddof=1)
+    norm_rates = (raw_rates - np.nanmean(raw_rates, axis=1, keepdims=True)) / np.nanstd(
+        raw_rates, axis=1, keepdims=True, ddof=1
+    )
 
     # ── Nature-style plot ──────────────────────────────────────────────────
-    plt.rcParams.update({
-        "font.family": "sans-serif",
-        "font.sans-serif": ["Arial", "DejaVu Sans"],
-        "font.size": 8,
-        "axes.linewidth": 0.5,
-        "xtick.major.width": 0.5,
-        "ytick.major.width": 0.5,
-        "xtick.major.size": 3,
-        "ytick.major.size": 3,
-    })
+    plt.rcParams.update(
+        {
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "DejaVu Sans"],
+            "font.size": 8,
+            "axes.linewidth": 0.5,
+            "xtick.major.width": 0.5,
+            "ytick.major.width": 0.5,
+            "xtick.major.size": 3,
+            "ytick.major.size": 3,
+        }
+    )
 
     color = "#414487"
 
@@ -222,8 +292,18 @@ def main():
     ylow, yhigh = -3, 3
     ax.set_ylim(ylow, yhigh)
 
-    _add_alpha_band(ax, t_grid, norm_rates, counts, color, "Speech",
-                    norm_counts, ylow, yhigh, zorder=1)
+    _add_alpha_band(
+        ax,
+        t_grid,
+        norm_rates,
+        counts,
+        color,
+        "Speech",
+        norm_counts,
+        ylow,
+        yhigh,
+        zorder=1,
+    )
 
     ax.axhline(0, color="black", lw=0.5, zorder=0)
     # Vertical guide lines at each ka
@@ -232,22 +312,38 @@ def main():
 
     # Historical event bars (spans)
     EVENTS = [
-        ("Yamnaya",          5.3, 4.6, "#c2945a"),
-        ("Corded Ware",      4.9, 4.35, "#8aaa5e"),
+        ("Yamnaya", 5.3, 4.6, "#c2945a"),
+        ("Corded Ware", 4.9, 4.35, "#8aaa5e"),
         ("Indus Valley Civ.", 5.3, 3.3, "#b07aa1"),
-        ("BMAC",             4.4, 3.6, "#d4a06a"),
-        ("Chariots",         4.1, 3.5, "#7297b5"),
+        ("BMAC", 4.4, 3.6, "#d4a06a"),
+        ("Chariots", 4.1, 3.5, "#7297b5"),
     ]
     bar_y_top = yhigh
     bar_h = (yhigh - ylow) * 0.035
     bar_gap = bar_h * 0.15
     for i, (name, t_start, t_end, ecolor) in enumerate(EVENTS):
         y_top_i = bar_y_top - i * (bar_h + bar_gap)
-        ax.barh(y_top_i - bar_h / 2, width=t_start - t_end, left=t_end,
-                height=bar_h, color=ecolor, alpha=0.7, edgecolor=ecolor,
-                linewidth=0.5, zorder=5)
-        ax.text(t_end - 0.03, y_top_i - bar_h / 2, name,
-                ha="right", va="center", fontsize=5, color="black", zorder=6)
+        ax.barh(
+            y_top_i - bar_h / 2,
+            width=t_start - t_end,
+            left=t_end,
+            height=bar_h,
+            color=ecolor,
+            alpha=0.7,
+            edgecolor=ecolor,
+            linewidth=0.5,
+            zorder=5,
+        )
+        ax.text(
+            t_end - 0.03,
+            y_top_i - bar_h / 2,
+            name,
+            ha="right",
+            va="center",
+            fontsize=5,
+            color="black",
+            zorder=6,
+        )
 
     ax.set_xlim(tmax, 0.0)
     ax.set_ylim(ylow, yhigh)
@@ -279,8 +375,18 @@ def main():
     counts_pct = np.sum(np.isfinite(pct), axis=0) / pct.shape[0] * 100
     ylow_p, yhigh_p = -100, 100
 
-    _add_alpha_band(ax, t_grid, pct, counts_pct, color, "Speech",
-                    norm_counts, ylow_p, yhigh_p, zorder=1)
+    _add_alpha_band(
+        ax,
+        t_grid,
+        pct,
+        counts_pct,
+        color,
+        "Speech",
+        norm_counts,
+        ylow_p,
+        yhigh_p,
+        zorder=1,
+    )
 
     ax.axhline(0, color="black", lw=0.5, zorder=0)
     ax.set_xlim(t_grid.max(), t_grid.min())
@@ -308,8 +414,11 @@ def main():
     # Save data for combine script
     np.savez(
         os.path.join(OUTPUT_DIR, "panel_b_data.npz"),
-        t_grid=t_grid, raw_rates=raw_rates, norm_rates=norm_rates,
-        pct_change=pct, tmax=tmax,
+        t_grid=t_grid,
+        raw_rates=raw_rates,
+        norm_rates=norm_rates,
+        pct_change=pct,
+        tmax=tmax,
     )
     print("  Saved intermediate data: panel_b_data.npz")
 
