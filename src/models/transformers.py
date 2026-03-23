@@ -123,7 +123,6 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
         self.load(cache_dir)
 
     def load(self, cache_dir=None):
-        # TODO: use AutoModel?
         if "wav2vec2" in self.model_id or "mms" in self.model_id:
             feature_extractor = Wav2Vec2Model.from_pretrained(
                 self.model_id,
@@ -270,17 +269,3 @@ def _load_finetuned_xlsr(
     print(f"missing keys: {missing_keys}\n" f"unexpec keys: {unexpected_keys}")
 
     return model
-
-
-TRANSFORMERS_AUDIO_MODELS = {
-    k: {
-        "extractor": TransformersFeatureExtractor,
-        "processor": TransformersAudioProcessor,
-    }
-    for k in (
-        "facebook/wav2vec2-xls-r-300m",
-        "facebook/mms-lid-126",
-        "facebook/mms-lid-256",
-        "facebook/mms-lid-4017",
-    )
-}

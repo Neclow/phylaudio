@@ -1,3 +1,5 @@
+"""Configuration constants for the project."""
+
 from collections import OrderedDict
 from typing import Final
 

@@ -1,0 +1,5 @@
+[TYPECHECK]
+generated-members=torch.*,F.*
+
+[MASTER]
+extension-pkg-whitelist=torch

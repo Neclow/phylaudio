@@ -1,3 +1,5 @@
+"""Model zoo for audio feature extractors and processors."""
+
 from typing import Final
 
 from .audio import AudioProcessor, LogMelSpectrogramFeatureExtractor

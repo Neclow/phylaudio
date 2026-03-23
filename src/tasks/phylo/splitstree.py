@@ -6,7 +6,7 @@ def extract_delta(filepath: str) -> pd.DataFrame:
 
     Parses the REPORT block produced by the Delta Score algorithm.
     """
-    with open(filepath) as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
     capturing = False

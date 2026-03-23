@@ -1,3 +1,5 @@
+"""openSMILE feature extractor wrapper."""
+
 import opensmile
 import torch
 

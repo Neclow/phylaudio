@@ -39,8 +39,10 @@ def report_variance_decomposition(tree):
         vals = df[col].dropna().values
         name = col.replace("shapley_", "").replace("_norm", "")
         lo, hi = np.percentile(vals, [2.5, 97.5])
-        print(f"  {name:40s}  mean={np.mean(vals):.3f}  "
-              f"median={np.median(vals):.3f}  95% CI=[{lo:.3f}, {hi:.3f}]")
+        print(
+            f"  {name:40s}  mean={np.mean(vals):.3f}  "
+            f"median={np.median(vals):.3f}  95% CI=[{lo:.3f}, {hi:.3f}]"
+        )
 
 
 def report_speech_vs_cognate_correlation():
@@ -52,13 +54,14 @@ def report_speech_vs_cognate_correlation():
     cognate = pd.read_csv(cognate_path)
 
     # Harmonise language names
-    cognate["language"] = cognate["language"].map(
-        lambda x: COGNATE_TO_SPEECH.get(x, x))
+    cognate["language"] = cognate["language"].map(lambda x: COGNATE_TO_SPEECH.get(x, x))
 
     s = speech[["language", "rate_median"]].rename(
-        columns={"rate_median": "speech_rate"})
+        columns={"rate_median": "speech_rate"}
+    )
     c = cognate[["language", "rate_median"]].rename(
-        columns={"rate_median": "cognate_rate"})
+        columns={"rate_median": "cognate_rate"}
+    )
     merged = s.merge(c, on="language")
 
     rho, pval = stats.spearmanr(merged["speech_rate"], merged["cognate_rate"])
@@ -76,7 +79,7 @@ def report_speech_vs_cognate_correlation():
         rhos[i] = stats.spearmanr(speech_vals[idx], cognate_vals[idx])[0]
     lo, hi = np.percentile(rhos, [2.5, 97.5])
 
-    print(f"\n── Speech vs Cognate rate correlation ──")
+    print("\n── Speech vs Cognate rate correlation ──")
     print(f"  N languages: {n}")
     print(f"  Spearman rho = {rho:.3f}, p = {pval:.4f}")
     print(f"  Spearman 95% bootstrap CI: [{lo:.3f}, {hi:.3f}]")

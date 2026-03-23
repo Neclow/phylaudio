@@ -1,3 +1,5 @@
+"""General utility functions for the project."""
+
 import subprocess
 import sys
 from itertools import islice
@@ -50,7 +52,6 @@ def _count_file_lines(fname):
     return count
 
 
-# TODO: update to Python 3.12
 def batched(iterable, n, *, strict=False):
     """
     Batch data from the iterable into tuples of length n.

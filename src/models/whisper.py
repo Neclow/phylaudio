@@ -1,3 +1,5 @@
+"""Whisper processor and feature extractor wrappers."""
+
 import torch
 import torch.nn.functional as F
 import whisper
@@ -193,15 +195,3 @@ class WhisperFeatureExtractor(BaseFeatureExtractor):
         )
 
         return hidden_states
-
-
-WHISPER_MODELS = {
-    k: {"extractor": WhisperFeatureExtractor, "processor": WhisperProcessor}
-    for k in (
-        "openai/whisper-tiny",
-        "openai/whisper-base",
-        "openai/whisper-small",
-        "openai/whisper-medium",
-        "openai/whisper-large-v3-turbo",
-    )
-}

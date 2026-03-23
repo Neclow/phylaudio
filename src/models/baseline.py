@@ -1,9 +1,9 @@
-# -----------------------------------------------------------------------------
+"""Baseline feature extractors for language identification.
 # Portions of this code are adapted from SpokenLanguageClassifiers
 # Original repository: https://github.com/RicherMans/SpokenLanguageClassifiers
 # Copyright (c) Heinrich Dinkel, 2020
 # Licensed under the MIT License (https://opensource.org/licenses/MIT)
-# -----------------------------------------------------------------------------
+"""
 
 import os
 import urllib
