@@ -11,12 +11,25 @@ pixi run post_install
 
 ### Data
 
+Download pipeline inputs:
+
 ```bash
-pixi run download_models # download all pre-trained models
-pixi run download_fleurs # download FLEURS-R
-pixi run download_glottolog # extract lineages from FLEURS-R
-pixi run download_reference_trees # extract and process reference trees
+pixi run download_models           # download pre-trained audio models
+pixi run download_fleurs           # download FLEURS-R audio dataset
+pixi run download_glottolog        # extract lineages from FLEURS-R
+pixi run download_reference_trees  # extract and process reference trees
+pixi run download_geojson          # download language polygon data (Glottography)
 ```
+
+Download external data from Zenodo (see `ZENODO.md` for full manifest):
+
+```bash
+# From the repo root:
+tar -xzf phylaudio_zenodo.tar.gz
+```
+
+This unpacks BEAST2 posteriors, XLS-R embeddings, and regression outputs into
+`data/`.
 
 ## Language identification
 
@@ -28,54 +41,57 @@ You will need to setup a user and project in
 pixi run lid --dataset fleurs-r --model_id NeMo_ambernet --project phylaudio
 ```
 
-## Sentence-wise distance trees
+## Sentence-wise trees
+
+### Distance trees
 
 ```bash
 pixi run sentence_distance --dataset fleurs-r --model_id NeMo_ambernet --ebs 1
 ```
 
-## Sentence-wise discrete trees
+### Discrete trees
 
 ```bash
 pixi run sentence_discrete --dataset fleurs-r --model_id NeMo_ambernet
 ```
 
-## Generating single language-tree estimates from sentence-wise runs (using ASTRAL-IV)
+### ASTRAL species tree estimation
 
 ```bash
 pixi run sentence_astral pdist
-```
-
-## Comparing ASTRAL-IV trees
-
-```bash
 pixi run sentence_summary pdist
 ```
 
-## BEAST
+## BEAST2
 
 ### Standard run
 
 ```bash
-pixi run beast2 -beagle_SSE -threads 8 -seed 889 data/trees/beast/iecor/fleurs_v5.xml
+pixi run beast2 -beagle_SSE -threads 8 -seed 889 data/trees/beast/speech/0.01_brsupport/input.xml
 ```
 
 ### Prior only
 
 ```bash
-pixi run beast2 -sampleFromPrior -beagle_SSE -threads 8 -seed 889 data/trees/beast/iecor/prior/fleurs_v5_prior.xml
+pixi run beast2 -sampleFromPrior -beagle_SSE -threads 8 -seed 889 data/trees/beast/speech/0.01_brsupport/prior.xml
 ```
 
-### Getting tree summaries with CCD
+### Combining runs
 
 ```bash
-pixi run treeannotator -topology CCD0 ./data/trees/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25/long_v3_44.trees long_v3_44.CCD.nex
+scripts/beast_combine_logs.sh data/trees/beast/speech/0.01_brsupport input_v12
 ```
 
-## Generating phylogenetic networks
+### Tree summaries (CCD)
 
 ```bash
-pixi run network_analysis data/trees/beast/eab44e7f-54cc-4469-87d1-282cc81e02c2/0.25/input.xml
+pixi run treeannotator -topology CCD0 data/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees input_combined_resampled.ccd0
+```
+
+### Phylogenetic networks
+
+```bash
+pixi run network_analysis data/trees/beast/speech/0.01_brsupport/input.xml
 ```
 
 ## Phylogenetic regression
@@ -101,12 +117,6 @@ Before running regression or plotting, the following files must be present:
 | `data/trees/beast/iecor/raw.log`                                        | `pixi run download_reference_trees` (IECoR posterior log) |
 | `data/trees/beast/iecor/prior/raw.log`                                  | `pixi run download_reference_trees` (IECoR prior log)     |
 | `data/trees/beast/iecor/prunedtomodern.trees`                           | `pixi run download_reference_trees` (auto-pruned)         |
-
-Download all reference and IECoR files:
-
-```bash
-pixi run download_reference_trees
-```
 
 ### Prepare regression data
 
@@ -137,38 +147,33 @@ Results are written to `data/phyloregression/<variant>/`.
 
 ## Plots
 
-To install visualization dependencies, run:
+Install visualization dependencies:
 
 ```bash
 pixi install -e viz
 ```
 
-### Visualizing audio embeddings
-
-```bash
-pixi install -e viz_embeddings_pca
-```
-
-Currently, you can visualize embeddings from XLS-R (fine-tuned on VoxLingua 107)
-at: <https://neclow.github.io/phylaudio/>
-
-### Download auxiliary data
-
-```bash
-pixi run download_geojson        # download language polygon data (Glottography)
-```
-
-### Compute some paper stats
-
-```bash
-pixi run python -m src.tasks.phylo.compute_paper_stats
-```
-
 ### Publication figures
 
 ```bash
-pixi run -e viz fig2_rates          # Figure 2 panel B (speech rate over time with CI bands)
-pixi run -e viz fig2_rates_cognate  # Cognate rate over time (same style as Figure 2 panel B)
-pixi run -e viz fig3_geo            # Figure 3 (regression panels)
-pixi run -e viz ext_rates_and_maps  # rate scatter, GP maps, root age, rate-over-time
+# Figure 1
+pixi run -e viz fig1_acc_vs_brsupport  # Panel A: LID accuracy vs. bootstrap support
+pixi run -e viz fig1_nmf               # Panel B: NMF structure plot
+pixi run -e viz fig1_delta             # Panel D: per-language delta scores
+pixi run -e viz fig1_pca               # Extended: PCA of XLS-R embeddings
+pixi run -e viz fig1_sqa               # Extended: silhouette vs. SI-SDR + correlation
+
+# Figures 2–3
+pixi run -e viz fig2_rates             # Figure 2 panel B: speech rate over time
+pixi run -e viz fig2_rates_cognate     # Cognate rate over time
+pixi run -e viz fig3_geo              # Figure 3: regression panels
+
+# Extended
+pixi run -e viz ext_rates_and_maps     # rate scatter, GP maps, root age, rate-over-time
+```
+
+### Compute paper stats
+
+```bash
+pixi run python -m src.tasks.phylo.compute_paper_stats
 ```
