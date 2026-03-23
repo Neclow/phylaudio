@@ -695,7 +695,7 @@ def plot_continuous_map_grid(
     from sklearn.preprocessing import StandardScaler
 
     if geojson_path is None:
-        geojson_path = f"{DATA_DIR}/metadata/fleurs-r/dataset.geojson"
+        geojson_path = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
 
     CMAP = "magma"
     GRID_N_LON_TRAIN, GRID_N_LAT_TRAIN = 150, 100
@@ -1101,7 +1101,7 @@ if __name__ == "__main__":
     except ImportError as e:
         print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
 
-    geojson = f"{DATA_DIR}/metadata/fleurs-r/dataset.geojson"
+    geojson = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
 
     for variant, mpaths in TREE_META_PATHS.items():
         out_dir = os.path.join(OUTPUT_DIR, variant)

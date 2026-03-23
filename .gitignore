@@ -212,6 +212,9 @@ CLAUDE.md
 # Plots (temporary)
 img/
 
+# Large external data
+*.geojson
+
 # BEAST xml states
 *.xml.*state
 

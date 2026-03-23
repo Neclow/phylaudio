@@ -40,7 +40,7 @@ OUT_DIR = BASE / "data/phyloregression/figures"
 
 RESULTS_DIR = BASE / "data/phyloregression/with_inventory"
 DATA_DIR = BASE / "data"
-GEOJSON_PATH = DATA_DIR / "metadata/fleurs-r/dataset.geojson"
+GEOJSON_PATH = DATA_DIR / "metadata/fleurs-r/language_polygons.geojson"
 
 # ─── Model config ─────────────────────────────────────────────────────────────
 SPEECH_TREE = "input_v12_combined_resampled"
