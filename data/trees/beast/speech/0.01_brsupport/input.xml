@@ -74,7 +74,7 @@
   <map name="prior">beast.base.inference.distribution.Prior</map>
   <map name="InverseGamma">beast.base.inference.distribution.InverseGamma</map>
   <map name="OneOnX">beast.base.inference.distribution.OneOnX</map>
-  <run id="mcmc" spec="coupledMCMC.CoupledMCMC" chainLength="250000000" chains="4" target="0.234" logHeatedChains="true" deltaTemperature="0.1" optimise="true" resampleEvery="10000">
+  <run id="mcmc" spec="coupledMCMC.CoupledMCMC" chainLength="100000000" chains="4" target="0.234" logHeatedChains="true" deltaTemperature="0.1" optimise="true" resampleEvery="10000">
     <state id="state" spec="State" storeEvery="10000">
       <tree id="Tree.t:tree" spec="beast.base.evolution.tree.Tree" name="stateNode">
         <taxonset id="TaxonSet.five" spec="TaxonSet">
