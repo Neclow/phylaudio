@@ -369,9 +369,9 @@ def plot_root_age_comparison(
                 label=label,
             )
 
-    plot_density(speech_post, "#2166ac", "Speech posterior", filled=True)
+    plot_density(speech_post, "#414487", "Speech posterior", filled=True)
     plot_density(cognate_post, "#7ad151", "Cognates posterior", filled=True)
-    plot_density(speech_prior, "#2166ac", "Speech prior", filled=False)
+    plot_density(speech_prior, "#414487", "Speech prior", filled=False)
     plot_density(cognate_prior, "#7ad151", "Cognates prior", filled=False)
 
     ax.set_xlim(xmax, 0)
