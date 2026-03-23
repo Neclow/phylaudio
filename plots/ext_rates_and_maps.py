@@ -383,7 +383,7 @@ def plot_root_age_comparison(
     ax.spines[["top", "right"]].set_visible(False)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)  
+    os.makedirs(output_dir, exist_ok=True)
     out_path = f"{output_dir}/root_age_comparison.pdf"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     # save as svg
