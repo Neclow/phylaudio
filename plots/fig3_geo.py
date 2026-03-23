@@ -35,7 +35,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 HERE = Path(__file__).resolve().parent
-BASE = HERE.parent.parent.parent  # src/tasks/phylo -> repo root
+BASE = HERE.parent  # this script is in plots/, so its parent is the repo root
 OUT_DIR = BASE / "data/phyloregression/figures"
 
 RESULTS_DIR = BASE / "data/phyloregression/with_inventory"
@@ -516,16 +516,70 @@ def make_panel_c(ax, dat, gp_result):
         zorder=4,
     )
 
-    for lang in langs:
-        ax.annotate(
-            lang,
-            (meta.loc[lang, "delta"], meta.loc[lang, "log_rate"]),
-            xytext=(4, 4),
-            textcoords="offset points",
-            fontsize=10,
-            color="#333333",
-            clip_on=False,
-        )
+    # Label only non-overlapping points: keep those far from neighbours
+    from scipy.spatial import cKDTree
+
+    xs = meta.loc[langs, "delta"].values
+    ys = meta.loc[langs, "log_rate"].values
+
+    # Normalise to axis range so x/y distances are comparable
+    x_range = xs.max() - xs.min() or 1
+    y_range = ys.max() - ys.min() or 1
+    coords = np.column_stack([xs / x_range, ys / y_range])
+    tree = cKDTree(coords)
+    dists, _ = tree.query(coords, k=2)  # k=2: nearest neighbour (not self)
+    nn_dist = dists[:, 1]
+
+    # Label threshold: top ~40% most isolated points
+    threshold = np.percentile(nn_dist, 60)
+    label_mask = nn_dist >= threshold
+
+    # Place labels with simple greedy repulsion to avoid overlaps
+    fig = ax.get_figure()
+    renderer = fig.canvas.get_renderer()
+    inv = ax.transData.inverted()
+    placed_boxes = []  # list of (x0, y0, x1, y1) in data coords
+
+    def _get_bbox_data(txt):
+        """Get text bounding box in data coordinates."""
+        bb = txt.get_window_extent(renderer=renderer)
+        (dx0, dy0), (dx1, dy1) = inv.transform([(bb.x0, bb.y0), (bb.x1, bb.y1)])
+        return (dx0, dy0, dx1, dy1)
+
+    def _overlaps(box):
+        for pb in placed_boxes:
+            if box[0] < pb[2] and box[2] > pb[0] and box[1] < pb[3] and box[3] > pb[1]:
+                return True
+        return False
+
+    # Try 8 offset directions to find non-overlapping placement
+    offsets_pt = [(6, 6), (-6, 6), (6, -10), (-6, -10),
+                  (12, 0), (-12, 0), (0, 10), (0, -14)]
+
+    for i, lang in enumerate(langs):
+        if not label_mask[i]:
+            continue
+        best_txt = None
+        for dx, dy in offsets_pt:
+            txt = ax.annotate(
+                lang, (xs[i], ys[i]),
+                xytext=(dx, dy), textcoords="offset points",
+                fontsize=11, color="#333333", clip_on=True,
+            )
+            box = _get_bbox_data(txt)
+            if not _overlaps(box):
+                placed_boxes.append(box)
+                best_txt = txt
+                break
+            txt.remove()
+        if best_txt is None:
+            # All positions overlap; place at first offset anyway
+            txt = ax.annotate(
+                lang, (xs[i], ys[i]),
+                xytext=offsets_pt[0], textcoords="offset points",
+                fontsize=11, color="#333333", clip_on=True,
+            )
+            placed_boxes.append(_get_bbox_data(txt))
 
     # Inset colorbar
     sm_dot = ScalarMappable(norm=dot_norm, cmap=SCMAP)
@@ -535,10 +589,10 @@ def make_panel_c(ax, dat, gp_result):
     # Tight axis limits with small padding
     x_vals = meta.loc[langs, "delta"].values
     y_vals = meta.loc[langs, "log_rate"].values
-    x_pad = (x_vals.max() - x_vals.min()) * 0.05
-    y_pad = (y_vals.max() - y_vals.min()) * 0.06
-    ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
-    ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
+    x_span = x_vals.max() - x_vals.min()
+    y_span = y_vals.max() - y_vals.min()
+    ax.set_xlim(x_vals.min() - x_span * 0.08, x_vals.max() + x_span * 0.18)
+    ax.set_ylim(y_vals.min() - y_span * 0.08, y_vals.max() + y_span * 0.08)
 
     ax.set_xlabel("Network signal (\u03b4)")
     ax.set_ylabel("Log Median Bayesian Phylogenetic Rate")

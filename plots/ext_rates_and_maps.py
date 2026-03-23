@@ -345,7 +345,11 @@ def plot_root_age_comparison(
             f"95% CI=[{np.percentile(arr, 2.5):.3f}, {np.percentile(arr, 97.5):.3f}]"
         )
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    # Match cognate rates plot x-range (0–10 ka) and width so 1 ka has
+    # the same physical length across figures.
+    all_ages = np.concatenate([speech_post, cognate_post, speech_prior, cognate_prior])
+    xmax = np.ceil(all_ages.max() + 0.5)  # round up to nearest ka
+    fig, ax = plt.subplots(figsize=(7.2, 4))
 
     def plot_density(data, color, label, filled=True):
         kde = stats.gaussian_kde(data)
@@ -365,23 +369,29 @@ def plot_root_age_comparison(
                 label=label,
             )
 
-    plot_density(speech_post, "#5e5eb5", "Speech posterior", filled=True)
-    plot_density(cognate_post, "#6ab06a", "Cognates posterior", filled=True)
-    plot_density(speech_prior, "#5e5eb5", "Speech prior", filled=False)
-    plot_density(cognate_prior, "#6ab06a", "Cognates prior", filled=False)
+    plot_density(speech_post, "#414487", "Speech posterior", filled=True)
+    plot_density(cognate_post, "#7ad151", "Cognates posterior", filled=True)
+    plot_density(speech_prior, "#414487", "Speech prior", filled=False)
+    plot_density(cognate_prior, "#7ad151", "Cognates prior", filled=False)
 
-    ax.set_xlabel("Root age (ka BP)", fontsize=22)
+    ax.set_xlim(xmax, 0)
+    ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+    ax.set_xlabel("Thousand years before present", fontsize=22)
     ax.set_ylabel("Density", fontsize=22)
-    ax.legend(loc="upper right", fontsize=16)
+    ax.legend(loc="upper left", fontsize=16)
     ax.set_ylim(0, None)
     ax.spines[["top", "right"]].set_visible(False)
 
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    out_path = f"{output_dir}/root_age_comparison_v4.pdf"
+    out_path = f"{output_dir}/root_age_comparison.pdf"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
+    # save as svg
+    out_path_svg = f"{output_dir}/root_age_comparison.svg"
+    plt.savefig(out_path_svg, dpi=300, bbox_inches="tight")
     plt.close()
     print(f"  Saved: {out_path}")
+    print(f"  Saved: {out_path_svg}")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
