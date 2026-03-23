@@ -534,26 +534,52 @@ def make_panel_c(ax, dat, gp_result):
     threshold = np.percentile(nn_dist, 60)
     label_mask = nn_dist >= threshold
 
-    texts = []
+    # Place labels with simple greedy repulsion to avoid overlaps
+    fig = ax.get_figure()
+    renderer = fig.canvas.get_renderer()
+    inv = ax.transData.inverted()
+    placed_boxes = []  # list of (x0, y0, x1, y1) in data coords
+
+    def _get_bbox_data(txt):
+        """Get text bounding box in data coordinates."""
+        bb = txt.get_window_extent(renderer=renderer)
+        (dx0, dy0), (dx1, dy1) = inv.transform([(bb.x0, bb.y0), (bb.x1, bb.y1)])
+        return (dx0, dy0, dx1, dy1)
+
+    def _overlaps(box):
+        for pb in placed_boxes:
+            if box[0] < pb[2] and box[2] > pb[0] and box[1] < pb[3] and box[3] > pb[1]:
+                return True
+        return False
+
+    # Try 8 offset directions to find non-overlapping placement
+    offsets_pt = [(6, 6), (-6, 6), (6, -10), (-6, -10),
+                  (12, 0), (-12, 0), (0, 10), (0, -14)]
+
     for i, lang in enumerate(langs):
         if not label_mask[i]:
             continue
-        # Push labels inward when near axis edges to avoid clipping
-        x_frac = (xs[i] - xs.min()) / (x_range or 1)
-        y_frac = (ys[i] - ys.min()) / (y_range or 1)
-        dx = -8 if x_frac > 0.85 else (4 if x_frac < 0.15 else 5)
-        dy = -10 if y_frac > 0.90 else (6 if y_frac < 0.10 else 5)
-        texts.append(
-            ax.annotate(
-                lang,
-                (xs[i], ys[i]),
-                xytext=(dx, dy),
-                textcoords="offset points",
-                fontsize=11,
-                color="#333333",
-                clip_on=True,
+        best_txt = None
+        for dx, dy in offsets_pt:
+            txt = ax.annotate(
+                lang, (xs[i], ys[i]),
+                xytext=(dx, dy), textcoords="offset points",
+                fontsize=11, color="#333333", clip_on=True,
             )
-        )
+            box = _get_bbox_data(txt)
+            if not _overlaps(box):
+                placed_boxes.append(box)
+                best_txt = txt
+                break
+            txt.remove()
+        if best_txt is None:
+            # All positions overlap; place at first offset anyway
+            txt = ax.annotate(
+                lang, (xs[i], ys[i]),
+                xytext=offsets_pt[0], textcoords="offset points",
+                fontsize=11, color="#333333", clip_on=True,
+            )
+            placed_boxes.append(_get_bbox_data(txt))
 
     # Inset colorbar
     sm_dot = ScalarMappable(norm=dot_norm, cmap=SCMAP)
