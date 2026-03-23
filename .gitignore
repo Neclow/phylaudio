@@ -209,6 +209,7 @@ data/trees/beast/*
 tmp/
 notes/
 notebooks/
+paper/
 drafts*.ipynb
 drafts*.R
 

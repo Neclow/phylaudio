@@ -13,19 +13,37 @@ from src.tasks.phylo.nmf import normalize_rows_to_proportions
 IMG_DIR = "img/fig1"
 BEAST_DIR = "data/trees/beast/speech/0.01_brsupport"
 DELTA_CSV_PATH = f"{BEAST_DIR}/_delta.csv"
-NMF_H5_PATH = "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/nmf/sweep_k2_k30.h5"
+NMF_H5_PATH = "data/trees/beast/speech/0.01_brsupport/nmf/sweep_k2_k30.h5"
 
 # ggthemes Tableau 20 palette (R order)
 TABLEAU20 = [
-    "#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D",
-    "#B6992D", "#F1CE63", "#499894", "#86BCB6", "#E15759", "#FF9D9A",
-    "#79706E", "#BAB0AC", "#D37295", "#FABFD2", "#B07AA1", "#D4A6C8",
-    "#9D7660", "#D7B5A6",
+    "#4E79A7",
+    "#A0CBE8",
+    "#F28E2B",
+    "#FFBE7D",
+    "#59A14F",
+    "#8CD17D",
+    "#B6992D",
+    "#F1CE63",
+    "#499894",
+    "#86BCB6",
+    "#E15759",
+    "#FF9D9A",
+    "#79706E",
+    "#BAB0AC",
+    "#D37295",
+    "#FABFD2",
+    "#B07AA1",
+    "#D4A6C8",
+    "#9D7660",
+    "#D7B5A6",
 ]
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-def clear_axes(ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True):
+def clear_axes(
+    ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True
+):
     if ax is None:
         axes = plt.gcf().axes
     else:
@@ -51,7 +69,9 @@ def load_data():
     P = normalize_rows_to_proportions(W)
     max_comp_per_lang = np.argmax(P, axis=1)
     colors = TABLEAU20[:K][::-1]
-    lang_to_color = {lang: colors[max_comp_per_lang[i]] for i, lang in enumerate(nmf_labels)}
+    lang_to_color = {
+        lang: colors[max_comp_per_lang[i]] for i, lang in enumerate(nmf_labels)
+    }
 
     # Load delta scores
     delta_df = pd.read_csv(DELTA_CSV_PATH)
@@ -75,12 +95,19 @@ def plot(delta_df):
 
         if has_ci:
             ax.errorbar(
-                x, delta_df.delta,
+                x,
+                delta_df.delta,
                 yerr=[delta_df.delta - delta_df.ci_lo, delta_df.ci_hi - delta_df.delta],
-                fmt="none", ecolor="black", elinewidth=1, capsize=1.0, zorder=3,
+                fmt="none",
+                ecolor="black",
+                elinewidth=1,
+                capsize=1.0,
+                zorder=3,
             )
 
-        ax.axhline(delta_mean, color="firebrick", linestyle="--", linewidth=0.6, zorder=4)
+        ax.axhline(
+            delta_mean, color="firebrick", linestyle="--", linewidth=0.6, zorder=4
+        )
 
         q025 = delta_df.delta.quantile(0.025)
         q975 = delta_df.delta.quantile(0.975)
@@ -89,9 +116,12 @@ def plot(delta_df):
 
         ax.set_xticks(x)
         ax.set_xticklabels(
-            delta_df.language, rotation=55,
-            ha="right", fontsize=8,
-            alpha=0.8, rotation_mode="anchor",
+            delta_df.language,
+            rotation=55,
+            ha="right",
+            fontsize=8,
+            alpha=0.8,
+            rotation_mode="anchor",
         )
         ylabel = r"$\bar{\delta}$ (95% bootstrap CI)" if has_ci else r"$\delta$"
         ax.set_ylabel(ylabel)

@@ -5,7 +5,7 @@ import re
 from src.tasks.phylo.splitstree import extract_delta
 
 base = "data/metadata/fleurs-r"
-mcc_speech = "data/trees/beast/input_v12_combined_resampled.mcc"
+mcc_speech = "data/trees/beast/speech/0.01_brsupport/input_combined_resampled.mcc"
 mcc_cognate = "data/trees/references/raw/iecor.nex"
 
 TREE_CONFIG = {

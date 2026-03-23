@@ -10,14 +10,30 @@ from src.tasks.phylo.nmf import normalize_rows_to_proportions
 # ── Configuration ─────────────────────────────────────────────────────────────
 IMG_DIR = "img/fig1"
 # NMF HDF5 is too large for git; kept in the original run directory (external archive)
-NMF_H5_PATH = "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/nmf/sweep_k2_k30.h5"
+NMF_H5_PATH = "data/trees/beast/speech/0.01_brsupport/nmf/sweep_k2_k30.h5"
 
 # ggthemes Tableau 20 palette (R order)
 TABLEAU20 = [
-    "#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D",
-    "#B6992D", "#F1CE63", "#499894", "#86BCB6", "#E15759", "#FF9D9A",
-    "#79706E", "#BAB0AC", "#D37295", "#FABFD2", "#B07AA1", "#D4A6C8",
-    "#9D7660", "#D7B5A6",
+    "#4E79A7",
+    "#A0CBE8",
+    "#F28E2B",
+    "#FFBE7D",
+    "#59A14F",
+    "#8CD17D",
+    "#B6992D",
+    "#F1CE63",
+    "#499894",
+    "#86BCB6",
+    "#E15759",
+    "#FF9D9A",
+    "#79706E",
+    "#BAB0AC",
+    "#D37295",
+    "#FABFD2",
+    "#B07AA1",
+    "#D4A6C8",
+    "#9D7660",
+    "#D7B5A6",
 ]
 
 COMP_LABELS = {
@@ -67,8 +83,12 @@ def plot(P_sorted, labels_sorted, K):
 
         for j in range(K):
             ax.barh(
-                y, P_sorted[:, j], left=left, height=1.0,
-                color=colors[j], label=COMP_LABELS[j + 1],
+                y,
+                P_sorted[:, j],
+                left=left,
+                height=1.0,
+                color=colors[j],
+                label=COMP_LABELS[j + 1],
                 edgecolor="none",
             )
             left += P_sorted[:, j]
@@ -84,7 +104,9 @@ def plot(P_sorted, labels_sorted, K):
         # X-axis at top
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position("top")
-        ax.set_xlabel("Component proportion", alpha=0.7, fontdict={"size": 8.5}, labelpad=6)
+        ax.set_xlabel(
+            "Component proportion", alpha=0.7, fontdict={"size": 8.5}, labelpad=6
+        )
         for label in ax.get_xticklabels():
             label.set_alpha(0.7)
             label.set_fontsize(7.5)
@@ -93,16 +115,25 @@ def plot(P_sorted, labels_sorted, K):
             spine.set_visible(False)
 
         leg = ax.legend(
-            loc="upper center", bbox_to_anchor=(0.5, -0.005),
-            fontsize=7.5, ncol=2, title="Acoustic components",
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.005),
+            fontsize=7.5,
+            ncol=2,
+            title="Acoustic components",
             title_fontproperties={"weight": "bold", "size": 8},
-            columnspacing=0.6, handletextpad=0.3, labelspacing=0.15,
+            columnspacing=0.6,
+            handletextpad=0.3,
+            labelspacing=0.15,
             alignment="left",
         )
         leg.get_title().set_position((0, 1))
         ax.grid(axis="x", linestyle="dashed", alpha=0.1, color="k")
 
-        plt.savefig(f"{IMG_DIR}/fig1b_nmf_structure_K12.pdf", bbox_inches="tight", pad_inches=0.05)
+        plt.savefig(
+            f"{IMG_DIR}/fig1b_nmf_structure_K12.pdf",
+            bbox_inches="tight",
+            pad_inches=0.05,
+        )
         plt.show()
 
 

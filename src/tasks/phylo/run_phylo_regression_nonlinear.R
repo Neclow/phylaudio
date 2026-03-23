@@ -140,7 +140,7 @@ if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 source("src/tasks/phylo/beast.R")
 
 tree_mcc <- list(
-    input_v12_combined_resampled = "data/trees/beast/input_v12_combined_resampled.mcc",
+    input_v12_combined_resampled = "data/trees/beast/speech/0.01_brsupport/input_combined_resampled.mcc",
     heggarty2024_raw             = "data/trees/references/raw/iecor.nex"
 )
 tree_path <- tree_mcc[[tree_name]]

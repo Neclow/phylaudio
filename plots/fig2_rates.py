@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-TREES_FILE = "data/trees/beast/input_v12_combined_resampled.trees"
+TREES_FILE = "data/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees"
 OUTPUT_DIR = "data/phyloregression/figures"
 BURNIN = 0  # speech trees have no burn-in
 NTIMES = 200

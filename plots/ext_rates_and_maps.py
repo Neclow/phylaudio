@@ -320,9 +320,9 @@ def _read_log_tree_height(log_path, burnin=0):
 
 
 def plot_root_age_comparison(
-    speech_log=f"{DATA_DIR}/trees/beast/input_v12_combined_resampled.log",
+    speech_log=f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/input_combined_resampled.log",
     cognate_log=f"{DATA_DIR}/trees/beast/iecor/raw.log",
-    speech_prior_log=f"{DATA_DIR}/trees/beast/priors/prior_v12_1.log",
+    speech_prior_log=f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/prior_1.log",
     cognate_prior_log=f"{DATA_DIR}/trees/beast/iecor/prior/raw.log",
     burnin=1000,
     output_dir=OUTPUT_DIR,
@@ -1145,7 +1145,7 @@ if __name__ == "__main__":
     plot_root_age_comparison(output_dir=OUTPUT_DIR)
 
     # ── Rate-over-time — same for both variants ────────────────────────────
-    speech_trees_path = f"{DATA_DIR}/trees/beast/input_v12_combined_resampled.trees"
+    speech_trees_path = f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees"
     cognate_trees_path = f"{DATA_DIR}/trees/beast/iecor/prunedtomodern.trees"
     if os.path.exists(speech_trees_path) and os.path.exists(cognate_trees_path):
         try:

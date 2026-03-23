@@ -90,17 +90,17 @@ pixi install -e regression
 
 Before running regression or plotting, the following files must be present:
 
-| File                                                  | Source                                                    |
-| ----------------------------------------------------- | --------------------------------------------------------- |
-| `data/trees/beast/input_v12_combined_resampled.mcc`   | Already in repo (speech MCC tree)                         |
-| `data/trees/beast/input_v12_combined_resampled.log`   | Already in repo (speech BEAST log)                        |
-| `data/trees/beast/input_v12_combined_resampled.trees` | Already in repo (speech posterior trees)                  |
-| `data/trees/beast/priors/prior_v12_1.log`             | Already in repo (speech prior log)                        |
-| `data/trees/references/raw/iecor.nex`                 | `pixi run download_reference_trees` (IECoR MCC tree)      |
-| `data/trees/beast/iecor/raw.trees`                    | `pixi run download_reference_trees` (IECoR posterior)     |
-| `data/trees/beast/iecor/raw.log`                      | `pixi run download_reference_trees` (IECoR posterior log) |
-| `data/trees/beast/iecor/prior/raw.log`                | `pixi run download_reference_trees` (IECoR prior log)     |
-| `data/trees/beast/iecor/prunedtomodern.trees`         | `pixi run download_reference_trees` (auto-pruned)         |
+| File                                                                    | Source                                                    |
+| ----------------------------------------------------------------------- | --------------------------------------------------------- |
+| `data/trees/beast/speech/0.01_brsupport/input_combined_resampled.mcc`   | Zenodo (speech MCC tree)                                  |
+| `data/trees/beast/speech/0.01_brsupport/input_combined_resampled.log`   | Zenodo (speech BEAST log)                                 |
+| `data/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees` | Zenodo (speech posterior trees)                           |
+| `data/trees/beast/speech/0.01_brsupport/prior_1.log`                    | Zenodo (speech prior log)                                 |
+| `data/trees/references/raw/iecor.nex`                                   | `pixi run download_reference_trees` (IECoR MCC tree)      |
+| `data/trees/beast/iecor/raw.trees`                                      | `pixi run download_reference_trees` (IECoR posterior)     |
+| `data/trees/beast/iecor/raw.log`                                        | `pixi run download_reference_trees` (IECoR posterior log) |
+| `data/trees/beast/iecor/prior/raw.log`                                  | `pixi run download_reference_trees` (IECoR prior log)     |
+| `data/trees/beast/iecor/prunedtomodern.trees`                           | `pixi run download_reference_trees` (auto-pruned)         |
 
 Download all reference and IECoR files:
 
