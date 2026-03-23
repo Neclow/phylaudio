@@ -5,3 +5,4 @@ repos:
       - id: prettier
         types_or: [markdown, html, css, scss, javascript, json]
         args: [--prose-wrap=always]
+        exclude: ^data/

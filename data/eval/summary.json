@@ -1,0 +1,86 @@
+{
+  "stcd98lb": {
+    "test_accuracy": 0.9173440337181091,
+    "test_f1": 0.5743961930274963,
+    "model_id": "NeMo_ambernet",
+    "model_size": 28926299
+  },
+  "phda5hx4": {
+    "test_accuracy": 0.8303113579750061,
+    "test_f1": 0.3130921721458435,
+    "model_id": "speechbrain/lang-id-voxlingua107-ecapa",
+    "model_size": 21246443
+  },
+  "9pxjgbzf": {
+    "test_accuracy": 0.9792734980583191,
+    "test_f1": 0.772484540939331,
+    "model_id": "facebook/wav2vec2-xls-r-300m",
+    "model_size": 315438720
+  },
+  "j48fhybx": {
+    "test_accuracy": 0.9710204005241394,
+    "test_f1": 0.7844156622886658,
+    "model_id": "facebook/mms-lid-126",
+    "model_size": 964648576
+  },
+  "r4nxhb8q": {
+    "test_accuracy": 0.9711766839027405,
+    "test_f1": 0.7672542333602905,
+    "model_id": "facebook/mms-lid-256",
+    "model_size": 964648576
+  },
+  "dauntvri": {
+    "test_accuracy": 0.9728648066520691,
+    "test_f1": 0.735327422618866,
+    "model_id": "facebook/mms-lid-4017",
+    "model_size": 964648576
+  },
+  "ei82cxxg": {
+    "test_accuracy": 0.77904212474823,
+    "test_f1": 0.31686997413635254,
+    "model_id": "mms-meta/mms-zeroshot-300m",
+    "model_size": 315438720
+  },
+  "tjbicd0j": {
+    "test_accuracy": 0.8245904445648193,
+    "test_f1": 0.21844877302646637,
+    "model_id": "openai/whisper-tiny",
+    "model_size": 37184640
+  },
+  "d46pizts": {
+    "test_accuracy": 0.8386582732200623,
+    "test_f1": 0.47584015130996704,
+    "model_id": "openai/whisper-medium",
+    "model_size": 762321920
+  },
+  "2m2wl1o9": {
+    "test_accuracy": 0.8500375151634216,
+    "test_f1": 0.29173028469085693,
+    "model_id": "openai/whisper-base",
+    "model_size": 71825920
+  },
+  "rzw723vt": {
+    "test_accuracy": 0.8908340334892273,
+    "test_f1": 0.4596417546272278,
+    "model_id": "openai/whisper-small",
+    "model_size": 240582912
+  },
+  "aec66q5z": {
+    "test_accuracy": 0.9060897827148438,
+    "test_f1": 0.5942256450653076,
+    "model_id": "openai/whisper-large-v3-turbo",
+    "model_size": 806958080
+  },
+  "l4yrl0zm": {
+    "test_accuracy": 0.4765849709510803,
+    "test_f1": 0.0604398176074028,
+    "model_id": "baseline/CNN6",
+    "model_size": 1211072
+  },
+  "6rsv6taf": {
+    "test_accuracy": 0.581874430179596,
+    "test_f1": 0.10011662542819977,
+    "model_id": "baseline/CNN10",
+    "model_size": 4686272
+  }
+}
