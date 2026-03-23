@@ -11,7 +11,7 @@ mcc_cognate = "data/trees/references/raw/iecor.nex"
 TREE_CONFIG = {
     "input_v12_combined_resampled": {
         "nex": mcc_speech,
-        "stree6": "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/__merged_splitstree.stree6",
+        "stree6": "data/trees/beast/speech/0.01_brsupport/__merged_splitstree.stree6",
         "name_col": "fleurs",
     },
     "heggarty2024_raw": {

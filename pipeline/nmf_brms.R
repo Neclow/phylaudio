@@ -10,8 +10,8 @@
 #   Rscript pipeline/nmf_brms.R <run_id> [dataset]
 #
 # Examples:
-#   Rscript pipeline/nmf_brms.R dd20
-#   Rscript pipeline/nmf_brms.R dd20 fleurs-r
+#   Rscript pipeline/nmf_brms.R speech
+#   Rscript pipeline/nmf_brms.R speech fleurs-r
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
 

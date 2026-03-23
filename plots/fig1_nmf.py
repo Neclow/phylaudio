@@ -9,6 +9,7 @@ from src.tasks.phylo.nmf import normalize_rows_to_proportions
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 IMG_DIR = "img/fig1"
+# NMF HDF5 is too large for git; kept in the original run directory (external archive)
 NMF_H5_PATH = "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/nmf/sweep_k2_k30.h5"
 
 # ggthemes Tableau 20 palette (R order)

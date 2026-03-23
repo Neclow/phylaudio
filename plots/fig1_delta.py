@@ -11,9 +11,9 @@ from src.tasks.phylo.nmf import normalize_rows_to_proportions
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 IMG_DIR = "img/fig1"
-BEAST_DIR = "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport"
-NMF_H5_PATH = f"{BEAST_DIR}/nmf/sweep_k2_k30.h5"
+BEAST_DIR = "data/trees/beast/speech/0.01_brsupport"
 DELTA_CSV_PATH = f"{BEAST_DIR}/_delta.csv"
+NMF_H5_PATH = "data/trees/beast/dd208931-4817-41ad-b18d-aa6a050a3f42/0.01_brsupport/nmf/sweep_k2_k30.h5"
 
 # ggthemes Tableau 20 palette (R order)
 TABLEAU20 = [
