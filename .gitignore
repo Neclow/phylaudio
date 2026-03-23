@@ -211,7 +211,6 @@ CLAUDE.md
 
 # Plots (temporary)
 img/
-plots/
 
 # BEAST xml states
 *.xml.*state
