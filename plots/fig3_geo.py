@@ -35,7 +35,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 HERE = Path(__file__).resolve().parent
-BASE = HERE.parent  # src/tasks/phylo -> repo root
+BASE = HERE.parent  # this script is in plots/, so its parent is the repo root
 OUT_DIR = BASE / "data/phyloregression/figures"
 
 RESULTS_DIR = BASE / "data/phyloregression/with_inventory"
