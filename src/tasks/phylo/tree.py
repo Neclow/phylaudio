@@ -118,7 +118,7 @@ def make_iqtree_tree(
     bootstrap=False,
     **kwargs,
 ):
-    command = f"{iqtree_alias} -s {fasta_path} -m {model} -T {n_threads} --seed {RANDOM_STATE} --undo"
+    command = f"{iqtree_alias} -s {fasta_path} -m {model} -T {n_threads} --seed {RANDOM_STATE}"
 
     if bootstrap:
         command += " -B 1000 -bnni"
