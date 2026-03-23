@@ -186,6 +186,7 @@ data/models
 # Language identification evaluation
 data/eval/*
 !data/eval/README.md
+!data/eval/summary.json
 
 # Embeddings
 data/embeddings/*
@@ -193,9 +194,16 @@ data/embeddings/*
 # Tree data (except README and template)
 data/trees/*
 !data/trees/README.md
+!data/trees/per_sentence/
+data/trees/per_sentence/*
+!data/trees/per_sentence/discrete/
+data/trees/per_sentence/discrete/*
+!data/trees/per_sentence/discrete/summary.csv
+!data/trees/per_sentence/discrete/*/
 !data/trees/beast/
 data/trees/beast/*
 !data/trees/beast/template.xml
+!data/trees/beast/speech/
 
 # My drafts
 tmp/
@@ -220,3 +228,6 @@ img/
 
 # Wikimedia outputs
 wikimedia.json
+
+# Node modules
+node_modules/
