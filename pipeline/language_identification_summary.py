@@ -72,7 +72,7 @@ def parse_args():
     parser.add_argument(
         "--min-speakers",
         type=float,
-        default=1.0,
+        default=0.0,
         help="Minimum number of speakers per language",
     )
     parser.add_argument(
@@ -192,6 +192,7 @@ if __name__ == "__main__":
             devices=[int(args.device.rsplit("cuda:", maxsplit=1)[-1])],
             accelerator="gpu",
             fast_dev_run=args.dry_run,
+            logger=False,
         )
         results[run_id] = trainer.test(model=model, dataloaders=test_loader)[0]
 

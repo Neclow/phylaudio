@@ -1,86 +1,86 @@
 {
   "stcd98lb": {
-    "test_accuracy": 0.9173440337181091,
-    "test_f1": 0.5743961930274963,
+    "test_accuracy": 0.9160481095314026,
+    "test_f1": 0.5637965202331543,
     "model_id": "NeMo_ambernet",
-    "model_size": 28926299
+    "model_size": 28978625
   },
   "phda5hx4": {
-    "test_accuracy": 0.8303113579750061,
-    "test_f1": 0.3130921721458435,
+    "test_accuracy": 0.8178468942642212,
+    "test_f1": 0.293720006942749,
     "model_id": "speechbrain/lang-id-voxlingua107-ecapa",
-    "model_size": 21246443
+    "model_size": 21272657
   },
   "9pxjgbzf": {
-    "test_accuracy": 0.9792734980583191,
-    "test_f1": 0.772484540939331,
+    "test_accuracy": 0.9778403639793396,
+    "test_f1": 0.7610076665878296,
     "model_id": "facebook/wav2vec2-xls-r-300m",
-    "model_size": 315438720
+    "model_size": 315543270
   },
   "j48fhybx": {
-    "test_accuracy": 0.9710204005241394,
-    "test_f1": 0.7844156622886658,
+    "test_accuracy": 0.9612342119216919,
+    "test_f1": 0.7612249255180359,
     "model_id": "facebook/mms-lid-126",
-    "model_size": 964648576
+    "model_size": 964779238
   },
   "r4nxhb8q": {
-    "test_accuracy": 0.9711766839027405,
-    "test_f1": 0.7672542333602905,
+    "test_accuracy": 0.9638348817825317,
+    "test_f1": 0.7337053418159485,
     "model_id": "facebook/mms-lid-256",
-    "model_size": 964648576
+    "model_size": 964779238
   },
   "dauntvri": {
-    "test_accuracy": 0.9728648066520691,
-    "test_f1": 0.735327422618866,
+    "test_accuracy": 0.9661645889282227,
+    "test_f1": 0.7119395732879639,
     "model_id": "facebook/mms-lid-4017",
-    "model_size": 964648576
-  },
-  "ei82cxxg": {
-    "test_accuracy": 0.77904212474823,
-    "test_f1": 0.31686997413635254,
-    "model_id": "mms-meta/mms-zeroshot-300m",
-    "model_size": 315438720
+    "model_size": 964779238
   },
   "tjbicd0j": {
-    "test_accuracy": 0.8245904445648193,
-    "test_f1": 0.21844877302646637,
+    "test_accuracy": 0.8335049152374268,
+    "test_f1": 0.21850068867206573,
     "model_id": "openai/whisper-tiny",
-    "model_size": 37184640
+    "model_size": 37223910
   },
   "d46pizts": {
-    "test_accuracy": 0.8386582732200623,
-    "test_f1": 0.47584015130996704,
+    "test_accuracy": 0.8390041589736938,
+    "test_f1": 0.4622519910335541,
     "model_id": "openai/whisper-medium",
-    "model_size": 762321920
+    "model_size": 762426470
   },
   "2m2wl1o9": {
-    "test_accuracy": 0.8500375151634216,
-    "test_f1": 0.29173028469085693,
+    "test_accuracy": 0.8535515069961548,
+    "test_f1": 0.2876339554786682,
     "model_id": "openai/whisper-base",
-    "model_size": 71825920
+    "model_size": 71878246
   },
   "rzw723vt": {
-    "test_accuracy": 0.8908340334892273,
-    "test_f1": 0.4596417546272278,
+    "test_accuracy": 0.8926423788070679,
+    "test_f1": 0.4571288824081421,
     "model_id": "openai/whisper-small",
-    "model_size": 240582912
+    "model_size": 240661350
   },
   "aec66q5z": {
-    "test_accuracy": 0.9060897827148438,
-    "test_f1": 0.5942256450653076,
+    "test_accuracy": 0.9140434265136719,
+    "test_f1": 0.5854838490486145,
     "model_id": "openai/whisper-large-v3-turbo",
-    "model_size": 806958080
+    "model_size": 807088742
+  },
+  "ei82cxxg": {
+    "test_accuracy": 0.7874248027801514,
+    "test_f1": 0.3171482980251312,
+    "model_id": "mms-meta/mms-zeroshot-300m",
+    "model_size": 315543270
   },
   "l4yrl0zm": {
-    "test_accuracy": 0.4765849709510803,
-    "test_f1": 0.0604398176074028,
+    "test_accuracy": 0.4999729096889496,
+    "test_f1": 0.06412126123905182,
     "model_id": "baseline/CNN6",
-    "model_size": 1211072
+    "model_size": 1237286
   },
   "6rsv6taf": {
-    "test_accuracy": 0.581874430179596,
-    "test_f1": 0.10011662542819977,
+    "test_accuracy": 0.5862274765968323,
+    "test_f1": 0.10026916116476059,
     "model_id": "baseline/CNN10",
-    "model_size": 4686272
+    "model_size": 4738598
   }
 }

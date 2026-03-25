@@ -119,7 +119,7 @@ def get_fleurs_parallel_args(with_common_args=True):
     parser.add_argument(
         "--min-speakers",
         type=float,
-        default=1.0,
+        default=0.0,
         help="Minimum number of speakers per language",
     )
     parser.add_argument(
