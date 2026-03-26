@@ -14,7 +14,7 @@ from src._config import DEFAULT_EMBEDDING_DIR, DEFAULT_ROOT_DIR, SAMPLE_RATE
 from src.models.audio import AudioProcessor
 from src.tasks.feature_extraction.base import prepare_dataset
 
-OUTPUT_FILE = "index.html"
+OUTPUT_FILE = "docs/index.html"
 
 
 def get_sentences(parallel_dataset):
