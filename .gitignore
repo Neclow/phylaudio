@@ -241,3 +241,6 @@ wikimedia.json
 
 # Node modules
 node_modules/
+
+# Compressed data files
+data/**/*.tar.gz
