@@ -123,33 +123,35 @@ def choose_k(results, error_slack=0.02):
 
 
 def plot_k_diagnostics(results, k_star=None):
-    ks = sorted(results.keys())
-    best_err = [results[k]["best"]["err"] for k in ks]
-    mean_err = [results[k]["errs"].mean() for k in ks]
-    stab = [results[k]["stability"] for k in ks]
+    with plt.style.context(".matplotlib/paper.mplstyle"):
+        ks = sorted(results.keys())
+        best_err = [results[k]["best"]["err"] for k in ks]
+        mean_err = [results[k]["errs"].mean() for k in ks]
+        stab = [results[k]["stability"] for k in ks]
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4))
 
-    ax = axes[0]
-    ax.plot(ks, best_err, "o-", label="Best reconstruction error")
-    ax.plot(ks, mean_err, "s-", label="Mean reconstruction error")
-    if k_star is not None:
-        ax.axvline(k_star, ls="--", color="grey", label=f"K* = {k_star}")
-    ax.set_xlabel("K")
-    ax.set_ylabel("Error")
-    ax.set_xticks(ks)
-    ax.legend()
+        ax = axes[0]
+        ax.plot(ks, best_err, "o-", label="Best reconstruction error")
+        ax.plot(ks, mean_err, "s-", label="Mean reconstruction error")
+        k_star = 12
+        if k_star is not None:
+            ax.axvline(k_star, ls="--", color="grey", label=f"K* = {k_star}")
+        ax.set_xlabel("K")
+        ax.set_ylabel("Error")
+        ax.set_xticks(ks[::2])
+        ax.legend()
 
-    ax = axes[1]
-    ax.plot(ks, stab, "o-", color="tab:green")
-    if k_star is not None:
-        ax.axvline(k_star, ls="--", color="grey")
-    ax.set_xlabel("K")
-    ax.set_ylabel("Stability (avg matched cosine sim)")
-    ax.set_xticks(ks)
+        ax = axes[1]
+        ax.plot(ks, stab, "o-", color="tab:green")
+        if k_star is not None:
+            ax.axvline(k_star, ls="--", color="grey")
+        ax.set_xlabel("K")
+        ax.set_ylabel("Stability (avg matched cosine sim)")
+        ax.set_xticks(ks[::2])
 
-    fig.tight_layout()
-    return fig
+        fig.tight_layout()
+        return fig
 
 
 def plot_structure(
@@ -165,64 +167,67 @@ def plot_structure(
     STRUCTURE-style stacked bars using normalized W.
     Returns the figure.
     """
-    P_struct = normalize_rows_to_proportions(W)
-    n_lang, k = P_struct.shape
+    with plt.style.context(".matplotlib/paper.mplstyle"):
+        P_struct = normalize_rows_to_proportions(W)
+        n_lang, k = P_struct.shape
 
-    max_comp = np.argmax(P_struct, axis=1)
-    max_val = P_struct[np.arange(n_lang), max_comp]
-    order = np.lexsort((-max_val, max_comp))
-    P_struct = P_struct[order]
+        max_comp = np.argmax(P_struct, axis=1)
+        max_val = P_struct[np.arange(n_lang), max_comp]
+        order = np.lexsort((-max_val, max_comp))
+        P_struct = P_struct[order]
 
-    if labels is not None:
-        labels = np.array(labels)[order]
+        if labels is not None:
+            labels = np.array(labels)[order]
 
-    fig, ax = plt.subplots(figsize=(5, 7.5))
-    bottom = np.zeros(n_lang)
-    x = np.arange(n_lang)
-    cmap_name = "tab20" if k > 8 else "Set2"
-    cmap = mpl.colormaps[cmap_name]
-    colors = cmap(np.linspace(0, 1, max(k, 2)))
+        fig, ax = plt.subplots(figsize=(5, 7.5))
+        bottom = np.zeros(n_lang)
+        x = np.arange(n_lang)
+        cmap_name = "tab20" if k > 8 else "Set2"
+        cmap = mpl.colormaps[cmap_name]
+        colors = cmap(np.linspace(0, 1, max(k, 2)))
 
-    for j in range(k):
-        ax.bar(
-            x,
-            P_struct[:, j],
-            bottom=bottom,
-            width=1.0,
-            color=colors[j],
-            label=f"{j + 1}",
+        for j in range(k):
+            ax.bar(
+                x,
+                P_struct[:, j],
+                bottom=bottom,
+                width=1.0,
+                color=colors[j],
+                label=f"{j + 1}",
+            )
+            bottom += P_struct[:, j]
+
+        ax.set_xlim(-0.5, n_lang - 0.5)
+        ax.set_ylim(0, 1)
+        ax.set_ylabel("Component proportion")
+        ax.set_xlabel(
+            "Languages (sorted by dominant component)"
+            if sort_by_component
+            else "Languages"
         )
-        bottom += P_struct[:, j]
+        if labels is not None:
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, rotation=45)
+        else:
+            ax.set_xticks([])
 
-    ax.set_xlim(-0.5, n_lang - 0.5)
-    ax.set_ylim(0, 1)
-    ax.set_ylabel("Component proportion")
-    ax.set_xlabel(
-        "Languages (sorted by dominant component)" if sort_by_component else "Languages"
-    )
-    if labels is not None:
-        ax.set_xticks(x)
-        ax.set_xticklabels(labels, rotation=45)
-    else:
-        ax.set_xticks([])
+        if title is not None:
+            ax.set_title(title, fontsize=12, fontweight="bold")
+        elif k_val is not None:
+            parts = [f"K = {k_val}"]
+            if err is not None:
+                parts.append(f"err={err:.1f}")
+            if stability is not None:
+                parts.append(f"stab={stability:.3f}")
+            ax.set_title(
+                "  ".join(parts[:1])
+                + ("  (" + ", ".join(parts[1:]) + ")" if len(parts) > 1 else ""),
+                fontsize=12,
+                fontweight="bold",
+            )
 
-    if title is not None:
-        ax.set_title(title, fontsize=12, fontweight="bold")
-    elif k_val is not None:
-        parts = [f"K = {k_val}"]
-        if err is not None:
-            parts.append(f"err={err:.1f}")
-        if stability is not None:
-            parts.append(f"stab={stability:.3f}")
-        ax.set_title(
-            "  ".join(parts[:1])
-            + ("  (" + ", ".join(parts[1:]) + ")" if len(parts) > 1 else ""),
-            fontsize=12,
-            fontweight="bold",
-        )
+        if k <= 20:
+            ax.legend(loc="upper right", fontsize=6, ncol=2, title="Comp.")
 
-    if k <= 20:
-        ax.legend(loc="upper right", fontsize=6, ncol=2, title="Comp.")
-
-    fig.tight_layout()
-    return fig
+        fig.tight_layout()
+        return fig

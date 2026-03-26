@@ -5,7 +5,7 @@ Usage:
     python -m pipeline.nmf_structure <run_id> [options]
 
 Example:
-    python -m pipeline.nmf_structure c59
+    python -m pipeline.nmf_structure speech
 """
 
 import os
