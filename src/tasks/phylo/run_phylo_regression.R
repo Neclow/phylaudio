@@ -326,7 +326,7 @@ df <- read.csv(reg_data_path, stringsAsFactors = FALSE)
 rownames(df) <- df$language
 
 tr    <- drop.tip(tr, setdiff(tr$tip.label, rownames(df)))
-V_raw <- vcv(unroot(tr))
+V_raw <- vcv(tr)
 V_raw <- V_raw[rownames(df), rownames(df)]
 
 # ═══════════════════════════════════════════════════════════════════════════════
