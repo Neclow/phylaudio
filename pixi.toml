@@ -9,9 +9,6 @@ name = "phylaudio"
 platforms = ["linux-64"]
 version = "0.1.0"
 
-[system-requirements]
-cuda = "12.6"
-
 [tasks]
 post_install = "bash scripts/post_install.sh"
 download_fleurs = "python -m pipeline.download_fleurs fleurs-r"

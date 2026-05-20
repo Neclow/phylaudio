@@ -9,6 +9,12 @@ pixi install
 pixi run post_install
 ```
 
+> [!WARNING] Embedding extraction and LID training were run on a CUDA 12.6 GPU;
+> higher CUDA versions are likely to work but are untested. A GPU is not
+> required to install the environment or to run the downstream phylogenetic
+> analyses — on CPU-only machines, `pixi install` will resolve the CPU build of
+> PyTorch automatically.
+
 ### Data
 
 Download pipeline inputs:
@@ -33,11 +39,16 @@ This unpacks BEAST2 posteriors, XLS-R embeddings, and regression outputs into
 
 ## Language identification
 
-You will need to setup a user and project in
-[Weights & Biases](https://wandb.ai). See the
-[Quickstart](https://docs.wandb.ai/quickstart/) for more information.
+By default, training metrics are written to a local CSV file via Lightning's
+`CSVLogger`. To use [Weights & Biases](https://wandb.ai) instead, set up an
+account (see the [Quickstart](https://docs.wandb.ai/quickstart/)) and pass
+`--project <name>`.
 
 ```bash
+# CSV logger (default, no account required)
+pixi run lid --dataset fleurs-r --model_id NeMo_ambernet
+
+# wandb logger
 pixi run lid --dataset fleurs-r --model_id NeMo_ambernet --project phylaudio
 ```
 

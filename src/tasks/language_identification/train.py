@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import torch
 from lightning.pytorch import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint, TQDMProgressBar
-from lightning.pytorch.loggers import WandbLogger
+from lightning.pytorch.loggers import CSVLogger, WandbLogger
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -21,7 +21,12 @@ def parse_lid_args(with_common_args=True):
     else:
         parser = ArgumentParser()
 
-    parser.add_argument("--project", type=str, required=True, help="Wandb project name")
+    parser.add_argument(
+        "--project",
+        type=str,
+        default=None,
+        help="Wandb project name. If unset, falls back to a local CSVLogger.",
+    )
     parser.add_argument("--ext", type=str, default="wav", help="Audio file extension")
     parser.add_argument(
         "--lr",
@@ -89,15 +94,24 @@ def fit_predict(
         devices = "auto"
 
     # Logging
-    wandb_logger = WandbLogger(project=args.project, save_dir=DEFAULT_EVAL_DIR)
-
-    wandb_logger.experiment.config.update(
-        {
-            "model_id": args.model_id,
-            "finetuned": args.finetuned,
-            "max_duration": args.max_length,
-        }
-    )
+    if args.project is None:
+        train_logger = CSVLogger(save_dir=DEFAULT_EVAL_DIR, name="phylaudio")
+        train_logger.log_hyperparams(
+            {
+                "model_id": args.model_id,
+                "finetuned": args.finetuned,
+                "max_duration": args.max_length,
+            }
+        )
+    else:
+        train_logger = WandbLogger(project=args.project, save_dir=DEFAULT_EVAL_DIR)
+        train_logger.experiment.config.update(
+            {
+                "model_id": args.model_id,
+                "finetuned": args.finetuned,
+                "max_duration": args.max_length,
+            }
+        )
 
     print("Start evaluation!")
     trainer = Trainer(
@@ -112,7 +126,7 @@ def fit_predict(
             ),
             TQDMProgressBar(),
         ],
-        logger=wandb_logger,
+        logger=train_logger,
     )
 
     trainer.fit(
