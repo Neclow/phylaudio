@@ -45,14 +45,6 @@ def get_common_args():
         help="Whether to load a finetuned XLS-R model",
     )
     parser.add_argument(
-        "--average-pool",
-        action="store_true",
-        help=(
-            "Whether to perform average pooling on the last hidden state "
-            "for `transformers`-based models"
-        ),
-    )
-    parser.add_argument(
         "--with-vad",
         action="store_true",
         help="Whether to transform the data using VAD",
@@ -77,7 +69,7 @@ def prepare_model(args, training=False):
     if processor_cls is not None:
         processor_kwargs = {
             **base_kwargs,
-            "max_length": args.max_length or MODEL_ZOO[args.model_id]["max_length"],
+            "max_length": args.max_length,
             "sr": SAMPLE_RATE,
         }
         processor = processor_cls(**processor_kwargs)
@@ -93,7 +85,6 @@ def prepare_model(args, training=False):
         "device": args.device,
         "training": training,
         "finetuned": args.finetuned,
-        "average_pool": args.average_pool,
     }
 
     feature_extractor = feature_extractor_cls(**feature_extractor_kwargs)

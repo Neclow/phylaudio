@@ -14,7 +14,8 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from ..._config import DEFAULT_THREADS_NEXUS, MIN_LANGUAGES, NONE_TENSOR
+from ..._config import DEFAULT_THREADS_NEXUS, MIN_LANGUAGES
+from ...data.glottolog import add_language_filter_args, read_exclude_file
 from ..common import get_common_args, prepare_dataset, prepare_model
 from ..language_identification.classifier import MLP
 from ._decomposition import decompose, fit_decomposer
@@ -110,18 +111,7 @@ def get_fleurs_parallel_args(with_common_args=True):
         default=DEFAULT_THREADS_NEXUS,
         help="Number of threads to use for parallel processing of iqtree",
     )
-    parser.add_argument(
-        "--glottocode",
-        type=str,
-        default="indo1319",
-        help="Glottocode to filter languages",
-    )
-    parser.add_argument(
-        "--min-speakers",
-        type=float,
-        default=0.0,
-        help="Minimum number of speakers per language",
-    )
+    add_language_filter_args(parser)
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -145,6 +135,8 @@ def prepare_everything(args, verbose=True):
 
     processor, feature_extractor = prepare_model(args, training=False)
 
+    exclude = read_exclude_file(args.exclude_languages_file)
+
     parallel_dataset = prepare_dataset(
         args,
         processor=processor,
@@ -152,6 +144,8 @@ def prepare_everything(args, verbose=True):
         fleurs_parallel=True,
         glottocode=args.glottocode,
         min_speakers=args.min_speakers,
+        exclude=exclude,
+        gender=args.gender,
     )[0]
 
     num_classes = len(parallel_dataset.label_encoder)
@@ -205,38 +199,23 @@ def save_state(fleurs_parallel_input, output_folder):
         )
 
 
-def get_embeddings(
-    fleurs_parallel_input,
-    X,
-    y,
-    attention_mask,
-    device="cpu",
-    batch_size=16,
-):
+def get_embeddings(fleurs_parallel_input, X, y, device="cpu"):
+    """Extract one embedding per utterance.
+
+    Each ``x_i`` is a ``(1, T_i)`` tensor at the utterance's natural length,
+    so every extractor runs B=1 over real audio only — no padding, no need
+    for attention_mask/lengths/wav_lens plumbing.
+    """
+    extractor = fleurs_parallel_input.feature_extractor
     all_embeddings = []
 
-    for i in tqdm(
-        range(0, len(X), batch_size), desc="Extracting embeddings", leave=False
-    ):
-        # X_batch: List
-        X_batch = X[i : i + batch_size]
-
-        if isinstance(X_batch[0], list):
-            X_batch = [x[0] for x in X_batch]
-        else:
-            X_batch = torch.stack(X_batch, dim=0).to(device)[:, 0, :]
-
-        # attention_mask: torch.Tensor
-        a_batch = attention_mask[i : i + batch_size].to(device)
-
-        if torch.equal(a_batch[0], NONE_TENSOR.to(a_batch.device)):
-            embedding = fleurs_parallel_input.feature_extractor(X_batch)
-        else:
-            embedding = fleurs_parallel_input.feature_extractor(X_batch, a_batch)
-
+    for x_i in tqdm(X, desc="Extracting embeddings", leave=False):
+        if isinstance(x_i, list):
+            x_i = x_i[0]
+        embedding = extractor(x_i.to(device))
         all_embeddings.append(embedding)
 
-    embeddings = torch.cat(all_embeddings, axis=0).to(device)
+    embeddings = torch.cat(all_embeddings, dim=0).to(device)
 
     if fleurs_parallel_input.classifier is not None:
         embeddings, y = filter_embeddings(
@@ -263,7 +242,6 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
         # T*: number of tokens
         X_input = batch["input"]
         y = batch["label"][0].to(args.device)
-        attention_mask = batch["attention_mask"][0].to(args.device)
         sentence_index = batch["sentence_index"][0]
 
         # Ignore if less than 4 languages ==> cannot build a tree
@@ -271,17 +249,10 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
             continue
 
         with torch.no_grad():
-            # Audio : embedding shape: N x (C) x D
-            # Text: embedding shape: N x (T) x D
-            # C: number of chunks
-            # T: number of tokens
-            # D: embedding dimension
             X_emb, y = get_embeddings(
                 fleurs_parallel_input=inputs,
                 X=X_input,
                 y=y,
-                attention_mask=attention_mask,
-                batch_size=args.ebs,
                 device=args.device,
             )
 
