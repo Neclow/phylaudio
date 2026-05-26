@@ -1,12 +1,19 @@
 from .datasets import AudioDataset, FleursParallelDataset, load_dataset
-from .glottolog import filter_languages_from_glottocode, get_language_to_family_mapping
+from .glottolog import (
+    add_language_filter_args,
+    filter_languages,
+    get_language_to_family_mapping,
+    read_exclude_file,
+)
 from .transforms import load_transforms
 
 __all__ = [
     "AudioDataset",
     "FleursParallelDataset",
     "load_dataset",
-    "filter_languages_from_glottocode",
+    "add_language_filter_args",
+    "filter_languages",
     "get_language_to_family_mapping",
+    "read_exclude_file",
     "load_transforms",
 ]

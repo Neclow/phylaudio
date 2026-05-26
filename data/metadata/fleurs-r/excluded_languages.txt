@@ -1,0 +1,13 @@
+# Languages excluded from Indo-European phylogenetic analyses.
+# One FLEURS-R dir per line; '#' starts a comment.
+
+# Insufficient pre-training data (<10 hours)
+or_in    # Odia
+ga_ie    # Irish
+
+# Poor performance in VL107
+cy_gb    # Welsh
+
+# Not in pre-training data
+ckb_iq   # Sorani Kurdish
+kea_cv   # Kabuverdianu
