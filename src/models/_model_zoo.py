@@ -38,6 +38,7 @@ TRANSFORMERS_AUDIO_MODELS: Final = {
         "facebook/mms-lid-4017",
         "facebook/mms-1b-all",
         "mms-meta/mms-zeroshot-300m",
+        "utter-project/mHuBERT-147",
     )
 }
 
@@ -96,6 +97,4 @@ AUDIO_MODELS: Final = {
 }
 
 
-MODEL_ZOO: Final = {
-    **{i: {**vi, "dtype": "audio"} for i, vi in AUDIO_MODELS.items()}
-}
+MODEL_ZOO: Final = {**{i: {**vi, "dtype": "audio"} for i, vi in AUDIO_MODELS.items()}}

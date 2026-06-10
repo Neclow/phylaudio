@@ -111,6 +111,16 @@ def get_fleurs_parallel_args(with_common_args=True):
         default=DEFAULT_THREADS_NEXUS,
         help="Number of threads to use for parallel processing of iqtree",
     )
+    parser.add_argument(
+        "--layer",
+        type=int,
+        default=-1,
+        help=(
+            "Transformer hidden-state index to use for the embedding. -1 (default) "
+            "uses the last layer (last_hidden_state). Only honoured by "
+            "wav2vec2/MMS-style extractors."
+        ),
+    )
     add_language_filter_args(parser)
     parser.add_argument(
         "--dry-run",

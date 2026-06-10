@@ -64,7 +64,7 @@ class MLP(nn.Module):
         torch dtype, by default None
     """
 
-    def __init__(self, in_dim, out_dim, hidden_dim=None, ste=False, dtype=None):
+    def __init__(self, in_dim, out_dim, hidden_dim=None, dtype=None):
         super().__init__()
 
         # TODO: add num_layers as arg for classifier?
@@ -80,7 +80,7 @@ class MLP(nn.Module):
 
             self.classifier = nn.Linear(self.in_dim, self.out_dim, dtype=dtype)
         else:
-            self.activation = STE() if ste else nn.ReLU()
+            self.activation = STE()
 
             self.projector = nn.Sequential(
                 nn.Linear(self.in_dim, self.hidden_dim, dtype=dtype),

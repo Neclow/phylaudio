@@ -85,6 +85,7 @@ def prepare_model(args, training=False):
         "device": args.device,
         "training": training,
         "finetuned": args.finetuned,
+        "layer": getattr(args, "layer", -1),
     }
 
     feature_extractor = feature_extractor_cls(**feature_extractor_kwargs)

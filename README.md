@@ -4,16 +4,18 @@
 
 ### Dependencies
 
+> [!WARNING]
+> Embedding extraction and LID training were run on a CUDA 12.6 GPU; higher
+> CUDA versions are likely to work but are untested. To use a different CUDA
+> version, edit the `cuda` key under `[system-requirements]` in `pixi.toml`.
+> On CPU-only machines, running `CONDA_OVERRIDE_CUDA=12.6 pixi install` will
+> pretend CUDA 12.6 is available and install the GPU-pinned dependencies; in
+> that case, pass `--device cpu` to any script that accepts a device flag.
+
 ```bash
-pixi install
+pixi install # Or CONDA_OVERRIDE_CUDA=12.6 pixi install
 pixi run post_install
 ```
-
-> [!WARNING] Embedding extraction and LID training were run on a CUDA 12.6 GPU;
-> higher CUDA versions are likely to work but are untested. A GPU is not
-> required to install the environment or to run the downstream phylogenetic
-> analyses — on CPU-only machines, `pixi install` will resolve the CPU build of
-> PyTorch automatically.
 
 ### Data
 

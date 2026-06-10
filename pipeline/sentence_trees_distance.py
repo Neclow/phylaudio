@@ -41,12 +41,6 @@ def parse_args(with_base_args=True):
         type=str,
         help="Distance-based phylogenetic method",
     )
-    parser.add_argument(
-        "--layer",
-        default=-1,
-        type=int,
-        help="Layer to use for distance calculation",
-    )
 
     return parser.parse_args()
 
