@@ -38,6 +38,13 @@ def parse_args(with_base_args=True):
     )
 
     parser.add_argument(
+        "--aggregation",
+        choices=("mean", "vote"),
+        default="mean",
+        help="How to collapse per-utterance embeddings per language",
+    )
+
+    parser.add_argument(
         "-q",
         "--q",
         type=int,
@@ -75,17 +82,35 @@ def groupby_and_agg(X, y, num_classes, agg="mean"):
     return torch.mm(M.to(dtype=X.dtype, device=X.device), X).float()
 
 
-def embedding_to_fasta(X_emb, y, sentence_index, args, inputs, output_folder):
-    grouped_embeddings = groupby_and_agg(X_emb, y, inputs.num_classes, agg="mean")
+def discretize_then_vote(X_emb, y, num_classes, args):
+    """Discretize per-utterance, then take per-language majority vote per feature."""
+    discretised = discretize(X_emb, method=args.discretization, q=args.q)
+    q = 2 if args.discretization == "step" else args.q
+    N, D = discretised.shape
 
-    # Step 3: Discretise
-    discretised_embeddings = (
-        discretize(
-            grouped_embeddings, idxs=y.unique(), method=args.discretization, q=args.q
+    one_hot = F.one_hot(discretised, num_classes=q).to(dtype=X_emb.dtype)
+    counts = groupby_and_agg(one_hot.reshape(N, D * q), y, num_classes, agg="sum")
+
+    return counts.reshape(num_classes, D, q).argmax(dim=-1)
+
+
+def embedding_to_fasta(X_emb, y, sentence_index, args, inputs, output_folder):
+    if args.aggregation == "vote":
+        discretised_embeddings = (
+            discretize_then_vote(X_emb, y, inputs.num_classes, args).cpu().numpy()
         )
-        .cpu()
-        .numpy()
-    )
+    else:
+        grouped_embeddings = groupby_and_agg(X_emb, y, inputs.num_classes, agg="mean")
+        discretised_embeddings = (
+            discretize(
+                grouped_embeddings,
+                idxs=y.unique(),
+                method=args.discretization,
+                q=args.q,
+            )
+            .cpu()
+            .numpy()
+        )
 
     # Write to fasta
     output_file = f"{output_folder}/{sentence_index}_{-1}.fa"
@@ -114,7 +139,9 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    dtype = "discrete"
+    dtype = "discrete2"
+    if args.aggregation != "mean":
+        dtype += f"+{args.aggregation}"
     if args.decomposition is not None:
         dtype += f"+{args.decomposition}{args.n_components}"
     discrete_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"

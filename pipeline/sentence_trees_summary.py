@@ -78,7 +78,6 @@ def extract_metrics_single(cfg_file, refs, output_tree_name):
 
     # Augment cfg with model defaults if not specified
     model_cfg = MODEL_ZOO[cfg["model_id"]]
-    cfg["max_length"] = cfg.get("max_length") or model_cfg["max_length"]
     cfg["dtype"] = cfg.get("dtype") or model_cfg["dtype"]
 
     # Glottocode

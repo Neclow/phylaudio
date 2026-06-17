@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from .._config import NONE_TENSOR
 from ..models.transformers import TransformersAudioProcessor
-from .glottolog import filter_languages_from_glottocode
+from .glottolog import filter_languages
 from .transforms import load_transforms
 
 
@@ -197,6 +197,11 @@ class FleursParallelDataset(BaseDataset):
     min_speakers : float, optional
         Min. number of speakers to select a subset of languages, by default 0.0
         (In millions)
+    exclude : list[str], optional
+        FLEURS dirs to exclude from the language set, by default None
+    gender : str, optional
+        If set (``"male"`` or ``"female"``, case-insensitive), keep only
+        samples of that gender. By default None (no filter).
     subset : str, optional
         Data subset (`train`, `dev`, `test`), by default None
     kwargs
@@ -211,6 +216,8 @@ class FleursParallelDataset(BaseDataset):
         # sentence_index_col="sentence_index",
         glottocode=None,
         min_speakers=0.0,
+        exclude=None,
+        gender=None,
         subset=None,
         # unique=False, # Only keep one sample per language (i.e., one speaker)
         **kwargs,
@@ -226,10 +233,11 @@ class FleursParallelDataset(BaseDataset):
 
         if self.glottocode is not None:
             glottolog_path = f"{self.meta_dir}/glottolog.csv"
-            languages_to_keep = filter_languages_from_glottocode(
+            languages_to_keep = filter_languages(
                 self.dataset,
                 glottocode=glottocode,
                 min_speakers=min_speakers,
+                exclude=exclude,
             )
             labels_to_keep = self.label_encoder.encode_sequence(  # noqa: F841
                 languages_to_keep
@@ -239,6 +247,15 @@ class FleursParallelDataset(BaseDataset):
             )
 
             self.data = self.data.query("language in @labels_to_keep")
+
+        if gender is not None:
+            mask = self.data["gender"].str.lower() == gender.lower()
+            n_before = len(self.data)
+            self.data = self.data[mask]
+            print(
+                f"(datasets) Gender filter '{gender}': "
+                f"{n_before} -> {len(self.data)} samples."
+            )
 
         self.sentence_idxs = self.data.sentence_index.unique()
 
@@ -286,8 +303,6 @@ class FleursParallelDataset(BaseDataset):
             labels[i] = label
             attention_masks.append(attention_mask)
 
-        attention_masks = torch.stack(attention_masks)
-
         return {
             "input": inputs,
             "label": labels,
@@ -332,9 +347,10 @@ def load_dataset(dtype, dataset, root_dir, split=True, fleurs_parallel=False, **
         raise NotImplementedError
 
     processor = kwargs["processor"]
-    # For transformer models, trimming/padding is built in
-    # For other models, need to trim/pad for non-Transformer models
-    # Such that input shape is `max_length` for all samples and models
+    # Transformer processors handle their own trimming/padding via the HF
+    # feature extractor. Other processors need a Trim+Pad transform only when
+    # the caller has opted into a fixed-length pipeline by setting max_length;
+    # load_transforms returns None when max_length is None.
     if not isinstance(processor, TransformersAudioProcessor):
         kwargs["transform"] = load_transforms(
             sr=processor.sr,

@@ -11,23 +11,22 @@ class TransformersAudioProcessor(AudioProcessor):
 
     Parameters
     ----------
-    model_id : str
-        Model ID (see model_ids)
     sr : int
         Sample rate
-    max_length : int
-        Max. number of samples/frames to keep
+    max_length : int, optional
+        Max. number of samples/frames to keep. ``None`` (default) runs
+        unbounded: no truncation, pad-to-longest. Set explicitly only to
+        opt into a fixed-length pipeline (e.g. LID training).
     model_id : str
         Model name
     cache_dir : str, optional
         Path to the folder where cached files are stored, by default None
     truncation : bool, optional
-        Activates truncation to cut input sequences longer than "max_length" to "max_length"., by default True
+        Activates truncation to ``max_length``. Defaults to ``True`` when
+        ``max_length`` is set, ``False`` otherwise.
     padding : str or bool, optional
-        Strategy to pad the returned sequences, by default "max_length"
-        "max_length": pad to ```max_length```
-        False: no padding
-        True or "longest": pad to the longest sequence
+        HF padding strategy. Defaults to ``"max_length"`` when
+        ``max_length`` is set, ``"longest"`` otherwise.
     padding_side : str, optional
         Where padding elements are added, by default "right"
     """
@@ -35,11 +34,11 @@ class TransformersAudioProcessor(AudioProcessor):
     def __init__(
         self,
         sr,
-        max_length,
-        model_id,
+        max_length=None,
+        model_id=None,
         cache_dir=None,
-        truncation=True,
-        padding="max_length",
+        truncation=None,
+        padding=None,
         padding_side="right",
         **kwargs,
     ):
@@ -54,15 +53,21 @@ class TransformersAudioProcessor(AudioProcessor):
             self.model_id, cache_dir=cache_dir, padding_side=padding_side, **kwargs
         )
 
-        self.truncation = truncation
-        self.padding = padding
+        # When max_length is None, run unbounded: no truncation, pad-to-longest.
+        # When set, preserve the fixed-length pipeline as an opt-in escape hatch.
+        self.truncation = (
+            truncation if truncation is not None else (max_length is not None)
+        )
+        if padding is not None:
+            self.padding = padding
+        else:
+            self.padding = "max_length" if max_length is not None else "longest"
 
     def process(self, file_path):
         x, _ = super().process(file_path)
 
-        # This ensures that the same data is fed in the model
-        # Needed because max_length is not the same for whisper
-        x = x[: self.max_length]
+        if self.max_length is not None:
+            x = x[: self.max_length]
 
         xp = self.processor(
             x,
@@ -104,7 +109,6 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
         model_id,
         cache_dir=None,
         finetuned=False,
-        average_pool=False,
         training=False,
         device="cpu",
         **kwargs,
@@ -117,8 +121,6 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
             cache_dir = f"{cache_dir}/huggingface"
 
         self.finetuned = finetuned
-
-        self.average_pool = average_pool
 
         self.load(cache_dir)
 
@@ -158,43 +160,38 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
             x, attention_mask=a
         ).last_hidden_state
 
-        if self.average_pool:
-            out = last_hidden_state.mean(dim=1)
-        else:
-            if "wav2vec2" in self.model_id or "mms" in self.model_id:
-                # Source:
-                # https://github.com/huggingface/transformers/blob/ccbd57a8b665fbb5b1d566c0b800dc6ede509e8e/src/transformers/models/wav2vec2/modeling_wav2vec2.py#L2340
-                # hidden_states = self.projector(hidden_states)
-                if a is None:
-                    out = last_hidden_state.mean(dim=1)
-                else:
-                    padding_mask = (
-                        self.feature_extractor._get_feature_vector_attention_mask(
-                            last_hidden_state.shape[1], a
-                        )
-                    )
-                    last_hidden_state[~padding_mask] = 0.0
-                    out = last_hidden_state.sum(dim=1) / padding_mask.sum(dim=1).view(
-                        -1, 1
-                    )
-
-            elif "xlm" in self.model_id:
-                # Source:
-                # https://github.com/huggingface/transformers/blob/7bbc62474391aff64f63fcc064c975752d1fa4de/src/transformers/models/xlm_roberta/modeling_xlm_roberta.py#L1306
-                # https://github.com/huggingface/transformers/blob/7bbc62474391aff64f63fcc064c975752d1fa4de/src/transformers/models/xlm_roberta/modeling_xlm_roberta.py#L1573
-                out = last_hidden_state[:, 0, :]
-            elif "aya" in self.model_id:
-                # Source:
-                # https://github.com/huggingface/transformers/blob/ccbd57a8b665fbb5b1d566c0b800dc6ede509e8e/src/transformers/models/t5/modeling_t5.py#L2239
-                eos_mask = x.eq(self.feature_extractor.config.eos_token_id).to(
-                    last_hidden_state.device
-                )
-                batch_size, _, hidden_size = last_hidden_state.shape
-                out = last_hidden_state[eos_mask, :].view(batch_size, -1, hidden_size)[
-                    :, -1, :
-                ]
+        if "wav2vec2" in self.model_id or "mms" in self.model_id:
+            # Source:
+            # https://github.com/huggingface/transformers/blob/ccbd57a8b665fbb5b1d566c0b800dc6ede509e8e/src/transformers/models/wav2vec2/modeling_wav2vec2.py#L2340
+            # hidden_states = self.projector(hidden_states)
+            if a is None:
+                out = last_hidden_state.mean(dim=1)
             else:
-                raise ValueError(f"Unknown model ID: {self.model_id}")
+                padding_mask = (
+                    self.feature_extractor._get_feature_vector_attention_mask(
+                        last_hidden_state.shape[1], a
+                    )
+                )
+                last_hidden_state[~padding_mask] = 0.0
+                out = last_hidden_state.sum(dim=1) / padding_mask.sum(dim=1).view(-1, 1)
+
+        elif "xlm" in self.model_id:
+            # Source:
+            # https://github.com/huggingface/transformers/blob/7bbc62474391aff64f63fcc064c975752d1fa4de/src/transformers/models/xlm_roberta/modeling_xlm_roberta.py#L1306
+            # https://github.com/huggingface/transformers/blob/7bbc62474391aff64f63fcc064c975752d1fa4de/src/transformers/models/xlm_roberta/modeling_xlm_roberta.py#L1573
+            out = last_hidden_state[:, 0, :]
+        elif "aya" in self.model_id:
+            # Source:
+            # https://github.com/huggingface/transformers/blob/ccbd57a8b665fbb5b1d566c0b800dc6ede509e8e/src/transformers/models/t5/modeling_t5.py#L2239
+            eos_mask = x.eq(self.feature_extractor.config.eos_token_id).to(
+                last_hidden_state.device
+            )
+            batch_size, _, hidden_size = last_hidden_state.shape
+            out = last_hidden_state[eos_mask, :].view(batch_size, -1, hidden_size)[
+                :, -1, :
+            ]
+        else:
+            raise ValueError(f"Unknown model ID: {self.model_id}")
 
         # Final output shape: B x emb_dim
         return out

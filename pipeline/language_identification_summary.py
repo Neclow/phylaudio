@@ -18,7 +18,11 @@ from src._config import (
     SAMPLE_RATE,
 )
 from src.data import load_dataset
-from src.data.glottolog import filter_languages_from_glottocode
+from src.data.glottolog import (
+    add_language_filter_args,
+    filter_languages,
+    read_exclude_file,
+)
 from src.models._model_zoo import MODEL_ZOO
 from src.tasks.language_identification.classifier import LightningMLP
 
@@ -63,18 +67,7 @@ def parse_args():
         help="Output file for the summary results",
     )
     parser.add_argument("--device", type=str, default="cuda:0", help="Device to use")
-    parser.add_argument(
-        "--glottocode",
-        type=str,
-        default="indo1319",
-        help="Glottocode to filter languages",
-    )
-    parser.add_argument(
-        "--min-speakers",
-        type=float,
-        default=0.0,
-        help="Minimum number of speakers per language",
-    )
+    add_language_filter_args(parser)
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -83,14 +76,17 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_test_data(dataset_args, processor, glottocode, min_speakers):
+def get_test_data(
+    dataset_args, processor, glottocode, min_speakers, exclude=None, gender=None
+):
     print("Loading data...")
     _, _, test_dataset = load_dataset(**dataset_args, processor=processor, split=True)
 
-    languages_to_keep = filter_languages_from_glottocode(
+    languages_to_keep = filter_languages(
         dataset=test_dataset.dataset,
         glottocode=glottocode,
         min_speakers=min_speakers,
+        exclude=exclude,
     )
     # pylint: disable=unused-variable
     labels_to_keep = test_dataset.label_encoder.encode_sequence(
@@ -98,6 +94,12 @@ def get_test_data(dataset_args, processor, glottocode, min_speakers):
     )  # noqa: F841
     # pylint: enable=unused-variable
     test_dataset.data = test_dataset.data.query("language in @labels_to_keep")
+
+    if gender is not None:
+        mask = test_dataset.data["gender"].str.lower() == gender.lower()
+        test_dataset.data = test_dataset.data[mask]
+        print(f"Gender filter '{gender}' applied.")
+
     print(f"Test dataset size after filtering: {len(test_dataset)} samples.")
 
     test_loader = DataLoader(test_dataset, shuffle=False, **LOADER_ARGS)
@@ -106,6 +108,8 @@ def get_test_data(dataset_args, processor, glottocode, min_speakers):
 
 if __name__ == "__main__":
     args = parse_args()
+
+    exclude = read_exclude_file(args.exclude_languages_file)
 
     ckpts = glob(f"{DEFAULT_EVAL_DIR}/{args.project_name}/*/checkpoints/*.ckpt")
     print(f"Found {len(ckpts)} checkpoints.")
@@ -129,7 +133,6 @@ if __name__ == "__main__":
         processor_kwargs = {
             **base_kwargs,
             "sr": SAMPLE_RATE,
-            "max_length": MODEL_ZOO[model_id]["max_length"],
         }
         processor = processor_cls(**processor_kwargs)
 
@@ -141,7 +144,6 @@ if __name__ == "__main__":
             "device": args.device,
             "training": False,
             "finetuned": model_id != "facebook/wav2vec2-xls-r-300m",
-            "average_pool": False,
         }
         feature_extractor = feature_extractor_cls(**feature_extractor_kwargs)
 
@@ -184,6 +186,8 @@ if __name__ == "__main__":
             processor,
             glottocode=args.glottocode,
             min_speakers=args.min_speakers,
+            exclude=exclude,
+            gender=args.gender,
         )
 
         # Calculate test results

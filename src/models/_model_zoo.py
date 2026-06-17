@@ -10,8 +10,6 @@ from .speechbrain import SpeechbrainFeatureExtractor, SpeechbrainProcessor
 from .transformers import TransformersAudioProcessor, TransformersFeatureExtractor
 from .whisper import WhisperFeatureExtractor, WhisperProcessor
 
-AUDIO_MAX_LENGTH: Final = 160000
-
 OPENSMILE_MODELS: Final = {
     k: {
         "extractor": openSmileFeatureExtractor,
@@ -99,8 +97,5 @@ AUDIO_MODELS: Final = {
 
 
 MODEL_ZOO: Final = {
-    **{
-        i: {**vi, "dtype": "audio", "max_length": AUDIO_MAX_LENGTH}
-        for i, vi in AUDIO_MODELS.items()
-    }
+    **{i: {**vi, "dtype": "audio"} for i, vi in AUDIO_MODELS.items()}
 }
