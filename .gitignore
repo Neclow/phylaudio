@@ -244,3 +244,6 @@ node_modules/
 
 # Compressed data files
 data/**/*.tar.gz
+
+# CmdStan compiled binaries
+src/tasks/phylo/additive_phylo_gp
