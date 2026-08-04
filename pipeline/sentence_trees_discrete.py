@@ -85,7 +85,7 @@ def groupby_and_agg(X, y, num_classes, agg="mean"):
 def discretize_then_vote(X_emb, y, num_classes, args):
     """Discretize per-utterance, then take per-language majority vote per feature."""
     discretised = discretize(X_emb, method=args.discretization, q=args.q)
-    q = 2 if args.discretization == "step" else args.q
+    q = 2 if args.discretization in ("step", "ste") else args.q
     N, D = discretised.shape
 
     one_hot = F.one_hot(discretised, num_classes=q).to(dtype=X_emb.dtype)
@@ -139,7 +139,7 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    dtype = "discrete2"
+    dtype = "discrete3"
     if args.aggregation != "mean":
         dtype += f"+{args.aggregation}"
     if args.decomposition is not None:

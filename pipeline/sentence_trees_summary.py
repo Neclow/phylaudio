@@ -30,7 +30,11 @@ METRICS = {
     "rf_generalized": generalized_robinson_foulds,
     "s2r": quartet_similarity,
 }
-OUTPUT_FILES = {"none": "_trees.txt", "astral4": "_trees_astral4.txt"}
+OUTPUT_SUFFIXES = {
+    "none": "_trees.txt",
+    "astral4": "_trees_astral4.txt",
+    "wastral": "_trees_wastral.txt",
+}
 REFERENCE_TREE_NAMES = [
     Path(f).stem for f in glob(f"{DEFAULT_REFERENCE_TREE_PROCESSED_DIR}/*.nwk")
 ]
@@ -63,8 +67,15 @@ def parse_args():
         "-ot",
         dest="output_type",
         default="astral4",
-        choices=("astral4", "none"),
+        choices=tuple(OUTPUT_SUFFIXES.keys()),
         type=str,
+    )
+    parser.add_argument(
+        "--splits",
+        type=str,
+        default=None,
+        help="Comma-separated splits label (e.g. dev,test). "
+        "Matches the --include/--exclude used in sentence_trees_astral.sh.",
     )
     parser.add_argument("--overwrite", action="store_true")
 
@@ -127,9 +138,18 @@ if __name__ == "__main__":
     n_files = len(cfg_files)
     assert n_files > 0, f"No runs found in {DEFAULT_PER_SENTENCE_DIR}/{args.indir}"
     print(f"Found {n_files} runs.")
-    output_tree_name = OUTPUT_FILES[args.output_type]
-    # Output file
-    output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary.csv"
+
+    # Build output tree filename from method + splits
+    base_suffix = OUTPUT_SUFFIXES[args.output_type]
+    if args.splits:
+        splits_label = "_".join(sorted(args.splits.split(",")))
+        output_tree_name = base_suffix.replace("_trees_", f"_trees_{splits_label}_")
+        if output_tree_name == base_suffix:
+            output_tree_name = base_suffix.replace("_trees.", f"_trees_{splits_label}.")
+        output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary_{splits_label}.csv"
+    else:
+        output_tree_name = base_suffix
+        output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary.csv"
 
     if args.ref != "all":
         refs = tuple([args.ref])

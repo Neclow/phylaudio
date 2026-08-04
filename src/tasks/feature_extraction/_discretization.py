@@ -31,6 +31,9 @@ DISCRETIZATION_METHODS = {
     "kmeans": kmeans_bucketize,
     "quantile": qcut,
     "step": lambda x, _: x.gt(0).long(),
+    # Embeddings are first projected through the trained LID head's STE
+    # bottleneck (see get_embeddings); the sign output is mapped to {0, 1}.
+    "ste": lambda x, _: x.gt(0).long(),
 }
 
 
