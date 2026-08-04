@@ -3,29 +3,39 @@
 # from a binary FASTA alignment.
 #
 # Usage:
-#   Rscript pipeline/bootstrap_delta.R <beast_run_dir> [n_boot]
+#   Rscript pipeline/bootstrap_delta.R <beast_run_dir> [brsupport] [n_boot] [seed]
 #
-# Looks for __merged_mapped.fa inside <beast_run_dir>/0.01_brsupport/,
+# Looks for __merged_mapped.fa inside <beast_run_dir>/<brsupport>/,
 # saves _delta.csv next to it.
+# If brsupport is a bare number (e.g. 0.05), "_brsupport" is appended.
 #
-# Example:
+# Examples:
 #   Rscript pipeline/bootstrap_delta.R speech
+#   Rscript pipeline/bootstrap_delta.R speech 0.05_brsupport_dev_test
+#   Rscript pipeline/bootstrap_delta.R speech 0.01 500
+#   Rscript pipeline/bootstrap_delta.R speech 0.01 1000 123
 
 library(parallel)
 
 BEAST_BASE <- "data/trees/beast"
-BRSUPPORT <- "0.01_brsupport"
 
 # ── CLI args ──────────────────────────────────────────────────────────────────
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 1) {
-  stop("Usage: Rscript pipeline/bootstrap_delta.R <beast_run_dir> [n_boot]")
+  stop("Usage: Rscript pipeline/bootstrap_delta.R <beast_run_dir> [brsupport] [n_boot] [seed]")
 }
 
-run_dir <- file.path(BEAST_BASE, args[1], BRSUPPORT)
+brsupport <- if (length(args) >= 2 && grepl("\\D", args[2])) args[2] else {
+  size <- if (length(args) >= 2) args[2] else "0.01"
+  paste0(size, "_brsupport")
+}
+n_boot_idx <- if (length(args) >= 2 && grepl("\\D", args[2])) 3L else 2L
+n_boot <- if (length(args) >= n_boot_idx) as.integer(args[n_boot_idx]) else 1000L
+seed <- if (length(args) >= n_boot_idx + 1L) as.integer(args[n_boot_idx + 1L]) else 42L
+
+run_dir <- file.path(BEAST_BASE, args[1], brsupport)
 fasta_file <- file.path(run_dir, "__merged_mapped.fa")
 output_csv <- file.path(run_dir, "_delta.csv")
-n_boot <- if (length(args) >= 2) as.integer(args[2]) else 1000L
 
 stopifnot(file.exists(fasta_file))
 
@@ -157,7 +167,7 @@ cat(sprintf(
   n_cores
 ))
 
-set.seed(42)
+set.seed(seed)
 t0 <- proc.time()
 boot_list <- mclapply(
   seq_len(n_boot),
