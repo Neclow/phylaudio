@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoFeatureExtractor, Wav2Vec2Model
+from transformers import AutoFeatureExtractor, HubertModel, Wav2Vec2Model
 
 from .audio import AudioProcessor
 from .base import BaseFeatureExtractor
@@ -111,6 +111,7 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
         finetuned=False,
         training=False,
         device="cpu",
+        layer=-1,
         **kwargs,
     ):
         dtype = torch.float32 if training or "cuda" not in device else torch.float16
@@ -121,6 +122,7 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
             cache_dir = f"{cache_dir}/huggingface"
 
         self.finetuned = finetuned
+        self.layer = layer
 
         self.load(cache_dir)
 
@@ -141,10 +143,23 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
                 if self.finetuned:
                     feature_extractor = _load_finetuned_xlsr(feature_extractor)
                 emb_dim = 1024
-
-            feature_extractor.freeze_feature_encoder()
+        elif "mHuBERT" in self.model_id:
+            feature_extractor = HubertModel.from_pretrained(
+                self.model_id,
+                cache_dir=cache_dir,
+                torch_dtype=self.dtype,
+            )
+            emb_dim = 768
         else:
             raise ValueError(f"Unknown model ID: {self.model_id}")
+
+        # HubertModel lacks freeze_feature_encoder() (it lives on the task-head
+        # classes); freeze the conv feature encoder submodule directly, which is
+        # what freeze_feature_encoder() does internally for Wav2Vec2.
+        if hasattr(feature_extractor, "freeze_feature_encoder"):
+            feature_extractor.freeze_feature_encoder()
+        else:
+            feature_extractor.feature_extractor._freeze_parameters()
 
         self.feature_extractor = feature_extractor
         self.emb_dim = emb_dim
@@ -156,11 +171,25 @@ class TransformersFeatureExtractor(BaseFeatureExtractor):
         if x.dtype != torch.long:
             x = x.to(self.dtype)
 
-        last_hidden_state = self.feature_extractor(
-            x, attention_mask=a
-        ).last_hidden_state
+        if self.layer == -1:
+            last_hidden_state = self.feature_extractor(
+                x, attention_mask=a
+            ).last_hidden_state
+        else:
+            # hidden_states is a tuple of (n_transformer_layers + 1) tensors:
+            # index 0 is the post-conv input projection, indices 1..N are layer
+            # outputs. Honour Python indexing so layer=-1 is unreachable here
+            # (handled by the branch above) and positive ints select directly.
+            hidden_states = self.feature_extractor(
+                x, attention_mask=a, output_hidden_states=True
+            ).hidden_states
+            last_hidden_state = hidden_states[self.layer]
 
-        if "wav2vec2" in self.model_id or "mms" in self.model_id:
+        if (
+            "wav2vec2" in self.model_id
+            or "mms" in self.model_id
+            or "mHuBERT" in self.model_id
+        ):
             # Source:
             # https://github.com/huggingface/transformers/blob/ccbd57a8b665fbb5b1d566c0b800dc6ede509e8e/src/transformers/models/wav2vec2/modeling_wav2vec2.py#L2340
             # hidden_states = self.projector(hidden_states)
