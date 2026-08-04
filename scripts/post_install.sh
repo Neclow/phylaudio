@@ -23,6 +23,7 @@ pixi run packagemanager -add SA -version 2.1.1 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add CCD -version 1.0.2 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add CoupledMCMC -version 1.2.2 -dir $BEAST_PKG_DIR
 pixi run packagemanager -add ORC -version 1.2.1 -dir $BEAST_PKG_DIR
+pixi run packagemanager -add NS -version 1.2.2 -dir $BEAST_PKG_DIR
 rm $BEAST_TARGET
 
 # Install DensiTree
