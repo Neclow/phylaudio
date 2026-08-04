@@ -97,7 +97,11 @@ if [[ ${#MATCHES[@]} -gt 1 ]]; then
     exit 1
 fi
 
-WORKING_DIR="${MATCHES[0]}/${SIZE}_brsupport"
+if [[ "$SIZE" =~ ^[0-9.]+$ ]]; then
+    WORKING_DIR="${MATCHES[0]}/${SIZE}_brsupport"
+else
+    WORKING_DIR="${MATCHES[0]}/${SIZE}"
+fi
 if [[ ! -d "$WORKING_DIR" ]]; then
     echo "Error: Directory not found: $WORKING_DIR"
     exit 1
@@ -163,3 +167,20 @@ fi
 
 cd "$BEAST_DIR"
 pixi run beast2 "${BEAST_ARGS[@]}" "$INPUT_FILE"
+
+# CoupledMCMC/NS runs dump state files in $HOME despite -working
+INPUT_BASENAME="$(basename "$INPUT_FILE" .xml)"
+shopt -s nullglob
+HOME_STATE_FILES=("$HOME/${INPUT_BASENAME}.xml."*state*)
+shopt -u nullglob
+
+if [[ ${#HOME_STATE_FILES[@]} -gt 0 ]]; then
+    echo ""
+    echo "Moving ${#HOME_STATE_FILES[@]} state file(s) from \$HOME to $WORKING_DIR"
+    for f in "${HOME_STATE_FILES[@]}"; do
+        SUFFIX="${f##*.xml.}"
+        DEST="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.xml.${SUFFIX}"
+        mv "$f" "$DEST"
+        echo "  $(basename "$f") -> $(basename "$DEST")"
+    done
+fi
