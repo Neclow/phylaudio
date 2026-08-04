@@ -1,31 +1,51 @@
-import pandas as pd
+import argparse
 import json
+import os
 import re
 
+import pandas as pd
+
+from src._config import DEFAULT_METADATA_DIR, DEFAULT_PHYLOREGRESSION_DIR
 from src.tasks.phylo.splitstree import extract_delta
 
-base = "data/metadata/fleurs-r"
-mcc_speech = "data/trees/beast/speech/0.01_brsupport/input_combined_resampled.mcc"
-mcc_cognate = "data/trees/references/raw/iecor.nex"
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Prepare regression metadata from BEAST MCC trees."
+    )
+    parser.add_argument("speech_mcc", help="Path to speech MCC/nexus file")
+    parser.add_argument("cognate_mcc", help="Path to cognate MCC/nexus file")
+    parser.add_argument(
+        "--dataset", default="fleurs-r", help="Dataset name (default: fleurs-r)"
+    )
+    return parser.parse_args()
+
+
+args = parse_args()
+metadata_dir = os.path.join(DEFAULT_METADATA_DIR, args.dataset)
+
+speech_dir = os.path.dirname(args.speech_mcc)
+cognate_dir = os.path.dirname(args.cognate_mcc)
 
 TREE_CONFIG = {
-    "input_v12_combined_resampled": {
-        "nex": mcc_speech,
-        "stree6": "data/trees/beast/speech/0.01_brsupport/__merged_splitstree.stree6",
+    "speech": {
+        "nex": args.speech_mcc,
+        "stree6": os.path.join(speech_dir, "__merged_splitstree.stree6"),
         "name_col": "fleurs",
     },
-    "heggarty2024_raw": {
-        "nex": mcc_cognate,
-        "stree6": "data/trees/beast/iecor/__merged_splitstree.stree6",
+    "cognate": {
+        "nex": args.cognate_mcc,
+        "stree6": os.path.join(cognate_dir, "__merged_splitstree.stree6"),
         "name_col": "iecor",
     },
 }
 
 # ─── Helper: extract rate_median from BEAST annotated nexus ──────────────────
 
+
 def extract_beast_rates(nex_path):
     """Parse a BEAST annotated nexus file, return {taxon_name: rate_median}."""
-    with open(nex_path) as f:
+    with open(nex_path, "r", encoding="utf-8") as f:
         text = f.read()
 
     # Parse Translate block: number -> taxon name
@@ -76,34 +96,38 @@ def extract_beast_rates(nex_path):
 
 # ─── Parse taxa from nex files ───────────────────────────────────────────────
 
+
 def parse_taxa(path):
     taxa, inside = [], False
-    with open(path) as f:
+    with open(path, "r", encoding="utf-8") as f:
         for line in f:
             s = line.strip()
-            if "Taxlabels" in s or "taxlabels" in s: inside = True; continue
+            if "Taxlabels" in s or "taxlabels" in s:
+                inside = True
+                continue
             if inside:
-                if s == ";": break
+                if s == ";":
+                    break
                 taxa.append(s)
     return taxa
 
 
 # ─── Load sources ────────────────────────────────────────────────────────────
 
-with open(f"{base}/languages.json") as f:
+with open(f"{metadata_dir}/languages.json", "r", encoding="utf-8") as f:
     langs = json.load(f)
-glottolog = pd.read_csv(f"{base}/glottolog.csv")
-speakers = pd.read_csv(f"{base}/n_speakers.csv")
+glottolog = pd.read_csv(f"{metadata_dir}/glottolog.csv")
+speakers = pd.read_csv(f"{metadata_dir}/n_speakers.csv")
 
-speech_taxa = set(parse_taxa(mcc_speech))
-cognate_taxa = set(parse_taxa(mcc_cognate))
+speech_taxa = set(parse_taxa(args.speech_mcc))
+cognate_taxa = set(parse_taxa(args.cognate_mcc))
 
 
 # number of languages before
 print(f"Speech taxa before in nexus: {len(speech_taxa)}")
 print(f"Cognate taxa before in nexus: {len(cognate_taxa)}")
 
-# remove Afrikaans and Kabuverdianu
+# remove Afrikaans and Kabuverdianu (out of European continent)
 speech_taxa = speech_taxa - {"Afrikaans", "Kabuverdianu"}
 cognate_taxa = cognate_taxa - {"Afrikaans", "Kabuverdianu"}
 
@@ -111,19 +135,32 @@ cognate_taxa = cognate_taxa - {"Afrikaans", "Kabuverdianu"}
 
 rows = []
 for key, v in langs.items():
-    rows.append(dict(fleurs_dir=key, fleurs=v["fleurs"], iecor=v.get("iecor"),
-                     glottocode=v["glottolog"]))
+    rows.append(
+        dict(
+            fleurs_dir=key,
+            fleurs=v["fleurs"],
+            iecor=v.get("iecor"),
+            glottocode=v["glottolog"],
+        )
+    )
 meta = pd.DataFrame(rows)
-meta = meta.merge(glottolog[["fleurs_dir", "longitude", "latitude"]], on="fleurs_dir", how="left")
-meta = meta.merge(speakers[["fleurs_dir", "speakers_linguameta"]], on="fleurs_dir", how="left")
+meta = meta.merge(
+    glottolog[["fleurs_dir", "longitude", "latitude"]], on="fleurs_dir", how="left"
+)
+meta = meta.merge(
+    speakers[["fleurs_dir", "speakers_linguameta"]], on="fleurs_dir", how="left"
+)
 meta = meta.rename(columns={"speakers_linguameta": "n_speakers"})
 
 # ─── Filter taxa (version without inventory — before PHOIBLE) ────────────────
 
 speech_df_no_inv = (
-    meta[meta["fleurs"].isin(speech_taxa)][["fleurs", "longitude", "latitude", "n_speakers"]]
+    meta[meta["fleurs"].isin(speech_taxa)][
+        ["fleurs", "longitude", "latitude", "n_speakers"]
+    ]
     .rename(columns={"fleurs": "language"})
-    .sort_values("language").reset_index(drop=True)
+    .sort_values("language")
+    .reset_index(drop=True)
 )
 
 cognate_df_no_inv = meta[meta["iecor"].isin(cognate_taxa)].copy()
@@ -131,12 +168,16 @@ cognate_df_no_inv = meta[meta["iecor"].isin(cognate_taxa)].copy()
 print(cognate_df_no_inv[cognate_df_no_inv["iecor"] == "SerboCroatian"])
 # keep only croa1245 - Croatian row
 cognate_df_no_inv = cognate_df_no_inv[
-    ~((cognate_df_no_inv["iecor"] == "SerboCroatian") & (cognate_df_no_inv["glottocode"] != "croa1245"))
+    ~(
+        (cognate_df_no_inv["iecor"] == "SerboCroatian")
+        & (cognate_df_no_inv["glottocode"] != "croa1245")
+    )
 ]
 cognate_df_no_inv = (
     cognate_df_no_inv[["iecor", "longitude", "latitude", "n_speakers"]]
     .rename(columns={"iecor": "language"})
-    .sort_values("language").reset_index(drop=True)
+    .sort_values("language")
+    .reset_index(drop=True)
 )
 
 # after merging with glottolog
@@ -149,25 +190,34 @@ print(f"Cognate taxa filtered out: {cognate_taxa - set(cognate_df_no_inv['langua
 
 # ─── PHOIBLE: load pre-computed n_phonemes from summary CSV ───────────────────
 
-phoible = pd.read_csv(f"{base}/phoible.csv")[["Glottocode", "n_phonemes"]]
-meta_inv = meta.merge(phoible, left_on="glottocode", right_on="Glottocode", how="left").drop(columns="Glottocode")
+phoible = pd.read_csv(f"{metadata_dir}/phoible.csv")[["Glottocode", "n_phonemes"]]
+meta_inv = meta.merge(
+    phoible, left_on="glottocode", right_on="Glottocode", how="left"
+).drop(columns="Glottocode")
 
 # ─── Filter taxa (version with inventory — after PHOIBLE) ────────────────────
 
 speech_df_inv = (
-    meta_inv[meta_inv["fleurs"].isin(speech_taxa)][["fleurs", "longitude", "latitude", "n_speakers", "n_phonemes"]]
+    meta_inv[meta_inv["fleurs"].isin(speech_taxa)][
+        ["fleurs", "longitude", "latitude", "n_speakers", "n_phonemes"]
+    ]
     .rename(columns={"fleurs": "language"})
-    .sort_values("language").reset_index(drop=True)
+    .sort_values("language")
+    .reset_index(drop=True)
 )
 
 cognate_df_inv = meta_inv[meta_inv["iecor"].isin(cognate_taxa)].copy()
 cognate_df_inv = cognate_df_inv[
-    ~((cognate_df_inv["iecor"] == "SerboCroatian") & (cognate_df_inv["glottocode"] != "croa1245"))
+    ~(
+        (cognate_df_inv["iecor"] == "SerboCroatian")
+        & (cognate_df_inv["glottocode"] != "croa1245")
+    )
 ]
 cognate_df_inv = (
     cognate_df_inv[["iecor", "longitude", "latitude", "n_speakers", "n_phonemes"]]
     .rename(columns={"iecor": "language"})
-    .sort_values("language").reset_index(drop=True)
+    .sort_values("language")
+    .reset_index(drop=True)
 )
 
 # ─── Report ──────────────────────────────────────────────────────────────────
@@ -175,22 +225,26 @@ cognate_df_inv = (
 missing_inv = set(speech_df_inv[speech_df_inv["n_phonemes"].isna()]["language"])
 speech_inv_final = len(speech_df_inv) - len(missing_inv)
 print(f"Speech (no inv):   {len(speech_df_no_inv)}/{len(speech_taxa)} taxa matched")
-print(f"Speech (with inv): {speech_inv_final} languages (dropped {len(missing_inv)} missing n_phonemes: {missing_inv or 'none'})")
+print(
+    f"Speech (with inv): {speech_inv_final} languages (dropped {len(missing_inv)} missing n_phonemes: {missing_inv or 'none'})"
+)
 
 missing_inv_c = set(cognate_df_inv[cognate_df_inv["n_phonemes"].isna()]["language"])
 cognate_inv_final = len(cognate_df_inv) - len(missing_inv_c)
 print(f"\nCognate (no inv):   {len(cognate_df_no_inv)} languages")
-print(f"Cognate (with inv): {cognate_inv_final} languages (dropped {len(missing_inv_c)} missing n_phonemes: {missing_inv_c or 'none'})")
+print(
+    f"Cognate (with inv): {cognate_inv_final} languages (dropped {len(missing_inv_c)} missing n_phonemes: {missing_inv_c or 'none'})"
+)
 
 # ─── Merge rate_median and delta, save both versions ─────────────────────────
 
 datasets = {
-    "input_v12_combined_resampled": ("speech",  speech_df_no_inv,  speech_df_inv),
-    "heggarty2024_raw": ("cognate", cognate_df_no_inv, cognate_df_inv),
+    "speech": (speech_df_no_inv, speech_df_inv),
+    "cognate": (cognate_df_no_inv, cognate_df_inv),
 }
 
-for tree_name, (stem, df_no_inv, df_inv) in datasets.items():
-    cfg = TREE_CONFIG[tree_name]
+for stem, (df_no_inv, df_inv) in datasets.items():
+    cfg = TREE_CONFIG[stem]
 
     rates = extract_beast_rates(cfg["nex"])
     delta_df = extract_delta(cfg["stree6"])
@@ -199,20 +253,24 @@ for tree_name, (stem, df_no_inv, df_inv) in datasets.items():
     # ── Version without inventory (pre-PHOIBLE) ──
     df_no_inv = df_no_inv.copy()
     df_no_inv["rate_median"] = df_no_inv["language"].map(rates)
-    df_no_inv["delta"]       = df_no_inv["language"].map(delta_map)
-    df_no_inv = df_no_inv.dropna(subset=["n_speakers", "rate_median", "delta"]).reset_index(drop=True)
+    df_no_inv["delta"] = df_no_inv["language"].map(delta_map)
+    df_no_inv = df_no_inv.dropna(
+        subset=["n_speakers", "rate_median", "delta"]
+    ).reset_index(drop=True)
 
     # ── Version with inventory (post-PHOIBLE) ──
     df_inv = df_inv.copy()
     df_inv["rate_median"] = df_inv["language"].map(rates)
-    df_inv["delta"]       = df_inv["language"].map(delta_map)
-    df_inv = df_inv.dropna(subset=["n_speakers", "n_phonemes", "rate_median", "delta"]).reset_index(drop=True)
+    df_inv["delta"] = df_inv["language"].map(delta_map)
+    df_inv = df_inv.dropna(
+        subset=["n_speakers", "n_phonemes", "rate_median", "delta"]
+    ).reset_index(drop=True)
 
-    path_no_inv = f"data/phyloregression/{stem}_metadata.csv"
-    path_inv    = f"data/phyloregression/{stem}_metadata_with_inventory.csv"
+    path_no_inv = f"{DEFAULT_PHYLOREGRESSION_DIR}/{stem}_metadata.csv"
+    path_inv = f"{DEFAULT_PHYLOREGRESSION_DIR}/{stem}_metadata_with_inventory.csv"
     df_no_inv.to_csv(path_no_inv, index=False)
     df_inv.to_csv(path_inv, index=False)
 
-    print(f"\n--- {tree_name} ---")
+    print(f"\n--- {stem} ---")
     print(f"  without inventory ({len(df_no_inv)} languages) -> {path_no_inv}")
     print(f"  with inventory    ({len(df_inv)} languages) -> {path_inv}")
