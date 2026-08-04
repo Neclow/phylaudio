@@ -49,6 +49,15 @@ def parse_lid_args(with_common_args=True):
     )
     parser.add_argument("--hidden-dim", type=int, help="Downstream hidden layer size")
     parser.add_argument(
+        "--embeddings-cache",
+        type=str,
+        default=None,
+        help=(
+            "Path to an extract_embeddings run dir. If set, train the head on "
+            "cached embeddings (no backbone) instead of running the model."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="If true, runs a quick development run for testing purposes",

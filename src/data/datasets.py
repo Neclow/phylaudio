@@ -167,7 +167,7 @@ class AudioDataset(BaseDataset):
 
     def __getitem__(self, idx):
         # Path: data_dir/language/language/audio/subset/*.wav
-        _, basename, *_, subset, label = self.data.iloc[idx]
+        sentence_index, basename, *_, subset, label = self.data.iloc[idx]
 
         x, attention_mask = self.read_audio(
             processor=self.processor,
@@ -181,7 +181,13 @@ class AudioDataset(BaseDataset):
         if self.target_transform:
             label = self.target_transform(label)
 
-        return {"input": x, "attention_mask": attention_mask, "label": label}
+        return {
+            "input": x,
+            "attention_mask": attention_mask,
+            "label": label,
+            "sentence_index": sentence_index,
+            "subset": subset,
+        }
 
 
 class FleursParallelDataset(BaseDataset):
@@ -308,6 +314,29 @@ class FleursParallelDataset(BaseDataset):
             "label": labels,
             "attention_mask": attention_masks,
             "sentence_index": sentence_index,
+        }
+
+
+class EmbeddingDataset(Dataset):
+    """Serve precomputed embeddings as LID batches (no audio, no backbone).
+
+    Yields the same batch dict shape as ``AudioDataset`` so the usual LID loop
+    works unchanged; ``attention_mask`` is ``NONE_TENSOR`` since embeddings are
+    already pooled (paired with ``EmbeddingFeatureExtractor``).
+    """
+
+    def __init__(self, embeddings, labels):
+        self.embeddings = embeddings
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.embeddings)
+
+    def __getitem__(self, idx):
+        return {
+            "input": self.embeddings[idx],
+            "label": self.labels[idx],
+            "attention_mask": NONE_TENSOR,
         }
 
 
