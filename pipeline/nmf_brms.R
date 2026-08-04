@@ -7,11 +7,12 @@
 # No phylogenetic covariance — just standard Bayesian linear regression.
 #
 # Usage:
-#   Rscript pipeline/nmf_brms.R <run_id> [dataset]
+#   Rscript pipeline/nmf_brms.R <run_id> [K] [dataset]
 #
 # Examples:
 #   Rscript pipeline/nmf_brms.R speech
-#   Rscript pipeline/nmf_brms.R speech fleurs-r
+#   Rscript pipeline/nmf_brms.R speech 12
+#   Rscript pipeline/nmf_brms.R speech 12 fleurs-r
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
 
@@ -30,23 +31,25 @@ args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\n\n"
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> [K] [dataset]\n\n"
   )
   cat("Arguments:\n")
   cat("  run_id    BEAST run UUID, prefix, or full path\n")
+  cat("  K         Number of NMF components (default: k_star from sweep)\n")
   cat("  dataset   Dataset name (default: fleurs-r)\n")
   quit(status = 0)
 }
 
 if (length(args) < 1) {
   stop(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\nUse -h or --help for more information",
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> [K] [dataset]\nUse -h or --help for more information",
     call. = FALSE
   )
 }
 
 run_id <- args[1]
-dataset <- ifelse(length(args) >= 2, args[2], "fleurs-r")
+k_override <- if (length(args) >= 2) as.integer(args[2]) else NULL
+dataset <- ifelse(length(args) >= 3, args[3], "fleurs-r")
 
 # Resolve run_id to BEAST directory
 if (dir.exists(run_id)) {
@@ -74,7 +77,10 @@ if (dir.exists(run_id)) {
 }
 
 # Find sweep HDF5 file inside beast dir
-h5_hits <- Sys.glob(file.path(beast_dir, "**", "nmf", "sweep_k*_k*.h5"))
+h5_hits <- Sys.glob(file.path(beast_dir, "*", "nmf", "sweep_k*_k*.h5"))
+if (length(h5_hits) == 0) {
+  h5_hits <- Sys.glob(file.path(beast_dir, "nmf", "sweep_k*_k*.h5"))
+}
 if (length(h5_hits) == 0) {
   stop(sprintf("No NMF sweep HDF5 found in %s/", beast_dir), call. = FALSE)
 }
@@ -91,7 +97,7 @@ cat(sprintf("Using %s\n", nmf_h5))
 cat("Loading NMF results...\n")
 h5 <- hdf5r::H5File$new(nmf_h5, mode = "r")
 
-K <- as.integer(h5attr(h5, "k_star"))
+K <- if (!is.null(k_override)) k_override else as.integer(h5attr(h5, "k_star"))
 nmf_labels <- h5[["labels"]]$read()
 group_name <- sprintf("K%02d", K)
 W <- t(h5[[paste0(group_name, "/W")]]$read())
