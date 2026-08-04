@@ -7,7 +7,13 @@ authors = [
 channels = ["conda-forge", "bioconda"]
 name = "phylaudio"
 platforms = ["linux-64"]
-version = "0.1.0"
+version = "0.1.1"
+
+[system-requirements]
+cuda = "13.2"
+
+[activation]
+scripts = ["scripts/activate.sh"]
 
 [tasks]
 post_install = "bash scripts/post_install.sh"
@@ -33,6 +39,7 @@ sentence_distance = "python -m pipeline.sentence_trees_distance"
 sentence_astral = "bash pipeline/sentence_trees_astral.sh"
 sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
+sentence_postprocess = "bash pipeline/sentence_trees_postprocess.sh"
 squim = "python -m pipeline.squim"
 download_geojson = "bash pipeline/download_geojson.sh"
 
@@ -57,7 +64,7 @@ python = "3.10.12.*"
 pandas = ">=2.3.2,<3"
 requests = ">=2.32.5,<3"
 tqdm = ">=4.67.1,<5"
-pytorch = ">=2.7.1,<2.9"
+pytorch = ">=2.7.1,<2.8"
 torchaudio = ">=2.7.1,<2.9"
 huggingface_hub = ">=0.34.4,<0.35"
 lightning = ">=2.5.4,<3"
@@ -82,7 +89,6 @@ r-tidyr = ">=1.3.1,<2"
 dendropy = ">=5.0,<6"
 iqtree = ">=3.0.1,<4"
 aster = { version = ">=1.23,<2", channel = "bioconda" }
-beagle-lib = { version = ">=4.0.1,<5", channel = "bioconda" }
 # Dev tools
 black = ">=25.1.0,<26"
 uv = ">=0.8.13,<0.9"
@@ -100,11 +106,15 @@ openai-whisper = ">=20250625, <20250626"
 torch-pca = ">=1.1.0, <2"
 rapidfuzz = "==3.14.1"
 pypdf = ">=6.5.0, <7"
+# espnet = ">=202205, <202208"
 
 [environments]
 default = { solve-group = "default" }
-regression = { features = ["regression"], solve-group = "regression", no-default-feature = true }
+regression = { features = [
+    "regression",
+], solve-group = "regression", no-default-feature = true }
 viz = { features = ["viz"], solve-group = "viz" }
+mfa = { features = ["mfa"], solve-group = "mfa", no-default-feature = true }
 
 [feature.regression.dependencies]
 python = "3.10.12.*"
@@ -123,6 +133,9 @@ r-cmdstanr = ">=0.9.0,<1"
 [feature.regression.tasks]
 prepare_regression_data = "python -m pipeline.prepare_regression_data"
 beast_phylolm = "Rscript pipeline/beast_phylolm.R"
+
+[feature.mfa.dependencies]
+montreal-forced-aligner = ">=3.3,<4"
 
 [feature.viz.dependencies]
 python = "3.10.12.*"

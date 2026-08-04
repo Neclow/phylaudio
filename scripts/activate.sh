@@ -1,0 +1,1 @@
+export LD_LIBRARY_PATH=$PIXI_PROJECT_ROOT/extern/beagle-lib/lib:$LD_LIBRARY_PATH

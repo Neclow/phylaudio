@@ -164,6 +164,7 @@ cython_debug/
 
 # BEAST2
 extern/beast2
+extern/beagle-lib
 .beast
 
 # DensiTree
@@ -244,6 +245,13 @@ node_modules/
 
 # Compressed data files
 data/**/*.tar.gz
+
+# BEAST2 output dumped outside data/trees/beast/
+/input_*.log*
+/input_*.trees
+/input_*.posterior.trees
+/input_*.state
+/input_*.*state
 
 # CmdStan compiled binaries
 src/tasks/phylo/additive_phylo_gp
