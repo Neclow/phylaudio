@@ -166,20 +166,41 @@ Install visualization dependencies:
 pixi install -e viz
 ```
 
+### Figure dependency table
+
+Each figure depends on one or more pipeline scripts that must be run first to
+produce the intermediate data. The plot scripts in `plots/` read that data and
+generate publication-ready figures.
+
+| Figure                                | Plot script                        | Pipeline dependency        | Data                                          |
+| ------------------------------------- | ---------------------------------- | -------------------------- | --------------------------------------------- |
+| Fig 1a                                | —                                  | —                          | —                                             |
+| Fig 1b (NMF STRUCTURE)                | `plots/fig1_nmf.py`                | `pipeline/nmf_structure.R` | `{run}/nmf/Q_K*.csv`                          |
+| Fig 1d (delta)                        | `plots/fig1_delta.py`              | `pipeline/nmf_structure.R` | `{run}/nmf/Q_K*.csv`, `{run}/_delta.csv`      |
+| Supp Fig 2 (NMF K selection)          | `plots/fig1_nmf.py`                | `pipeline/nmf_structure.R` | `{run}/nmf/cross_entropy.csv`                 |
+| Supp Fig 3 (PHOIBLE regression)       | `plots/fig1_nmf.py`                | `pipeline/nmf_brms.R`      | `{run}/brms_phoible/`                         |
+| Ext (PCA)                             | `plots/fig1_pca.py`                |                            | `{run}/nmf/Q_K*.csv`                          |
+| Ext (audio quality)                   | `plots/fig1_sqa.py`                |                            |                                               |
+| Fig 2a (root age)                     | `plots/fig2_heights.py`            | `run_beast.sh`             | `{run}/input_v1_101.log`                      |
+| Fig 2b (speech rates)                 | `plots/fig2_rates.py`              | `run_beast.sh`             | `{run}/input_v1_101.trees`                    |
+| Supp Fig 4 (cognate root age + rates) | `fig2_heights.py`, `fig2_rates.py` | `run_beast.sh`             | `iecor/raw.log`, `iecor/prunedtomodern.trees` |
+| Fig 3 (geo regression)                | `plots/fig3_geo.py`                | `pipeline/beast_phylolm.R` | `data/phyloregression/`                       |
+| Ext (rates & maps)                    | `plots/ext_rates_and_maps.py`      | `pipeline/beast_phylolm.R` | `data/phyloregression/`                       |
+
 ### Publication figures
 
 ```bash
 # Figure 1
 pixi run -e viz fig1_acc_vs_brsupport  # Panel A: LID accuracy vs. bootstrap support
-pixi run -e viz fig1_nmf               # Panel B: NMF structure plot
+pixi run -e viz fig1_nmf               # Panel B: sNMF structure plot
 pixi run -e viz fig1_delta             # Panel D: per-language delta scores
 pixi run -e viz fig1_pca               # Extended: PCA of XLS-R embeddings
 pixi run -e viz fig1_sqa               # Extended: silhouette vs. SI-SDR + correlation
 
 # Figures 2–3
-pixi run -e viz fig2_rates             # Figure 2 panel B: speech rate over time
-pixi run -e viz fig2_rates_cognate     # Cognate rate over time
-pixi run -e viz fig3_geo              # Figure 3: regression panels
+pixi run -e viz fig2_heights           # Figure 2 panel A: root age distribution
+pixi run -e viz fig2_rates             # Figure 2 panel B + Supp Fig 4: speech & cognate rates
+pixi run -e viz fig3_geo               # Figure 3: regression panels
 
 # Extended
 pixi run -e viz ext_rates_and_maps     # rate scatter, GP maps, root age, rate-over-time
