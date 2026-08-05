@@ -8,32 +8,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
 from matplotlib.colors import to_rgb
 
-from ._config import BEAST_DIR, DEFAULT_IMG_DIR, DEFAULT_STYLE, PALETTE
+from ._config import (
+    BEAST_DIR,
+    DEFAULT_IMG_DIR,
+    DEFAULT_STYLE,
+    NMF_COMP_LABELS,
+    NMF_COMP_ORDER,
+    PALETTE,
+)
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
 NMF_DIR = f"{BEAST_DIR}/nmf"
 BRMS_DIR = f"{BEAST_DIR}/brms_phoible"
 
 K = 9
-
-COMP_LABELS = [
-    "E. South Asian",
-    "W. South Asian",
-    "Iran. Plateau",
-    "E. Slavic",
-    "C. European",
-    "W. Balkan",
-    "NW. European",
-    "Gallo-Iberian",
-    "Italo-Lusitanic",
-]
-
-# Visual ordering of NMF components (0-indexed column indices).
-# Display order top-to-bottom: C9, C5, C7, C1, C6, C4, C2, C8, C3
-COMP_ORDER = [8, 4, 6, 0, 5, 3, 1, 7, 2]
 
 
 # Data loading
@@ -49,7 +39,7 @@ def load_nmf(nmf_dir=NMF_DIR):
     k_star = P.shape[1]
     assert k_star == K, f"Expected K={K} but Q matrix has {k_star} components"
 
-    P = P[:, COMP_ORDER]
+    P = P[:, NMF_COMP_ORDER]
 
     # Sort languages: by dominant component, then by its proportion (descending)
     max_comp = np.argmax(P, axis=1)
@@ -85,7 +75,7 @@ def plot_structure(P_sorted, labels_sorted):
                 left=left,
                 height=1.0,
                 color=colors[j],
-                label=COMP_LABELS[j],
+                label=NMF_COMP_LABELS[j],
                 edgecolor="none",
             )
             left += P_sorted[:, j]
@@ -189,11 +179,11 @@ def load_brms(brms_dir=BRMS_DIR):
     ci_hi = df.pivot(index="feature_label", columns="component", values="ci_upper")
     r2 = df.groupby("component")["r2_mean"].first().values
 
-    col_order = [c + 1 for c in COMP_ORDER]
+    col_order = [c + 1 for c in NMF_COMP_ORDER]
     coef = coef.loc[feat_labels, col_order].values
     ci_lo = ci_lo.loc[feat_labels, col_order].values
     ci_hi = ci_hi.loc[feat_labels, col_order].values
-    r2 = r2[COMP_ORDER]
+    r2 = r2[NMF_COMP_ORDER]
 
     sig = (ci_lo > 0) | (ci_hi < 0)
     return feat_labels, coef, ci_lo, ci_hi, sig, r2
@@ -276,7 +266,7 @@ def plot_phoible_forest(feat_labels, coef, ci_lo, ci_hi, sig, r2):
 
             ax.axvline(0, color="black", linewidth=0.5, linestyle="--", alpha=0.5)
             ax.set_title(
-                f"Comp {j + 1}\n({COMP_LABELS[j]})", fontsize=8, linespacing=1.4
+                f"Comp {j + 1}\n({NMF_COMP_LABELS[j]})", fontsize=8, linespacing=1.4
             )
             ax.set_yticks(range(n_feat))
             if j % ncols == 0:

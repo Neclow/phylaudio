@@ -1,97 +1,62 @@
-#!/usr/bin/env python3
-"""Figure 1 Panel D: Contribution to network structure per language (delta)."""
+"""Figure 1d: per-language delta scores colored by NMF component proportions."""
 
-import h5py
+import os
+from glob import glob
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
-from src.tasks.phylo.nmf import normalize_rows_to_proportions
+from ._config import BEAST_DIR, DEFAULT_IMG_DIR, DEFAULT_STYLE, NMF_COMP_ORDER, PALETTE
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-IMG_DIR = "img/fig1"
-BEAST_DIR = "data/trees/beast/speech/0.01_brsupport"
-DELTA_CSV_PATH = f"{BEAST_DIR}/_delta.csv"
-NMF_H5_PATH = "data/trees/beast/speech/0.01_brsupport/nmf/sweep_k2_k30.h5"
-
-# ggthemes Tableau 20 palette (R order)
-TABLEAU20 = [
-    "#4E79A7",
-    "#A0CBE8",
-    "#F28E2B",
-    "#FFBE7D",
-    "#59A14F",
-    "#8CD17D",
-    "#B6992D",
-    "#F1CE63",
-    "#499894",
-    "#86BCB6",
-    "#E15759",
-    "#FF9D9A",
-    "#79706E",
-    "#BAB0AC",
-    "#D37295",
-    "#FABFD2",
-    "#B07AA1",
-    "#D4A6C8",
-    "#9D7660",
-    "#D7B5A6",
-]
+IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
+NMF_DIR = f"{BEAST_DIR}/nmf"
+DELTA_CSV = f"{BEAST_DIR}/_delta.csv"
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-def clear_axes(
-    ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True
-):
-    if ax is None:
-        axes = plt.gcf().axes
-    else:
-        axes = [ax]
-    for ax_i in axes:
-        sns.despine(ax=ax_i, top=top, right=right, left=left, bottom=bottom)
-        if minorticks_off:
-            ax_i.minorticks_off()
-        ax_i.tick_params(axis="x", which="both", top=not top)
-        ax_i.tick_params(axis="y", which="both", right=not right)
-        ax_i.tick_params(axis="y", which="both", left=not left)
-        ax_i.tick_params(axis="x", which="both", bottom=not bottom)
-
-
-# ── Data loading ──────────────────────────────────────────────────────────────
 def load_data():
-    # Load NMF for color assignment
-    with h5py.File(NMF_H5_PATH, "r") as f:
-        nmf_labels = [l.decode() for l in f["labels"][()]]
-        W = f["K12"]["W"][()]
+    hits = sorted(glob(f"{NMF_DIR}/Q_K*.csv"))
+    if not hits:
+        raise FileNotFoundError(f"No Q_K*.csv found in {NMF_DIR}/")
+    df_q = pd.read_csv(hits[0])
+    nmf_labels = df_q["language"].values
+    P = df_q.drop(columns=["language"]).values
+    K = P.shape[1]
 
-    K = W.shape[1]
-    P = normalize_rows_to_proportions(W)
-    max_comp_per_lang = np.argmax(P, axis=1)
-    colors = TABLEAU20[:K][::-1]
-    lang_to_color = {
-        lang: colors[max_comp_per_lang[i]] for i, lang in enumerate(nmf_labels)
-    }
+    P = P[:, NMF_COMP_ORDER]
+    lang_to_props = {lang: P[i] for i, lang in enumerate(nmf_labels)}
 
-    # Load delta scores
-    delta_df = pd.read_csv(DELTA_CSV_PATH)
+    delta_df = pd.read_csv(DELTA_CSV)
     delta_df = delta_df.sort_values("delta", ascending=True).reset_index(drop=True)
-    delta_df["color"] = delta_df.language.map(lang_to_color).fillna("grey50")
 
-    return delta_df
+    return delta_df, lang_to_props
 
 
-# ── Plot ──────────────────────────────────────────────────────────────────────
-def plot(delta_df):
+def plot(delta_df, lang_to_props):
     delta_mean = delta_df.delta.mean()
     has_ci = "ci_lo" in delta_df.columns and delta_df.ci_lo.notna().all()
+    K = len(PALETTE)
+    colors = PALETTE[:K]
+    ymin = 0.25
 
-    with plt.style.context(".matplotlib/paper.mplstyle"):
+    with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=(7, 2.5))
         ax.set_axisbelow(True)
 
         x = np.arange(len(delta_df))
-        ax.bar(x, delta_df.delta, color=delta_df.color, edgecolor="none", width=0.7)
+        visible_h = (delta_df.delta.values - ymin).clip(0)
+        bottom = np.full(len(delta_df), ymin)
+        for j in range(K):
+            props = np.array([
+                lang_to_props.get(lang, np.zeros(K))[j]
+                for lang in delta_df.language
+            ])
+            heights = visible_h * props
+            ax.bar(
+                x, heights, bottom=bottom, color=colors[j],
+                edgecolor="none", width=0.7,
+            )
+            bottom += heights
 
         if has_ci:
             ax.errorbar(
@@ -132,18 +97,20 @@ def plot(delta_df):
         for label in ax.get_yticklabels():
             label.set_alpha(0.8)
 
-        clear_axes(ax)
-        plt.savefig(f"{IMG_DIR}/fig1d_delta_speech.pdf", bbox_inches="tight")
+        for spine in ("top", "right"):
+            ax.spines[spine].set_visible(False)
+
+        output_path = f"{IMG_DIR}/fig1d_delta_speech.pdf"
+        fig.savefig(output_path, bbox_inches="tight")
+        print(f"Saved figure to {output_path}")
         plt.show()
 
 
 if __name__ == "__main__":
-    import os
-
     os.makedirs(IMG_DIR, exist_ok=True)
-    delta_df = load_data()
+    delta_df, lang_to_props = load_data()
     has_ci = "ci_lo" in delta_df.columns and delta_df.ci_lo.notna().all()
     print(f"Delta: {len(delta_df)} languages, mean={delta_df.delta.mean():.4f}")
     if has_ci:
         print("Bootstrap CIs loaded (95%)")
-    plot(delta_df)
+    plot(delta_df, lang_to_props)
