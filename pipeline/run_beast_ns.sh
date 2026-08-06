@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <uuid> <size> [seed]
+
+Run all nested sampling (NS) models for a BEAST2 run.
+
+Arguments:
+  uuid    Run UUID under data/trees/beast/ (supports partial matching)
+          e.g., "ba9" matches "ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc"
+  size    Branch support threshold (e.g., 0.05_brsupport_dev_test)
+  seed    Random seed (default: 101)
+
+All input_ns_*.xml files in the ns/ subdirectory are auto-discovered.
+
+Examples:
+  run_beast_ns.sh ba9 0.05_brsupport_dev_test
+  run_beast_ns.sh ba9 0.05_brsupport_dev_test 42
+EOF
+    exit 1
+}
+
+[[ $# -lt 2 || "$1" == "-h" || "$1" == "--help" ]] && usage
+
+UUID_PATTERN=$1
+SIZE=$2
+SEED=${3:-101}
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BEAST_DIR="$(dirname "$SCRIPT_DIR")"
+TREES_DIR="$BEAST_DIR/data/trees/beast"
+
+# Expand partial UUID
+shopt -s nullglob
+MATCHES=("$TREES_DIR"/"$UUID_PATTERN"*)
+shopt -u nullglob
+
+if [[ ${#MATCHES[@]} -eq 0 ]]; then
+    echo "Error: No directory found matching: $TREES_DIR/$UUID_PATTERN*"
+    exit 1
+fi
+if [[ ${#MATCHES[@]} -gt 1 ]]; then
+    echo "Error: Multiple directories match '$UUID_PATTERN':"
+    printf "  %s\n" "${MATCHES[@]}"
+    exit 1
+fi
+
+NS_DIR="${MATCHES[0]}/${SIZE}/ns"
+if [[ ! -d "$NS_DIR" ]]; then
+    echo "Error: NS directory not found: $NS_DIR"
+    exit 1
+fi
+
+# Auto-discover NS XML files
+shopt -s nullglob
+XMLS=("$NS_DIR"/input_ns_*.xml)
+shopt -u nullglob
+
+if [[ ${#XMLS[@]} -eq 0 ]]; then
+    echo "Error: No input_ns_*.xml files found in $NS_DIR"
+    exit 1
+fi
+
+BEAST_FLAGS=(-overwrite -working -beagle_GPU -beagle_order 1 -seed "${SEED}")
+
+echo "=== NS production runs (seed=${SEED}) ==="
+echo "=== Directory: $NS_DIR ==="
+echo "=== ${#XMLS[@]} models ==="
+echo ""
+
+for i in "${!XMLS[@]}"; do
+    xml_path="${XMLS[$i]}"
+    xml="$(basename "$xml_path")"
+    n=$((i + 1))
+    stdout="${NS_DIR}/${xml%.xml}_${SEED}.stdout"
+
+    echo "[${n}/${#XMLS[@]}] ${xml}"
+    pixi run beast2 "${BEAST_FLAGS[@]}" "${xml_path}" 2>&1 | tee "$stdout"
+
+    if grep -q 'RuntimeException\|Fatal Error\|SAXParseException\|Exception in thread' "$stdout"; then
+        echo "FATAL: ${xml} failed. See ${stdout}"
+        exit 1
+    fi
+    if ! grep -q 'Marginal likelihood:' "$stdout"; then
+        echo "FATAL: ${xml} produced no marginal likelihood. See ${stdout}"
+        exit 1
+    fi
+    echo ""
+done
+
+echo "=== All done. Extracting summary ==="
+
+mkdir -p "${NS_DIR}/results"
+printf "Model\tML\tSD\tH\n" > "${NS_DIR}/results/ns_summary.tsv"
+for xml_path in "${XMLS[@]}"; do
+    xml="$(basename "$xml_path")"
+    log="${NS_DIR}/${xml%.xml}_${SEED}.stdout"
+    name="${xml#input_ns_}"
+    name="${name%.xml}"
+    if [[ -f "$log" ]]; then
+        ml=$(grep -oP 'Marginal likelihood: \K[-0-9.]+' "$log" | tail -1)
+        sd=$(grep -oP 'SD=\(\K[0-9.]+' "$log" | tail -1)
+        h=$(grep -oP 'Information: \K[0-9.]+' "$log" | tail -1)
+        printf "%s\t%s\t%s\t%s\n" "$name" "$ml" "$sd" "$h"
+    else
+        printf "%s\t-\t-\t-\n" "$name"
+    fi
+done >> "${NS_DIR}/results/ns_summary.tsv"
+
+echo "Summary written to ${NS_DIR}/results/ns_summary.tsv"

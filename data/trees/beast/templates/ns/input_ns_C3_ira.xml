@@ -1,0 +1,325 @@
+<beast beautistatus="" namespace="beast.pkgmgmt:beast.base.core:beast.base.inference:       beast.base.evolution.alignment:beast.base.evolution.tree.coalescent:       beast.base.util:beast.base.math:       beast.evolution.nuc:       beast.base.evolution.operator:beast.base.inference.operator:       beast.base.evolution.sitemodel:beast.base.evolution.substitutionmodel:       beast.base.evolution.likelihood:       beast.base.evolution.operator.kernel:beast.base.inference.operator.kernel:       beast.gss" required="" version="2.7">
+    <data id="audio" spec="Alignment" dataType="integer">
+    </data>
+    <map name="Uniform">beast.base.inference.distribution.Uniform</map>
+    <map name="Exponential">beast.base.inference.distribution.Exponential</map>
+    <map name="LogNormal">beast.base.inference.distribution.LogNormalDistributionModel</map>
+    <map name="Normal">beast.base.inference.distribution.Normal</map>
+    <map name="Beta">beast.base.inference.distribution.Beta</map>
+    <map name="Gamma">beast.base.inference.distribution.Gamma</map>
+    <map name="LaplaceDistribution">beast.base.inference.distribution.LaplaceDistribution</map>
+    <map name="prior">beast.base.inference.distribution.Prior</map>
+    <map name="InverseGamma">beast.base.inference.distribution.InverseGamma</map>
+    <map name="OneOnX">beast.base.inference.distribution.OneOnX</map>
+    <run id="mcmc" spec="beast.gss.NS" chainLength="50000" particleCount="20" subChainLength="5000">
+        <state id="state" spec="State" storeEvery="10000">
+            <tree id="Tree.t:tree" spec="beast.base.evolution.tree.Tree" name="stateNode">
+                <taxonset id="TaxonSet.five" spec="TaxonSet">
+                    <alignment id="five" spec="FilteredAlignment" filter="-">
+                        <data idref="audio" />
+                    </alignment>
+                </taxonset>
+            </tree>
+            <parameter id="mutationRate.s:five" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
+            <parameter id="ORCsigma.c:clock" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.2</parameter>
+            <parameter id="ORCRates.c:clock" spec="parameter.RealParameter" dimension="70" lower="0.0" name="stateNode">0.5</parameter>
+            <parameter id="bcov_alpha.s:five" spec="parameter.RealParameter" lower="1.0E-2" name="stateNode" upper="1.0">0.5</parameter>
+            <parameter id="bcov_s.s:five" spec="parameter.RealParameter" lower="1.0E-4" name="stateNode" upper="Infinity">0.5</parameter>
+            <parameter id="frequencies.s:five" spec="parameter.RealParameter" dimension="2" lower="0.0" name="stateNode" upper="1.0">0.5 0.5</parameter>
+            <parameter id="origin" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="51.0">51.0</parameter>
+            <parameter id="reproductiveNumber" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="Infinity">1.5</parameter>
+            <parameter id="becomeUninfectiousRate" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="Infinity">2.0</parameter>
+            <parameter id="rho" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="1.0">0.11</parameter>
+        </state>
+        <init id="RandomTree.t:tree" spec="beast.base.evolution.tree.coalescent.RandomTree" estimate="false" initial="@Tree.t:tree" taxa="@five">
+            <populationModel id="ConstantPopulation0.t:tree" spec="ConstantPopulation">
+                <parameter id="randomPopSize.t:tree" spec="parameter.RealParameter" name="popSize">0.01</parameter>
+            </populationModel>
+        </init>
+        <distribution id="posterior" spec="beast.base.inference.CompoundDistribution">
+            <distribution id="prior" spec="beast.base.inference.CompoundDistribution">
+                <distribution id="BDlikelihood" spec="beast.base.inference.CompoundDistribution">
+                    <distribution id="birthDeath" spec="bdsky.evolution.speciation.BirthDeathSkylineModel" contemp="true" becomeUninfectiousRate="@becomeUninfectiousRate" origin="@origin" reproductiveNumber="@reproductiveNumber" rho="@rho" samplingProportion="0.0" tree="@Tree.t:tree" />
+                </distribution>
+                <prior id="bcov_alpha_prior.s:five" name="distribution" x="@bcov_alpha.s:five">
+                    <Uniform name="distr" upper="Infinity" />
+                </prior>
+                <prior id="bcov_s_prior.s:five" name="distribution" x="@bcov_s.s:five">
+                    <Gamma id="Gamma.0" name="distr">
+                        <parameter id="RealParameter.01" spec="parameter.RealParameter" lower="0.0" name="alpha" upper="0.0">0.05</parameter>
+                        <parameter id="RealParameter.11" spec="parameter.RealParameter" lower="0.0" name="beta" upper="0.0">10.0</parameter>
+                    </Gamma>
+                </prior>
+                <prior id="becomeUninfectiousRatePrior" name="distribution" x="@becomeUninfectiousRate">
+                    <Exponential id="Exponential.0" name="distr">
+                        <parameter id="RealParameter.2" spec="parameter.RealParameter" lower="0.0" name="mean" upper="0.0">0.2</parameter>
+                    </Exponential>
+                </prior>
+                <prior id="R0Prior" name="distribution" x="@reproductiveNumber">
+                    <LogNormal id="LogNormalDistributionModel.0" name="distr">
+                        <parameter id="RealParameter.0" spec="parameter.RealParameter" lower="0.0" name="M" upper="0.0">0.0</parameter>
+                        <parameter id="RealParameter.1" spec="parameter.RealParameter" lower="0.0" name="S" upper="0.0">1.0</parameter>
+                    </LogNormal>
+                </prior>
+                <prior id="originPrior" name="distribution" x="@origin">
+                    <Gamma name="distr" alpha="10.0" beta="0.7" />
+                </prior>
+                <prior id="rhoPrior" name="distribution" x="@rho">
+                    <Beta name="distr" alpha="51.0" beta="400.0" />
+                </prior>
+                <prior id="ORCRatePriorDistribution.c:clock" name="distribution" x="@ORCRates.c:clock">
+                    <LogNormal name="distr" M="1.0" S="@ORCsigma.c:clock" meanInRealSpace="true" />
+                </prior>
+                <prior id="ORCsigmaPrior.c:clock" name="distribution" x="@ORCsigma.c:clock">
+                    <Gamma name="distr" alpha="0.5396" beta="0.3819" />
+                </prior>
+                <distribution id="indoiranian.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+                    <taxonset id="indoiranian" spec="TaxonSet">
+                        <taxon id="Assamese" spec="Taxon" />
+                        <taxon id="Bengali" spec="Taxon" />
+                        <taxon id="Gujarati" spec="Taxon" />
+                        <taxon id="Hindi" spec="Taxon" />
+                        <taxon id="Marathi" spec="Taxon" />
+                        <taxon id="Nepali" spec="Taxon" />
+                        <taxon id="Oriya" spec="Taxon" />
+                        <taxon id="Punjabi" spec="Taxon" />
+                        <taxon id="Sindhi" spec="Taxon" />
+                        <taxon id="Urdu" spec="Taxon" />
+                        <taxon id="Sorani-Kurdish" spec="Taxon" />
+                        <taxon id="Pashto" spec="Taxon" />
+                        <taxon id="Tajik" spec="Taxon" />
+                        <taxon id="Persian" spec="Taxon" />
+                    </taxonset>
+                    <Normal name="distr" mean="3.9" sigma="0.25" />
+                </distribution>
+                <distribution id="iranian.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
+                    <taxonset id="iranian" spec="TaxonSet">
+                        <taxon idref="Sorani-Kurdish" />
+                        <taxon idref="Pashto" />
+                        <taxon idref="Tajik" />
+                        <taxon idref="Persian" />
+                    </taxonset>
+                </distribution>
+                <distribution id="indoaryan.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
+                    <taxonset id="indoaryan" spec="TaxonSet">
+                        <taxon idref="Assamese" />
+                        <taxon idref="Bengali" />
+                        <taxon idref="Gujarati" />
+                        <taxon idref="Hindi" />
+                        <taxon idref="Marathi" />
+                        <taxon idref="Nepali" />
+                        <taxon idref="Oriya" />
+                        <taxon idref="Punjabi" />
+                        <taxon idref="Sindhi" />
+                        <taxon idref="Urdu" />
+                    </taxonset>
+                </distribution>
+                <distribution id="celtic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+                    <taxonset id="celtic" spec="TaxonSet">
+                        <taxon id="Welsh" spec="Taxon" />
+                        <taxon id="Irish" spec="Taxon" />
+                    </taxonset>
+                </distribution>
+                <distribution id="germanic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+                    <taxonset id="germanic" spec="TaxonSet">
+                        <taxon id="Danish" spec="Taxon" />
+                        <taxon id="Dutch" spec="Taxon" />
+                        <taxon id="English" spec="Taxon" />
+                        <taxon id="German" spec="Taxon" />
+                        <taxon id="Icelandic" spec="Taxon" />
+                        <taxon id="Luxembourgish" spec="Taxon" />
+                        <taxon id="Norwegian" spec="Taxon" />
+                        <taxon id="Swedish" spec="Taxon" />
+                    </taxonset>
+                    <Normal name="distr" mean="2.0" sigma="0.2" />
+                </distribution>
+                <distribution id="northgermanic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+                    <taxonset id="northgermanic" spec="TaxonSet">
+                        <taxon idref="Danish" />
+                        <taxon idref="Icelandic" />
+                        <taxon idref="Norwegian" />
+                        <taxon idref="Swedish" />
+                    </taxonset>
+                </distribution>
+                <distribution id="westgermanic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+                    <taxonset id="westgermanic" spec="TaxonSet">
+                        <taxon idref="Dutch" />
+                        <taxon idref="English" />
+                        <taxon idref="German" />
+                        <taxon idref="Luxembourgish" />
+                    </taxonset>
+                </distribution>
+                <distribution id="romance.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
+                    <taxonset id="romance" spec="TaxonSet">
+                        <taxon id="Asturian" spec="Taxon" />
+                        <taxon id="Catalan" spec="Taxon" />
+                        <taxon id="Spanish" spec="Taxon" />
+                        <taxon id="French" spec="Taxon" />
+                        <taxon id="Galician" spec="Taxon" />
+                        <taxon id="Italian" spec="Taxon" />
+                        <taxon id="Kabuverdianu" spec="Taxon" />
+                        <taxon id="Occitan" spec="Taxon" />
+                        <taxon id="Portuguese" spec="Taxon" />
+                        <taxon id="Romanian" spec="Taxon" />
+                    </taxonset>
+                    <Normal name="distr" mean="1.4" sigma="0.1" />
+                </distribution>
+                <distribution id="baltoslavic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" useOriginate="true" tree="@Tree.t:tree">
+                    <taxonset id="baltoslavic" spec="TaxonSet">
+                        <taxon id="Lithuanian" spec="Taxon" />
+                        <taxon id="Latvian" spec="Taxon" />
+                        <taxon id="Belarusian" spec="Taxon" />
+                        <taxon id="Bulgarian" spec="Taxon" />
+                        <taxon id="Bosnian" spec="Taxon" />
+                        <taxon id="Croatian" spec="Taxon" />
+                        <taxon id="Czech" spec="Taxon" />
+                        <taxon id="Macedonian" spec="Taxon" />
+                        <taxon id="Polish" spec="Taxon" />
+                        <taxon id="Russian" spec="Taxon" />
+                        <taxon id="Serbian" spec="Taxon" />
+                        <taxon id="Slovak" spec="Taxon" />
+                        <taxon id="Slovenian" spec="Taxon" />
+                        <taxon id="Ukrainian" spec="Taxon" />
+                    </taxonset>
+                    <Normal name="distr" mean="4.0" sigma="0.15" />
+                </distribution>
+                <distribution id="baltic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
+                    <taxonset id="baltic" spec="TaxonSet">
+                        <taxon idref="Latvian" />
+                        <taxon idref="Lithuanian" />
+                    </taxonset>
+                </distribution>
+                <distribution id="slavic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
+                    <taxonset id="slavic" spec="TaxonSet">
+                        <taxon idref="Belarusian" />
+                        <taxon idref="Bulgarian" />
+                        <taxon idref="Bosnian" />
+                        <taxon idref="Croatian" />
+                        <taxon idref="Czech" />
+                        <taxon idref="Macedonian" />
+                        <taxon idref="Polish" />
+                        <taxon idref="Russian" />
+                        <taxon idref="Serbian" />
+                        <taxon idref="Slovak" />
+                        <taxon idref="Slovenian" />
+                        <taxon idref="Ukrainian" />
+                    </taxonset>
+                </distribution>
+            </distribution>
+            <distribution id="likelihood" spec="beast.base.inference.CompoundDistribution" useThreads="true">
+                <distribution id="treeLikelihood.five" spec="TreeLikelihood" tree="@Tree.t:tree" useAmbiguities="true">
+                    <data id="orgdata.five" spec="FilteredAlignment" ascertained="true" data="@five" excludeto="1" filter="-">
+                        <userDataType id="TwoStateCovarion.0" spec="beast.base.evolution.datatype.TwoStateCovarion" />
+                    </data>
+                    <siteModel id="SiteModel.s:five" spec="SiteModel" gammaCategoryCount="1" mutationRate="@mutationRate.s:five">
+                        <parameter id="gammaShape.s:five" spec="parameter.RealParameter" estimate="false" name="shape">1.0</parameter>
+                        <parameter id="proportionInvariant.s:five" spec="parameter.RealParameter" estimate="false" lower="0.0" name="proportionInvariant" upper="1.0">0.0</parameter>
+                        <substModel id="covarion" spec="BinaryCovarion" alpha="@bcov_alpha.s:five" switchRate="@bcov_s.s:five" vfrequencies="@frequencies.s:five">
+                            <parameter id="hiddenfrequencies.s:five" spec="parameter.RealParameter" dimension="2" estimate="false" lower="0.0" name="hfrequencies" upper="1.0">0.5 0.5</parameter>
+                            <frequencies id="dummyfrequencies.s:five" spec="Frequencies" data="@five" estimate="false" />
+                        </substModel>
+                    </siteModel>
+                    <branchRateModel id="RelaxedClock.c:clock" spec="beast.base.evolution.branchratemodel.UCRelaxedClockModel" rates="@ORCRates.c:clock" tree="@Tree.t:tree">
+                        <LogNormal id="LogNormalDistributionModel.c:clock" S="@ORCsigma.c:clock" meanInRealSpace="true" name="distr">
+                            <parameter estimate="false" name="M">1.0</parameter>
+                        </LogNormal>
+                    </branchRateModel>
+                </distribution>
+            </distribution>
+        </distribution>
+        <operator id="originOperator" spec="BactrianScaleOperator" parameter="@origin" weight="1.0" scaleFactor="0.75" />
+        <operator id="reproductiveNumberOperator" spec="BactrianScaleOperator" parameter="@reproductiveNumber" weight="3.0" scaleFactor="0.9" />
+        <operator id="becomeUninfectiousRateOperator" spec="BactrianScaleOperator" parameter="@becomeUninfectiousRate" weight="3.0" scaleFactor="0.9" />
+        <operator id="rhoOperator" spec="BactrianScaleOperator" parameter="@rho" weight="3.0" scaleFactor="0.9" />
+        <operator id="BDUpDownOperator" spec="BactrianUpDownOperator" scaleFactor="0.95" weight="3.0">
+            <up idref="reproductiveNumber" />
+            <down idref="becomeUninfectiousRate" />
+        </operator>
+        <operator id="TreeScaler.t:tree" spec="BactrianScaleOperator" scaleFactor="0.95" tree="@Tree.t:tree" weight="3.0" />
+        <operator id="TreeRootScaler.t:tree" spec="BactrianScaleOperator" rootOnly="true" scaleFactor="0.95" tree="@Tree.t:tree" weight="3.0" />
+        <operator id="UniformOperator.t:tree" spec="BactrianNodeOperator" tree="@Tree.t:tree" weight="30.0" />
+        <operator id="SubtreeSlide.t:tree" spec="BactrianSubtreeSlide" tree="@Tree.t:tree" weight="15.0" />
+        <operator id="Narrow.t:tree" spec="Exchange" tree="@Tree.t:tree" weight="0.0" />
+        <operator id="Wide.t:tree" spec="Exchange" isNarrow="false" tree="@Tree.t:tree" weight="3.0" />
+        <operator id="WilsonBalding.t:tree" spec="WilsonBalding" tree="@Tree.t:tree" weight="3.0" />
+        <operator id="ORCAdaptableOperatorSampler_NER.t:tree" spec="AdaptableOperatorSampler" weight="15.0">
+            <tree idref="Tree.t:tree" />
+            <operator id="ORCNER_null.t:tree" spec="Exchange" tree="@Tree.t:tree" weight="0.0" />
+            <operator id="ORCNER_dAE_dBE_dCE.t:tree" spec="orc.ner.NEROperator_dAE_dBE_dCE" rates="@ORCRates.c:clock" tree="@Tree.t:tree" weight="1.0" />
+        </operator>
+        <operator id="bcovAlphaScaler.s:five" spec="BactrianScaleOperator" parameter="@bcov_alpha.s:five" weight="1.0" />
+        <operator id="bcovSwitchParamScaler.s:five" spec="BactrianScaleOperator" parameter="@bcov_s.s:five" weight="1.0" />
+        <operator id="frequenciesDelta.s:five" spec="BactrianDeltaExchangeOperator" delta="0.01" weight="1.0">
+            <parameter idref="frequencies.s:five" />
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_sigma.c:clock" spec="AdaptableOperatorSampler" weight="3.0">
+            <parameter idref="ORCsigma.c:clock" />
+            <operator id="ORCucldStdevScaler.c:clock" spec="orc.consoperators.UcldScalerOperator" distr="@LogNormalDistributionModel.c:clock" rates="@ORCRates.c:clock" scaleFactor="0.5" stdev="@ORCsigma.c:clock" weight="1.0" />
+            <operator id="ORCUcldStdevRandomWalk.c:clock" spec="BactrianRandomWalkOperator" parameter="@ORCsigma.c:clock" scaleFactor="0.1" weight="1.0" />
+            <operator id="ORCUcldStdevScale.c:clock" spec="kernel.BactrianScaleOperator" parameter="@ORCsigma.c:clock" scaleFactor="0.5" upper="10.0" weight="1.0" />
+            <operator id="ORCSampleFromPriorOperator_sigma.c:clock" spec="orc.operators.SampleFromPriorOperator" parameter="@ORCsigma.c:clock" prior2="@ORCsigmaPrior.c:clock" weight="1.0" />
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_rates_root.c:clock" spec="AdaptableOperatorSampler" weight="1.0">
+            <parameter idref="ORCRates.c:clock" />
+            <tree idref="Tree.t:tree" />
+            <operator id="ORCRootOperator1.c:clock" spec="orc.consoperators.SimpleDistance" clockModel="@RelaxedClock.c:clock" rates="@ORCRates.c:clock" tree="@Tree.t:tree" twindowSize="0.005" weight="1.0" />
+            <operator id="ORCRootOperator2.c:clock" spec="orc.consoperators.SmallPulley" clockModel="@RelaxedClock.c:clock" rates="@ORCRates.c:clock" tree="@Tree.t:tree" dwindowSize="0.005" weight="1.0" />
+        </operator>
+        <operator id="ORCAdaptableOperatorSampler_rates_internal.c:clock" spec="AdaptableOperatorSampler" weight="20.0">
+            <parameter idref="ORCRates.c:clock" />
+            <tree idref="Tree.t:tree" />
+            <operator id="ORCInternalnodesOperator.c:clock" spec="orc.consoperators.InConstantDistanceOperator" clockModel="@RelaxedClock.c:clock" rates="@ORCRates.c:clock" tree="@Tree.t:tree" twindowSize="0.005" weight="1.0" />
+            <operator id="ORCRatesRandomWalk.c:clock" spec="operator.kernel.BactrianRandomWalkOperator" parameter="@ORCRates.c:clock" scaleFactor="0.1" weight="1.0" />
+            <operator id="ORCRatesScale.c:clock" spec="kernel.BactrianScaleOperator" parameter="@ORCRates.c:clock" scaleFactor="0.5" upper="10.0" weight="1.0" />
+            <operator id="ORCSampleFromPriorOperator.rates.c:clock" spec="orc.operators.SampleFromPriorOperator" parameter="@ORCRates.c:clock" prior2="@ORCRatePriorDistribution.c:clock" weight="1.0" />
+        </operator>
+        <logger id="tracelog" spec="Logger" fileName="$(filebase)_$(seed).log" logEvery="10000" model="@posterior" sort="smart">
+            <log idref="posterior" />
+            <log idref="likelihood" />
+            <log idref="prior" />
+            <log idref="birthDeath" />
+            <log id="TreeHeight.t:tree" spec="beast.base.evolution.tree.TreeHeightLogger" tree="@Tree.t:tree" />
+            <log idref="reproductiveNumber" />
+            <log idref="becomeUninfectiousRate" />
+            <log idref="rho" />
+            <log id="birth" spec="beast.base.inference.util.RPNcalculator" expression="reproductiveNumber becomeUninfectiousRate *">
+                <parameter idref="becomeUninfectiousRate" />
+                <parameter idref="reproductiveNumber" />
+            </log>
+            <log idref="bcov_alpha.s:five" />
+            <log idref="bcov_s.s:five" />
+            <log idref="ORCsigma.c:clock" />
+            <log idref="frequencies.s:five" />
+            <log idref="mutationRate.s:five" />
+            <log id="rate.c:clock" spec="beast.base.evolution.RateStatistic" branchratemodel="@RelaxedClock.c:clock" tree="@Tree.t:tree" />
+            <log idref="indoiranian.prior" />
+            <log idref="indoaryan.prior" />
+            <log idref="iranian.prior" />
+            <log idref="romance.prior" />
+            <log idref="celtic.prior" />
+            <log idref="germanic.prior" />
+            <log idref="westgermanic.prior" />
+            <log idref="northgermanic.prior" />
+            <log idref="baltoslavic.prior" />
+            <log idref="baltic.prior" />
+            <log idref="slavic.prior" />
+        </logger>
+        <logger id="tracelogpermeaning" spec="Logger" fileName="$(filebase)_$(seed).log.permeaning" logEvery="10000" model="@posterior" sort="smart">
+            <log idref="posterior" />
+            <log idref="likelihood" />
+            <log idref="prior" />
+            <log idref="bcov_alpha.s:five" />
+            <log idref="bcov_s.s:five" />
+            <log idref="frequencies.s:five" />
+        </logger>
+        <logger id="screenlog" spec="Logger" logEvery="10000">
+            <log idref="posterior" />
+            <log id="ESS.0" spec="util.ESS" arg="@posterior" />
+            <log idref="likelihood" />
+            <log idref="prior" />
+        </logger>
+        <logger id="treelog.t:tree" spec="Logger" fileName="$(filebase)_$(seed).trees" logEvery="10000" mode="tree">
+            <log id="TreeWithMetaDataLogger.t:tree" spec="beast.base.evolution.TreeWithMetaDataLogger" branchratemodel="@RelaxedClock.c:clock" tree="@Tree.t:tree" />
+        </logger>
+    </run>
+</beast>

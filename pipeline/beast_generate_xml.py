@@ -15,6 +15,7 @@ from Bio import SeqIO
 from src._config import (
     _FLEURS_TO_INDO1319_FAMILIES,
     DEFAULT_BEAST_DIR,
+    DEFAULT_BEAST_TEMPLATE_DIR,
     DEFAULT_MAPPED_FASTA_FILE,
     DEFAULT_MERGED_FASTA_FILE,
     DEFAULT_METADATA_DIR,
@@ -23,7 +24,8 @@ from src._config import (
 )
 from src.tasks.phylo.fasta import merge_fastas, to_beast
 
-XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_DIR}/template.xml"
+XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/input_v1.xml"
+NS_TEMPLATE_DIR = f"{DEFAULT_BEAST_TEMPLATE_DIR}/ns"
 
 
 class MixedFormatter(ArgumentDefaultsHelpFormatter, MetavarTypeHelpFormatter):
@@ -60,7 +62,39 @@ def parse_args():
         default=DEFAULT_METADATA_KEY,
         help="Reference field in language metadata to use for taxon names",
     )
+    parser.add_argument(
+        "--include",
+        type=str,
+        default=None,
+        help="Comma-separated splits to include (e.g. dev,test)",
+    )
+    parser.add_argument(
+        "--exclude",
+        type=str,
+        default=None,
+        help="Comma-separated splits to exclude (e.g. train)",
+    )
     return parser.parse_args()
+
+
+VALID_SPLITS = ("train", "dev", "test")
+
+
+def resolve_splits(include, exclude):
+    """Resolve --include/--exclude to a sorted splits label (or None for all)."""
+    if include and exclude:
+        raise ValueError("--include and --exclude are mutually exclusive")
+    if include:
+        splits = sorted(include.split(","))
+    elif exclude:
+        excluded = set(exclude.split(","))
+        splits = sorted(s for s in VALID_SPLITS if s not in excluded)
+    else:
+        return None
+    for s in splits:
+        if s not in VALID_SPLITS:
+            raise ValueError(f"Invalid split '{s}' (must be one of {VALID_SPLITS})")
+    return "_".join(splits)
 
 
 def main():
@@ -75,6 +109,8 @@ def main():
             f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
         )
     ascending = ascending_by[args.by]
+
+    splits_label = resolve_splits(args.include, args.exclude)
 
     if not os.path.isdir(args.run_id):
         potential_run_dirs = glob(f"{DEFAULT_PER_SENTENCE_DIR}/*/{args.run_id}")
@@ -96,7 +132,8 @@ def main():
         run_dir = args.run_id
 
     print(f"Using run directory: {run_dir}")
-    df = pd.read_csv(f"{run_dir}/_stats.csv", index_col=0)
+    stats_file = f"{run_dir}/_stats_{splits_label}.csv" if splits_label else f"{run_dir}/_stats.csv"
+    df = pd.read_csv(stats_file, index_col=0)
     sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
         : int(args.p * df.shape[0])
     ]
@@ -114,6 +151,8 @@ def main():
 
     beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
     beast_p_dir += f"_{args.by}"
+    if splits_label:
+        beast_p_dir += f"_{splits_label}"
     os.makedirs(beast_p_dir, exist_ok=True)
 
     # Merge FASTA files
@@ -150,6 +189,20 @@ def main():
         template_beast_file=XML_TEMPLATE_FILE,
         taxonsets=taxonsets,
     )
+
+    ns_templates = sorted(glob(f"{NS_TEMPLATE_DIR}/input_ns_*.xml"))
+    if ns_templates:
+        ns_dir = f"{beast_p_dir}/ns"
+        os.makedirs(ns_dir, exist_ok=True)
+        print(f"Generating {len(ns_templates)} NS XML files in {ns_dir}...")
+        for template in ns_templates:
+            ns_output = f"{ns_dir}/{Path(template).name}"
+            to_beast(
+                input_file=mapped_file,
+                output_file=ns_output,
+                template_beast_file=template,
+                taxonsets=taxonsets,
+            )
 
     print("Done")
 
