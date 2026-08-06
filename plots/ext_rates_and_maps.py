@@ -16,38 +16,30 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from src.tasks.phylo.constants import (
-    COGNATE_TO_SPEECH,
+from src._config import (
+    COGNATE_BEAST_DIR,
     EXCLUDE_LANGUAGES,
     GEOJSON_EXPANSION,
+    GEOJSON_PATH,
+    NE_COUNTRIES_PATH,
+    NE_LAND_PATH,
+    SPEECH_BEAST_DIR,
 )
 
 # only need CPU
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-# ─── Configuration ───────────────────────────────────────────────────────────
-
-RESULTS_DIR = "data/phyloregression"
-OUTPUT_DIR = "data/phyloregression/figures"
+OUTPUT_DIR = "img_v2/ext"
 DATA_DIR = "data"
-REGRESSION_DIR = "data/phyloregression"
 
-# Metadata CSV paths keyed by variant then tree name
-TREE_META_PATHS = {
-    "with_inventory": {
-        "input_v12_combined_resampled": f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv",
-        "heggarty2024_raw": f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv",
-    },
-    "no_inventory": {
-        "input_v12_combined_resampled": f"{REGRESSION_DIR}/speech_metadata.csv",
-        "heggarty2024_raw": f"{REGRESSION_DIR}/cognate_metadata.csv",
-    },
+BEAST_DIRS = {
+    "speech": SPEECH_BEAST_DIR,
+    "cognate": COGNATE_BEAST_DIR,
 }
 
-# Mapping from tree identifiers in CSVs to display names
-TREE_DISPLAY = {
-    "heggarty2024_raw": "Cognates",
-    "input_v12_combined_resampled": "Speech",
+DISPLAY_LABELS = {
+    "speech": "Speech",
+    "cognate": "Cognates",
 }
 
 # Canonical family lookup (used by delta and continuous-map plots)
@@ -260,13 +252,11 @@ def _get_land_gdf():
 # ═════════════════════════════════════════════════════════════════════════════
 
 
-def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
-    if meta_paths is None:
-        meta_paths = TREE_META_PATHS["with_inventory"]
-    for tree_name in ["heggarty2024_raw", "input_v12_combined_resampled"]:
-        meta_path = meta_paths.get(tree_name)
-        if meta_path is None or not os.path.exists(meta_path):
-            print(f"  Skipping {tree_name}: metadata not found")
+def plot_rate_vs_longitude(output_dir=OUTPUT_DIR):
+    for label, beast_dir in BEAST_DIRS.items():
+        meta_path = f"{beast_dir}/metadata_with_inventory.csv"
+        if not os.path.exists(meta_path):
+            print(f"  Skipping {label}: metadata not found")
             continue
 
         meta = pd.read_csv(meta_path).set_index("language")
@@ -298,7 +288,7 @@ def plot_rate_vs_longitude(output_dir=OUTPUT_DIR, meta_paths=None):
         plt.grid(True)
 
         os.makedirs(output_dir, exist_ok=True)
-        out_path = f"{output_dir}/rate_vs_longitude_{tree_name}.pdf"
+        out_path = f"{output_dir}/rate_vs_longitude_{label}.pdf"
         plt.savefig(out_path, dpi=300)
         plt.close()
         print(f"  Saved: {out_path}")
@@ -691,12 +681,8 @@ def plot_pct_change_over_time(
 # ═════════════════════════════════════════════════════════════════════════════
 
 
-def plot_continuous_map_grid(
-    results_dir=RESULTS_DIR, output_dir=OUTPUT_DIR, geojson_path=None, meta_paths=None
-):
+def plot_continuous_map_grid(output_dir=OUTPUT_DIR):
     """GP-interpolated rate map trained on polygon-interior grid points."""
-    if meta_paths is None:
-        meta_paths = TREE_META_PATHS["with_inventory"]
     import geopandas as gpd
     import gpflow
     from shapely.geometry import Point, box
@@ -704,16 +690,11 @@ def plot_continuous_map_grid(
     from shapely.strtree import STRtree
     from sklearn.preprocessing import StandardScaler
 
-    if geojson_path is None:
-        geojson_path = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
-
     CMAP = "magma"
     GRID_N_LON_TRAIN, GRID_N_LAT_TRAIN = 150, 100
     GRID_N_LON_PRED, GRID_N_LAT_PRED = 600, 400
     FIXED_NOISE = 1e-2
     PAD_DEG = 15
-
-    tree_names = ["heggarty2024_raw", "input_v12_combined_resampled"]
 
     world = _get_world_gdf()
     ire = world.loc[world["name"] == "Ireland"].total_bounds
@@ -724,7 +705,7 @@ def plot_continuous_map_grid(
     ROI_MAXY = max(ire[3], bgd[3]) + PAD_DEG
     ROI_BOX = box(ROI_MINX, ROI_MINY, ROI_MAXX, ROI_MAXY)
 
-    gdf_language = load_language_polygons(geojson_path)
+    gdf_language = load_language_polygons(GEOJSON_PATH)
 
     def create_polygon_grid_training_data(
         gdf_lang, meta, roi_box, n_lon, n_lat, n_min_per_lang=20
@@ -806,10 +787,10 @@ def plot_continuous_map_grid(
             var_all.append(v.numpy().ravel())
         return np.concatenate(mean_all), np.concatenate(var_all)
 
-    for tree_name in tree_names:
-        print(f"  [{tree_name}] Processing...")
-        meta_path = meta_paths.get(tree_name)
-        if meta_path is None or not os.path.exists(meta_path):
+    for label, beast_dir in BEAST_DIRS.items():
+        print(f"  [{label}] Processing...")
+        meta_path = f"{beast_dir}/metadata_with_inventory.csv"
+        if not os.path.exists(meta_path):
             print(f"    metadata not found; skipping.")
             continue
 
@@ -967,7 +948,7 @@ def plot_continuous_map_grid(
         plt.tight_layout()
         os.makedirs(output_dir, exist_ok=True)
         fig_path = os.path.join(
-            output_dir, f"language_polygons_gridtrain_{tree_name}.pdf"
+            output_dir, f"language_polygons_gridtrain_{label}.pdf"
         )
         fig.savefig(fig_path, dpi=300)
         plt.close()
@@ -1011,10 +992,21 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
         }
     )
 
-    speech = pd.read_csv(f"{REGRESSION_DIR}/speech_metadata_with_inventory.csv")
-    cognate = pd.read_csv(f"{REGRESSION_DIR}/cognate_metadata_with_inventory.csv")
+    import json
 
-    cognate["language"] = cognate["language"].map(lambda x: COGNATE_TO_SPEECH.get(x, x))
+    from src._config import DEFAULT_METADATA_DIR
+
+    speech = pd.read_csv(f"{SPEECH_BEAST_DIR}/metadata_with_inventory.csv")
+    cognate = pd.read_csv(f"{COGNATE_BEAST_DIR}/metadata_with_inventory.csv")
+
+    with open(f"{DEFAULT_METADATA_DIR}/fleurs-r/languages.json") as f:
+        langs = json.load(f)
+    iecor_to_fleurs = {
+        v["iecor"]: v["fleurs"]
+        for v in langs.values()
+        if "iecor" in v and v["iecor"] != v["fleurs"]
+    }
+    cognate["language"] = cognate["language"].map(lambda x: iecor_to_fleurs.get(x, x))
 
     s = speech[["language", "rate_median"]].rename(
         columns={"rate_median": "speech_rate"}
@@ -1095,13 +1087,6 @@ def plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR):
 if __name__ == "__main__":
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    tree_order = ["input_v12_combined_resampled", "heggarty2024_raw"]
-    tree_labels = {
-        "input_v12_combined_resampled": "Speech",
-        "heggarty2024_raw": "Cognates",
-    }
-
-    # ── Pre-load GP libraries once (used in loop below) ──────────────────────
     _gpflow_ok = False
     try:
         import gpflow  # noqa: F811
@@ -1111,52 +1096,23 @@ if __name__ == "__main__":
     except ImportError as e:
         print(f"  gpflow/tensorflow not available — GP maps will be skipped: {e}")
 
-    geojson = f"{DATA_DIR}/metadata/fleurs-r/language_polygons.geojson"
+    print("Rate vs longitude scatter")
+    plot_rate_vs_longitude()
 
-    for variant, mpaths in TREE_META_PATHS.items():
-        out_dir = os.path.join(OUTPUT_DIR, variant)
-        os.makedirs(out_dir, exist_ok=True)
-        # Regression CSVs live in a variant-specific subdir of RESULTS_DIR
-        results_dir_v = os.path.join(RESULTS_DIR, variant)
-        if not os.path.isdir(results_dir_v):
-            results_dir_v = RESULTS_DIR
+    if _gpflow_ok and os.path.exists(GEOJSON_PATH):
+        print("Continuous GP maps...")
+        plot_continuous_map_grid()
+    elif not _gpflow_ok:
+        print("Skipping GP maps (gpflow unavailable).")
 
-        print("=" * 60)
-        print(f"Rate vs longitude scatter  [{variant}]")
-        print("=" * 60)
-        plot_rate_vs_longitude(output_dir=out_dir, meta_paths=mpaths)
-
-        print()
-        print("=" * 60)
-        print(f"Continuous GP maps  [{variant}]")
-        print("=" * 60)
-        if _gpflow_ok and os.path.exists(geojson):
-            print("  Grid-trained GP maps...")
-            plot_continuous_map_grid(
-                output_dir=out_dir, geojson_path=geojson, meta_paths=mpaths
-            )
-        elif not _gpflow_ok:
-            print("  Skipping (gpflow unavailable).")
-        else:
-            print(f"  GeoJSON not found: {geojson}")
-
-        print()
-
-    # ── Speech vs Cognate rate scatter ──────────────────────────────────────
-    print("=" * 60)
     print("Speech vs Cognate rate scatter")
-    print("=" * 60)
-    plot_speech_vs_cognate_rates(output_dir=OUTPUT_DIR)
+    plot_speech_vs_cognate_rates()
 
-    # ── Root age comparison — same for both variants ───────────────────────
-    print("=" * 60)
     print("Root age comparison")
-    print("=" * 60)
     plot_root_age_comparison(output_dir=OUTPUT_DIR)
 
-    # ── Rate-over-time — same for both variants ────────────────────────────
-    speech_trees_path = f"{DATA_DIR}/trees/beast/speech/0.01_brsupport/input_combined_resampled.trees"
-    cognate_trees_path = f"{DATA_DIR}/trees/beast/iecor/prunedtomodern.trees"
+    speech_trees_path = f"{SPEECH_BEAST_DIR}/input_v1_101.trees"
+    cognate_trees_path = f"{COGNATE_BEAST_DIR}/prunedtomodern.trees"
     if os.path.exists(speech_trees_path) and os.path.exists(cognate_trees_path):
         try:
             import dendropy
@@ -1182,5 +1138,4 @@ if __name__ == "__main__":
         except ImportError:
             print("  dendropy not installed; skipping.")
 
-    print()
     print("Done.")

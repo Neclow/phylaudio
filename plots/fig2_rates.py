@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 
-from ._config import BEAST_DIR, BURNIN_FRAC, DEFAULT_IMG_DIR, DEFAULT_STYLE
+from ._config import BURNIN_FRAC, COGNATE_BEAST_DIR, DEFAULT_IMG_DIR, DEFAULT_STYLE, SPEECH_BEAST_DIR
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
-SPEECH_TREES_FILE = f"{BEAST_DIR}/input_v1_101.trees"
-COGNATE_TREES_FILE = "data/trees/beast/iecor/prunedtomodern.trees"
+SPEECH_TREES_FILE = f"{SPEECH_BEAST_DIR}/input_v1_101.trees"
+COGNATE_TREES_FILE = f"{COGNATE_BEAST_DIR}/prunedtomodern.trees"
 NTIMES = 200
 MAX_TREES = 2500
 

@@ -10,7 +10,10 @@ import plotly.graph_objects as go
 import torch
 
 from plots.fig1_pca import EMB_DIR, TAXONSET_DISPLAY, TAXONSET_ORDER, load_data
-from src._config import DEFAULT_EMBEDDING_DIR, DEFAULT_ROOT_DIR, SAMPLE_RATE
+from src._config import (
+    RANDOM_STATE,
+    SAMPLE_RATE,
+)
 from src.models.audio import AudioProcessor
 from src.tasks.feature_extraction.base import prepare_dataset
 
@@ -56,7 +59,7 @@ def load_sentences():
 
 
 def plot_plotly(X_pca, y_emb, var_exp, labels_pca, mapping, color_map, sentences=None):
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(RANDOM_STATE)
     idxs = rng.choice(X_pca.shape[0], size=min(15000, X_pca.shape[0]), replace=False)
 
     traces = []

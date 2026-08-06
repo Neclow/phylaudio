@@ -11,11 +11,15 @@ import seaborn as sns
 import torch
 from matplotlib.lines import Line2D
 
+from src._config import DEFAULT_EMBEDDING_DIR, DEFAULT_METADATA_DIR
 from src.tasks.feature_extraction._decomposition import decompose, fit_decomposer
 
+from ._config import DEFAULT_IMG_DIR
+
 # ── Configuration ─────────────────────────────────────────────────────────────
-IMG_DIR = "img/fig1"
-EMB_DIR = "data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m"
+DATASET = "fleurs-r"
+IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
+EMB_DIR = f"{DEFAULT_EMBEDDING_DIR}/{DATASET}/67c9af47-6177-4d06-bcc5-7c64b43e4b06"
 
 PALETTE_MAP = {
     "germanic": "Reds_r",
@@ -30,19 +34,34 @@ PALETTE_MAP = {
 }
 
 TAXONSET_ORDER = [
-    "germanic", "celtic", "slavic", "romance",
-    "indoaryan", "iranian", "baltic", "greek", "armenian",
+    "germanic",
+    "celtic",
+    "slavic",
+    "romance",
+    "indoaryan",
+    "iranian",
+    "baltic",
+    "greek",
+    "armenian",
 ]
 
 TAXONSET_DISPLAY = {
-    "germanic": "Germanic", "celtic": "Celtic", "slavic": "Slavic",
-    "romance": "Romance", "indoaryan": "Indo-Aryan", "iranian": "Iranian",
-    "baltic": "Baltic", "greek": "Greek", "armenian": "Armenian",
+    "germanic": "Germanic",
+    "celtic": "Celtic",
+    "slavic": "Slavic",
+    "romance": "Romance",
+    "indoaryan": "Indo-Aryan",
+    "iranian": "Iranian",
+    "baltic": "Baltic",
+    "greek": "Greek",
+    "armenian": "Armenian",
 }
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
-def clear_axes(ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True):
+def clear_axes(
+    ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True
+):
     if ax is None:
         axes = plt.gcf().axes
     else:
@@ -64,16 +83,24 @@ def load_data():
     X_emb = torch.load(f"{EMB_DIR}/embeddings.pt", map_location=device)
     y_emb = torch.load(f"{EMB_DIR}/labels.pt", map_location=device)
 
-    with open("data/metadata/fleurs-r/labels.txt") as f:
+    with open(
+        f"{DEFAULT_METADATA_DIR}/{DATASET}/labels.txt", "r", encoding="utf-8"
+    ) as f:
         all_labels = [l.strip().split(" => ")[0].strip("'") for l in f.readlines()]
 
-    with open("data/metadata/fleurs-r/languages.json") as f:
+    with open(
+        f"{DEFAULT_METADATA_DIR}/{DATASET}/languages.json", "r", encoding="utf-8"
+    ) as f:
         mapping = json.load(f)
 
-    labels_pca = {i: code for i, code in enumerate(all_labels) if i in y_emb.unique().tolist()}
+    labels_pca = {
+        i: code for i, code in enumerate(all_labels) if i in y_emb.unique().tolist()
+    }
 
     # Fit PCA
-    decomposer = fit_decomposer(X_emb, method="pca", n_components=0.99, standardize=True, device=device, seed=42)
+    decomposer = fit_decomposer(
+        X_emb, method="pca", n_components=0.99, standardize=True, device=device, seed=42
+    )
     X_pca = decompose(decomposer, X_emb)
     var_exp = decomposer.explained_variance_ratio_
 
@@ -106,7 +133,9 @@ def plot(X_pca, y_emb, var_exp, labels_pca, mapping, color_map, hex_map):
         fig, ax = plt.subplots(figsize=(6, 6))
 
         rng = np.random.default_rng(42)
-        idxs = rng.choice(X_pca.shape[0], size=min(15000, X_pca.shape[0]), replace=False)
+        idxs = rng.choice(
+            X_pca.shape[0], size=min(15000, X_pca.shape[0]), replace=False
+        )
 
         for taxonset in TAXONSET_ORDER:
             for class_id in y_emb.cpu().unique().tolist():
@@ -122,7 +151,9 @@ def plot(X_pca, y_emb, var_exp, labels_pca, mapping, color_map, hex_map):
                 ax.scatter(
                     X_pca[class_idxs, 0].cpu().numpy(),
                     X_pca[class_idxs, 1].cpu().numpy(),
-                    s=3, alpha=0.15, color=color_map[class_id],
+                    s=3,
+                    alpha=0.15,
+                    color=color_map[class_id],
                     rasterized=True,
                 )
 
@@ -134,20 +165,36 @@ def plot(X_pca, y_emb, var_exp, labels_pca, mapping, color_map, hex_map):
             lang_name = mapping[lang_code]["fleurs"].split(" ")[0]
 
             ax.scatter(
-                centroid[0], centroid[1], s=40,
+                centroid[0],
+                centroid[1],
+                s=40,
                 color=color_map[class_id],
-                edgecolor="k", linewidth=0.5, zorder=5,
+                edgecolor="k",
+                linewidth=0.5,
+                zorder=5,
             )
             ax.annotate(
-                lang_name, (centroid[0], centroid[1]),
-                fontsize=5, ha="center", va="bottom",
-                xytext=(0, 4), textcoords="offset points",
+                lang_name,
+                (centroid[0], centroid[1]),
+                fontsize=5,
+                ha="center",
+                va="bottom",
+                xytext=(0, 4),
+                textcoords="offset points",
             )
 
         legend_handles = [
-            Line2D([], [], marker="o", color=hex_map[ts][0], linestyle="",
-                   markersize=5, label=TAXONSET_DISPLAY[ts])
-            for ts in TAXONSET_ORDER if ts in hex_map
+            Line2D(
+                [],
+                [],
+                marker="o",
+                color=hex_map[ts][0],
+                linestyle="",
+                markersize=5,
+                label=TAXONSET_DISPLAY[ts],
+            )
+            for ts in TAXONSET_ORDER
+            if ts in hex_map
         ]
         ax.legend(handles=legend_handles, loc="lower left", fontsize=7)
 

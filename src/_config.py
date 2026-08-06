@@ -28,10 +28,6 @@ DEFAULT_METADATA_DIR: Final = f"{DEFAULT_DATA_DIR}/metadata"
 DEFAULT_TREE_DIR: Final = f"{DEFAULT_DATA_DIR}/trees"
 DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
 DEFAULT_BEAST_TEMPLATE_DIR: Final = f"{DEFAULT_BEAST_DIR}/templates"
-SPEECH_BEAST_DIR: Final = (
-    f"{DEFAULT_BEAST_DIR}/ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc/0.05_brsupport_dev_test"
-)
-COGNATE_BEAST_DIR: Final = f"{DEFAULT_BEAST_DIR}/iecor"
 DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
 DEFAULT_GEO_DIR: Final = f"{DEFAULT_DATA_DIR}/geo"
 GEOJSON_PATH: Final = f"{DEFAULT_GEO_DIR}/language_polygons.geojson"

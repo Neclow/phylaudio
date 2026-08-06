@@ -11,17 +11,17 @@ import seaborn as sns
 from matplotlib.colors import to_rgb
 
 from ._config import (
-    BEAST_DIR,
     DEFAULT_IMG_DIR,
     DEFAULT_STYLE,
     NMF_COMP_LABELS,
     NMF_COMP_ORDER,
     PALETTE,
+    SPEECH_BEAST_DIR,
 )
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
-NMF_DIR = f"{BEAST_DIR}/nmf"
-BRMS_DIR = f"{BEAST_DIR}/brms_phoible"
+NMF_DIR = f"{SPEECH_BEAST_DIR}/nmf"
+BRMS_DIR = f"{SPEECH_BEAST_DIR}/brms_phoible"
 
 K = 9
 

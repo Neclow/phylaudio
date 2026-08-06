@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from ._config import BEAST_DIR, DEFAULT_IMG_DIR, DEFAULT_STYLE, NMF_COMP_ORDER, PALETTE
+from ._config import DEFAULT_IMG_DIR, DEFAULT_STYLE, NMF_COMP_ORDER, PALETTE, SPEECH_BEAST_DIR
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
-NMF_DIR = f"{BEAST_DIR}/nmf"
-DELTA_CSV = f"{BEAST_DIR}/_delta.csv"
+NMF_DIR = f"{SPEECH_BEAST_DIR}/nmf"
+DELTA_CSV = f"{SPEECH_BEAST_DIR}/_delta.csv"
 
 
 def load_data():

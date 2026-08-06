@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from ._config import BEAST_DIR, BURNIN_FRAC, DEFAULT_IMG_DIR, DEFAULT_STYLE
+from ._config import BURNIN_FRAC, COGNATE_BEAST_DIR, DEFAULT_IMG_DIR, DEFAULT_STYLE, SPEECH_BEAST_DIR
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
-SPEECH_LOG_FILE = f"{BEAST_DIR}/input_v1_101.log"
-COGNATE_LOG_FILE = "data/trees/beast/iecor/raw.log"
+SPEECH_LOG_FILE = f"{SPEECH_BEAST_DIR}/input_v1_101.log"
+COGNATE_LOG_FILE = f"{COGNATE_BEAST_DIR}/raw.log"
 
 
 def load_root_age(log_file):
