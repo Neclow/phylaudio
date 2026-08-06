@@ -41,7 +41,7 @@ sentence_summary = "python -m pipeline.sentence_trees_summary"
 sentence_stats = "Rscript pipeline/sentence_trees_stats.R"
 sentence_postprocess = "bash pipeline/sentence_trees_postprocess.sh"
 squim = "python -m pipeline.squim"
-download_geojson = "bash pipeline/download_geojson.sh"
+download_geojson = "python -m pipeline.download_geojson"
 
 [tasks.beast2]
 cmd = "extern/beast2/bin/beast"
@@ -113,8 +113,8 @@ default = { solve-group = "default" }
 regression = { features = [
     "regression",
 ], solve-group = "regression", no-default-feature = true }
+gp = { features = ["gp"], solve-group = "gp", no-default-feature = true }
 viz = { features = ["viz"], solve-group = "viz" }
-mfa = { features = ["mfa"], solve-group = "mfa", no-default-feature = true }
 
 [feature.regression.dependencies]
 python = "3.10.12.*"
@@ -134,8 +134,19 @@ r-cmdstanr = ">=0.9.0,<1"
 prepare_regression_data = "python -m pipeline.prepare_regression_data"
 beast_phylolm = "Rscript pipeline/beast_phylolm.R"
 
-[feature.mfa.dependencies]
-montreal-forced-aligner = ">=3.3,<4"
+[feature.gp.dependencies]
+python = "3.10.12.*"
+pandas = ">=2.3.2,<3"
+tqdm = ">=4.67.1,<5"
+setuptools = ">=80,<81"
+geopandas = ">=1.0,<2"
+gpflow = ">=2.9,<3"
+tensorflow = ">=2.16,<3"
+tf-keras = ">=2.16,<3"
+scikit-learn = ">=1.5,<2"
+
+[feature.gp.tasks]
+fit_gp_surface = "python -m pipeline.fit_gp_surface"
 
 [feature.viz.dependencies]
 python = "3.10.12.*"
@@ -144,16 +155,8 @@ seaborn = ">=0.13.2,<0.14"
 bioconductor-ggtree = { version = ">=4.0.4,<5", channel = "bioconda" }
 scipy = ">=1.15.2,<2"
 geopandas = ">=1.0,<2"
-gpflow = ">=2.9,<3"
-tensorflow = ">=2.16,<3"
-tf-keras = ">=2.16,<3"
 dendropy = ">=5.0,<6"
-scikit-learn = ">=1.5,<2"
 matplotlib-base = ">=3.9,<4"
-
-[feature.viz.pypi-dependencies]
-llvmlite = "==0.44.0"
-numba = "==0.61.2"
 
 [feature.viz.tasks]
 fig1_acc_vs_brsupport = "python -m plots.fig1_acc_vs_brsupport"
@@ -161,8 +164,7 @@ fig1_nmf = "python -m plots.fig1_nmf"
 fig1_delta = "python -m plots.fig1_delta"
 fig1_pca = "python -m plots.fig1_pca"
 fig1_sqa = "python -m plots.fig1_sqa"
-fig2a_root_age = "python -m plots.fig2a_root_age"
-fig2b_rates = "python -m plots.fig2b_rates"
-fig2_rates_cognate = "python -m plots.fig2_cognate_rates"
+fig2_heights = "python -m plots.fig2_heights"
+fig2_rates = "python -m plots.fig2_rates"
 fig3_geo = "python -m plots.fig3_geo"
 ext_rates_and_maps = "python -m plots.ext_rates_and_maps"

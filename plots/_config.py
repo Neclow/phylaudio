@@ -2,11 +2,16 @@
 
 from typing import Final
 
-from src._config import DEFAULT_BEAST_DIR
-
-BEAST_DIR: Final = (
-    f"{DEFAULT_BEAST_DIR}/ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc/0.05_brsupport_dev_test"
+from src._config import (
+    COGNATE_BEAST_DIR,
+    EXCLUDE_LANGUAGES,
+    GEOJSON_EXPANSION,
+    GEOJSON_PATH,
+    NE_COUNTRIES_PATH,
+    NE_LAND_PATH,
+    SPEECH_BEAST_DIR,
 )
+
 DEFAULT_IMG_DIR: Final = "img_v2"
 DEFAULT_STYLE: Final = ".matplotlib/paper.mplstyle"
 BURNIN_FRAC: Final = 0.10

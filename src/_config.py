@@ -3,13 +3,18 @@
 from collections import OrderedDict
 from typing import Final
 
-import torch
+# NONE_TENSOR is used as a sentinel by model/data code that already depends on
+# torch.  The guard lets lightweight envs (gp, regression) import this module
+# for directory constants without pulling in pytorch.
+try:
+    import torch
+    NONE_TENSOR: Final = torch.tensor([-1])
+except ModuleNotFoundError:
+    NONE_TENSOR = None
 
 RANDOM_STATE: Final = 42
 
 SAMPLE_RATE: Final = 16000
-
-NONE_TENSOR: Final = torch.tensor([-1])
 
 # Default directories
 DEFAULT_ROOT_DIR: Final = "data"
@@ -18,10 +23,17 @@ DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
 DEFAULT_EMBEDDING_DIR: Final = f"{DEFAULT_ROOT_DIR}/embeddings"
 DEFAULT_EVAL_DIR: Final = f"{DEFAULT_ROOT_DIR}/eval"
 DEFAULT_METADATA_DIR: Final = f"{DEFAULT_ROOT_DIR}/metadata"
-DEFAULT_PHYLOREGRESSION_DIR: Final = f"{DEFAULT_ROOT_DIR}/phyloregression"
 DEFAULT_TREE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees"
 DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
+SPEECH_BEAST_DIR: Final = (
+    f"{DEFAULT_BEAST_DIR}/ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc/0.05_brsupport_dev_test"
+)
+COGNATE_BEAST_DIR: Final = f"{DEFAULT_BEAST_DIR}/iecor"
 DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
+DEFAULT_GEO_DIR: Final = f"{DEFAULT_ROOT_DIR}/geo"
+GEOJSON_PATH: Final = f"{DEFAULT_GEO_DIR}/language_polygons.geojson"
+NE_COUNTRIES_PATH: Final = f"{DEFAULT_GEO_DIR}/naturalearth/ne_110m_admin_0_countries.shp"
+NE_LAND_PATH: Final = f"{DEFAULT_GEO_DIR}/naturalearth/ne_50m_land.shp"
 
 # Default filenames
 DEFAULT_MERGED_FASTA_FILE: Final = "__merged.fa"
@@ -390,3 +402,25 @@ DEFAULT_METADATA_KEY = "fleurs"
 DEFAULT_REFERENCE_TREE_DIR = "data/trees/references"
 DEFAULT_REFERENCE_TREE_RAW_DIR = f"{DEFAULT_REFERENCE_TREE_DIR}/raw"
 DEFAULT_REFERENCE_TREE_PROCESSED_DIR = f"{DEFAULT_REFERENCE_TREE_DIR}/processed"
+
+# Maps a geojson "name" to ALL metadata language names it should match.
+GEOJSON_EXPANSION: Final = {
+    "Belarusian (Belorussian)": ["Belarusian"],
+    "Punjabi (Panjabi)": ["Punjabi"],
+    "Netherlandic": ["Dutch"],
+    "Slovene": ["Slovene", "Slovenian"],
+    "Norwegian": ["Norwegian", "NorwegianBokmal"],
+    "Persian (Farsi)": ["Persian", "PersianTehran"],
+    "Armenian": ["Armenian", "ArmenianEastern"],
+    "Kurdish": ["KurdishCJafi", "Sorani-Kurdish"],
+    "Welsh": ["Welsh", "WelshNorth"],
+    "Irish": ["Irish", "GaelicIrish"],
+    "Serbian / Croatian / Bosnian": ["Serbian", "Croatian", "Bosnian", "SerboCroatian"],
+}
+
+# Languages to exclude from regression/plotting (non-IE or insufficient data)
+EXCLUDE_LANGUAGES: Final = {
+    "Turkish", "Finnish", "Hungarian",
+    "Breton", "Cornish",
+    "Scottish Gaelic", "Gaelic", "Manx",
+}
