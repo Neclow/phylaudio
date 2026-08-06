@@ -8,6 +8,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from Bio import SeqIO
 
 from src._config import DEFAULT_MAPPED_FASTA_FILE, DEFAULT_SPLITSTREE_FASTA_FILE
+from src.tasks.phylo.beast import resolve_beast_dir
 from src.tasks.phylo.fasta import from_beast
 
 
@@ -17,9 +18,20 @@ def parse_args():
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "input",
+        "run_id",
         type=str,
-        help="Input BEAST XML file",
+        help="BEAST run UUID, prefix, or full path",
+    )
+    parser.add_argument(
+        "subdir",
+        type=str,
+        help="Subdirectory name or prefix within the run",
+    )
+    parser.add_argument(
+        "--version",
+        type=int,
+        default=1,
+        help="BEAST input version (XML = input_v{version}.xml)",
     )
     parser.add_argument(
         "--workflow",
@@ -50,13 +62,17 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
+    beast_dir = resolve_beast_dir(args.run_id, args.subdir)
+    xml_path = f"{beast_dir}/input_v{args.version}.xml"
+    if not os.path.exists(xml_path):
+        raise FileNotFoundError(f"XML not found: {xml_path}")
+
     # Step 1: Convert BEAST XML to FASTA
-    print("Converting BEAST XML to FASTA...")
-    dirname = os.path.dirname(args.input)
-    fasta_file = f"{dirname}/{DEFAULT_MAPPED_FASTA_FILE}"
+    print(f"Converting {xml_path} to FASTA...")
+    fasta_file = f"{beast_dir}/{DEFAULT_MAPPED_FASTA_FILE}"
 
     if not os.path.exists(fasta_file) or args.overwrite:
-        from_beast(args.input, fasta_file)
+        from_beast(xml_path, fasta_file)
 
     maps = args.char_map.split(";")
     char_map = {}
@@ -65,7 +81,7 @@ if __name__ == "__main__":
             k, v = m.split("->")
             char_map[k] = v
 
-    splitstree_input = f"{dirname}/{DEFAULT_SPLITSTREE_FASTA_FILE}"
+    splitstree_input = f"{beast_dir}/{DEFAULT_SPLITSTREE_FASTA_FILE}"
     splitstree_output = os.path.splitext(splitstree_input)[0] + ".stree6"
     with open(splitstree_input, "w", encoding="utf-8") as f_out:
         records = SeqIO.parse(fasta_file, "fasta")
