@@ -178,8 +178,11 @@ extern/splitstree
 # Lightning
 lightning_logs/
 
-# Datasets
+# Audio datasets
 data/datasets
+
+# Geographical data
+data/geo
 
 # Models
 data/models
@@ -208,7 +211,7 @@ data/trees/per_sentence/discrete/*
 !data/trees/per_sentence/discrete/*/
 !data/trees/beast/
 data/trees/beast/*
-!data/trees/beast/template.xml
+!data/trees/beast/templates/
 !data/trees/beast/speech/
 !data/trees/beast/iecor/
 data/trees/beast/iecor/*
