@@ -8,6 +8,7 @@ from typing import Final
 # for directory constants without pulling in pytorch.
 try:
     import torch
+
     NONE_TENSOR: Final = torch.tensor([-1])
 except ModuleNotFoundError:
     NONE_TENSOR = None
@@ -17,28 +18,35 @@ RANDOM_STATE: Final = 42
 SAMPLE_RATE: Final = 16000
 
 # Default directories
-DEFAULT_ROOT_DIR: Final = "data"
-DEFAULT_AUDIO_DIR: Final = f"{DEFAULT_ROOT_DIR}/datasets"
-DEFAULT_CACHE_DIR: Final = f"{DEFAULT_ROOT_DIR}/models"
-DEFAULT_EMBEDDING_DIR: Final = f"{DEFAULT_ROOT_DIR}/embeddings"
-DEFAULT_EVAL_DIR: Final = f"{DEFAULT_ROOT_DIR}/eval"
-DEFAULT_METADATA_DIR: Final = f"{DEFAULT_ROOT_DIR}/metadata"
-DEFAULT_TREE_DIR: Final = f"{DEFAULT_ROOT_DIR}/trees"
+DEFAULT_DATA_DIR: Final = "data"
+DEFAULT_SRC_DIR: Final = "src"
+DEFAULT_AUDIO_DIR: Final = f"{DEFAULT_DATA_DIR}/datasets"
+DEFAULT_CACHE_DIR: Final = f"{DEFAULT_DATA_DIR}/models"
+DEFAULT_EMBEDDING_DIR: Final = f"{DEFAULT_DATA_DIR}/embeddings"
+DEFAULT_EVAL_DIR: Final = f"{DEFAULT_DATA_DIR}/eval"
+DEFAULT_METADATA_DIR: Final = f"{DEFAULT_DATA_DIR}/metadata"
+DEFAULT_TREE_DIR: Final = f"{DEFAULT_DATA_DIR}/trees"
 DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
+DEFAULT_BEAST_TEMPLATE_DIR: Final = f"{DEFAULT_BEAST_DIR}/templates"
 SPEECH_BEAST_DIR: Final = (
     f"{DEFAULT_BEAST_DIR}/ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc/0.05_brsupport_dev_test"
 )
 COGNATE_BEAST_DIR: Final = f"{DEFAULT_BEAST_DIR}/iecor"
 DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
-DEFAULT_GEO_DIR: Final = f"{DEFAULT_ROOT_DIR}/geo"
+DEFAULT_GEO_DIR: Final = f"{DEFAULT_DATA_DIR}/geo"
 GEOJSON_PATH: Final = f"{DEFAULT_GEO_DIR}/language_polygons.geojson"
-NE_COUNTRIES_PATH: Final = f"{DEFAULT_GEO_DIR}/naturalearth/ne_110m_admin_0_countries.shp"
+NE_COUNTRIES_PATH: Final = (
+    f"{DEFAULT_GEO_DIR}/naturalearth/ne_110m_admin_0_countries.shp"
+)
 NE_LAND_PATH: Final = f"{DEFAULT_GEO_DIR}/naturalearth/ne_50m_land.shp"
 
 # Default filenames
 DEFAULT_MERGED_FASTA_FILE: Final = "__merged.fa"
 DEFAULT_MAPPED_FASTA_FILE: Final = "__merged_mapped.fa"
 DEFAULT_SPLITSTREE_FASTA_FILE: Final = "__merged_splitstree.fa"
+DEFAULT_SPLITSTREE_WORKFLOW: Final = (
+    f"{DEFAULT_SRC_DIR}/tasks/phylo/splitstree_default.wflow6"
+)
 
 # Default number of threads for phylogenetic tree inference (iqtree/raxml)
 DEFAULT_THREADS_TREE: Final = 4
@@ -334,7 +342,7 @@ _FLEURS_TO_IECOR: Final = {
     "ur_pk": "Urdu",
 }
 
-# Taxonset memberships by IECOR name (from BEAST2 template.xml)
+# Taxonset memberships by IECOR name (from BEAST2 templates/input_v1.xml)
 _INDO1319_FAMILIES_TO_FLEURS = {
     "armenian": ["hy_am"],
     "baltic": ["lt_lt", "lv_lv"],
@@ -399,7 +407,7 @@ _FLEURS_TO_INDO1319_FAMILIES = {
 }
 
 DEFAULT_METADATA_KEY = "fleurs"
-DEFAULT_REFERENCE_TREE_DIR = "data/trees/references"
+DEFAULT_REFERENCE_TREE_DIR = f"{DEFAULT_TREE_DIR}/references"
 DEFAULT_REFERENCE_TREE_RAW_DIR = f"{DEFAULT_REFERENCE_TREE_DIR}/raw"
 DEFAULT_REFERENCE_TREE_PROCESSED_DIR = f"{DEFAULT_REFERENCE_TREE_DIR}/processed"
 
@@ -420,7 +428,12 @@ GEOJSON_EXPANSION: Final = {
 
 # Languages to exclude from regression/plotting (non-IE or insufficient data)
 EXCLUDE_LANGUAGES: Final = {
-    "Turkish", "Finnish", "Hungarian",
-    "Breton", "Cornish",
-    "Scottish Gaelic", "Gaelic", "Manx",
+    "Turkish",
+    "Finnish",
+    "Hungarian",
+    "Breton",
+    "Cornish",
+    "Scottish Gaelic",
+    "Gaelic",
+    "Manx",
 }
