@@ -5,7 +5,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import torch
 from lightning.pytorch import seed_everything
 
-from .._config import DEFAULT_CACHE_DIR, DEFAULT_ROOT_DIR, RANDOM_STATE, SAMPLE_RATE
+from .._config import DEFAULT_CACHE_DIR, DEFAULT_DATA_DIR, RANDOM_STATE, SAMPLE_RATE
 from ..data import load_dataset
 from ..models._model_zoo import MODEL_ZOO
 
@@ -101,7 +101,7 @@ def prepare_dataset(args, processor, **kwargs):
     core_dataset_args = {
         "dataset": args.dataset,
         "dtype": MODEL_ZOO[args.model_id]["dtype"],
-        "root_dir": DEFAULT_ROOT_DIR,
+        "root_dir": DEFAULT_DATA_DIR,
         "with_vad": args.with_vad,
         "processor": processor,
     }
