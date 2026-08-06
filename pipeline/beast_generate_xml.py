@@ -25,6 +25,7 @@ from src._config import (
 from src.tasks.phylo.fasta import merge_fastas, to_beast
 
 XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/input_v1.xml"
+PRIOR_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/prior_v1.xml"
 NS_TEMPLATE_DIR = f"{DEFAULT_BEAST_TEMPLATE_DIR}/ns"
 
 
@@ -189,6 +190,16 @@ def main():
         template_beast_file=XML_TEMPLATE_FILE,
         taxonsets=taxonsets,
     )
+
+    if os.path.exists(PRIOR_TEMPLATE_FILE):
+        prior_output = f"{beast_p_dir}/prior_v1.xml"
+        print(f"Generating prior XML: {prior_output}")
+        to_beast(
+            input_file=mapped_file,
+            output_file=prior_output,
+            template_beast_file=PRIOR_TEMPLATE_FILE,
+            taxonsets=taxonsets,
+        )
 
     ns_templates = sorted(glob(f"{NS_TEMPLATE_DIR}/input_ns_*.xml"))
     if ns_templates:
