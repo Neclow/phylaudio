@@ -1,7 +1,7 @@
 # Phylaudio
 
-Repository for "Scheidwasser, Zhu, Duchêne & Bhatt. Indo-European language
-acoustics through space and time. Under review, 2026."
+Repository for _Indo-European language acoustics through space and time_, Under
+review, 2026.
 
 ## Installation
 
@@ -15,10 +15,10 @@ curl -fsSL https://pixi.sh/install.sh | bash
 
 ### Dependencies
 
-> [!NOTE] > **GPU vs. CPU.** Embedding extraction and LID training were run on a
-> CUDA 13.2 GPU. On CPU-only machines, set the CUDA override so pixi can resolve
-> the dependency tree, then pass `--device cpu` to any script that accepts a
-> device flag:
+> [!IMPORTANT] > **GPU vs. CPU.** Compute-intensive steps were run on a CUDA
+> 13.2-powered GPU. On CPU-only machines, set the CUDA override so `pixi` can
+> resolve the dependency tree, then pass `--device cpu` to any script that
+> accepts a device flag:
 >
 > ```bash
 > CONDA_OVERRIDE_CUDA=13.2 pixi install
@@ -43,7 +43,20 @@ pixi install -e viz         # publication figures (plotly, seaborn)
 ## Usage
 
 Data download and pipeline steps are documented in
-[docs/pipeline.md](docs/pipeline.md).
+[docs/README.md](docs/README.md).
+
+## Citation
+
+If you use this code, please cite:
+
+```bibtex
+@article{scheidwasser2026phylaudio,
+  title   = {Indo-European language acoustics through space and time},
+  author  = {Scheidwasser, Neil and Zhu, Harrison Bo Hua and Fosse, Samuel and Huang, Hengguan and Greenhill, Simon J. and Bhatt, Samir and Duch{\^e}ne, David A.},
+  year    = {2026},
+  note    = {Under review}
+}
+```
 
 ## License
 

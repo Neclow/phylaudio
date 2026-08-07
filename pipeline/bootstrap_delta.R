@@ -1,19 +1,16 @@
-#!/usr/bin/env Rscript
 # Compute per-taxon delta scores (Holland et al. 2002) with bootstrap CIs
 # from a binary FASTA alignment.
 #
 # Usage:
-#   Rscript pipeline/bootstrap_delta.R <beast_run_dir> [brsupport] [n_boot] [seed]
+#   Rscript pipeline/bootstrap_delta.R <run_id> <subdir> [n_boot] [seed]
 #
-# Looks for __merged_mapped.fa inside <beast_run_dir>/<brsupport>/,
+# Looks for __merged_mapped.fa inside the resolved BEAST directory,
 # saves _delta.csv next to it.
-# If brsupport is a bare number (e.g. 0.05), "_brsupport" is appended.
 #
 # Examples:
-#   Rscript pipeline/bootstrap_delta.R speech
-#   Rscript pipeline/bootstrap_delta.R speech 0.05_brsupport_dev_test
-#   Rscript pipeline/bootstrap_delta.R speech 0.01 500
-#   Rscript pipeline/bootstrap_delta.R speech 0.01 1000 123
+#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.05_brsupport_dev_test
+#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.01_brsupport 500
+#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.01_brsupport 1000 123
 
 library(parallel)
 
@@ -21,19 +18,47 @@ BEAST_BASE <- "data/trees/beast"
 
 # ── CLI args ──────────────────────────────────────────────────────────────────
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 1) {
-  stop("Usage: Rscript pipeline/bootstrap_delta.R <beast_run_dir> [brsupport] [n_boot] [seed]")
+if (length(args) < 2) {
+  stop(
+    "Usage: Rscript pipeline/bootstrap_delta.R <run_id> <subdir> [n_boot] [seed]"
+  )
 }
 
-brsupport <- if (length(args) >= 2 && grepl("\\D", args[2])) args[2] else {
-  size <- if (length(args) >= 2) args[2] else "0.01"
-  paste0(size, "_brsupport")
-}
-n_boot_idx <- if (length(args) >= 2 && grepl("\\D", args[2])) 3L else 2L
-n_boot <- if (length(args) >= n_boot_idx) as.integer(args[n_boot_idx]) else 1000L
-seed <- if (length(args) >= n_boot_idx + 1L) as.integer(args[n_boot_idx + 1L]) else 42L
+run_id <- args[1]
+subdir <- args[2]
+n_boot <- if (length(args) >= 3) as.integer(args[3]) else 1000L
+seed <- if (length(args) >= 4) as.integer(args[4]) else 42L
 
-run_dir <- file.path(BEAST_BASE, args[1], brsupport)
+# Resolve run_id (prefix match)
+run_matches <- Sys.glob(file.path(BEAST_BASE, paste0(run_id, "*")))
+run_matches <- run_matches[file.info(run_matches)$isdir]
+if (length(run_matches) == 0) {
+  stop(sprintf("No BEAST run matching '%s' in %s/", run_id, BEAST_BASE))
+}
+if (length(run_matches) > 1) {
+  stop(sprintf(
+    "Ambiguous run_id '%s': %s",
+    run_id,
+    paste(run_matches, collapse = ", ")
+  ))
+}
+beast_root <- run_matches[1]
+
+# Resolve subdir (prefix match)
+subdir_matches <- Sys.glob(file.path(beast_root, paste0(subdir, "*")))
+subdir_matches <- subdir_matches[file.info(subdir_matches)$isdir]
+if (length(subdir_matches) == 0) {
+  stop(sprintf("No subdirectory matching '%s' in %s/", subdir, beast_root))
+}
+if (length(subdir_matches) > 1) {
+  stop(sprintf(
+    "Ambiguous subdir '%s': %s",
+    subdir,
+    paste(subdir_matches, collapse = ", ")
+  ))
+}
+run_dir <- subdir_matches[1]
+
 fasta_file <- file.path(run_dir, "__merged_mapped.fa")
 output_csv <- file.path(run_dir, "_delta.csv")
 

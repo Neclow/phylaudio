@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-#
 # beast_phylolm.R - Phylogenetic regression pipeline dispatcher
 #
 # Runs linear (brms) and GP (cmdstanr) regression for speech and cognate trees.
@@ -27,7 +25,7 @@ COGNATE_BEAST_DIR_DEFAULT <- "data/trees/beast/iecor"
 
 SCRIPTS <- list(
     linear_geo = "src/tasks/phylo/run_phylo_regression.R",
-    gp_geo     = "src/tasks/phylo/run_phylo_regression_nonlinear.R"
+    gp_geo = "src/tasks/phylo/run_phylo_regression_nonlinear.R"
 )
 
 all_args <- commandArgs(trailingOnly = TRUE)
@@ -39,9 +37,12 @@ if (length(args) > 0 && args[1] %in% c("-h", "--help")) {
     quit(status = 0)
 }
 
-if (length(args) < 2)
-    stop("Usage: Rscript pipeline/beast_phylolm.R <run_id> <subdir> [options]",
-         call. = FALSE)
+if (length(args) < 2) {
+    stop(
+        "Usage: Rscript pipeline/beast_phylolm.R <run_id> <subdir> [options]",
+        call. = FALSE
+    )
+}
 
 run_id <- args[1]
 subdir <- args[2]
@@ -66,9 +67,13 @@ while (i <= length(args)) {
     }
 }
 
-if (!is.null(model_type) && !model_type %in% names(SCRIPTS))
-    stop(sprintf("Unknown model_type '%s'. Must be one of: %s",
-                 model_type, paste(names(SCRIPTS), collapse = ", ")))
+if (!is.null(model_type) && !model_type %in% names(SCRIPTS)) {
+    stop(sprintf(
+        "Unknown model_type '%s'. Must be one of: %s",
+        model_type,
+        paste(names(SCRIPTS), collapse = ", ")
+    ))
+}
 
 # Resolve run_id to BEAST directory
 if (dir.exists(run_id)) {
@@ -76,38 +81,58 @@ if (dir.exists(run_id)) {
 } else {
     matches <- Sys.glob(file.path(BEAST_DIR, paste0(run_id, "*")))
     matches <- matches[dir.exists(matches)]
-    if (length(matches) == 0)
-        stop(sprintf("No BEAST run matching '%s' in %s/", run_id, BEAST_DIR),
-             call. = FALSE)
-    if (length(matches) > 1)
-        stop(sprintf("Ambiguous run_id '%s': matches %s",
-                     run_id, paste(matches, collapse = ", ")),
-             call. = FALSE)
+    if (length(matches) == 0) {
+        stop(
+            sprintf("No BEAST run matching '%s' in %s/", run_id, BEAST_DIR),
+            call. = FALSE
+        )
+    }
+    if (length(matches) > 1) {
+        stop(
+            sprintf(
+                "Ambiguous run_id '%s': matches %s",
+                run_id,
+                paste(matches, collapse = ", ")
+            ),
+            call. = FALSE
+        )
+    }
     beast_root <- matches[1]
 }
 
 # Resolve subdir within the run
 subdir_matches <- Sys.glob(file.path(beast_root, paste0(subdir, "*")))
 subdir_matches <- subdir_matches[dir.exists(subdir_matches)]
-if (length(subdir_matches) == 0)
-    stop(sprintf("No subdirectory matching '%s' in %s/", subdir, beast_root),
-         call. = FALSE)
-if (length(subdir_matches) > 1)
-    stop(sprintf("Ambiguous subdir '%s': matches %s",
-                 subdir, paste(subdir_matches, collapse = ", ")),
-         call. = FALSE)
+if (length(subdir_matches) == 0) {
+    stop(
+        sprintf("No subdirectory matching '%s' in %s/", subdir, beast_root),
+        call. = FALSE
+    )
+}
+if (length(subdir_matches) > 1) {
+    stop(
+        sprintf(
+            "Ambiguous subdir '%s': matches %s",
+            subdir,
+            paste(subdir_matches, collapse = ", ")
+        ),
+        call. = FALSE
+    )
+}
 
 speech_beast_dir <- subdir_matches[1]
 
 # Determine runs
 model_types <- if (is.null(model_type)) names(SCRIPTS) else model_type
-beast_dirs  <- list(speech = speech_beast_dir, cognate = cognate_beast_dir)
+beast_dirs <- list(speech = speech_beast_dir, cognate = cognate_beast_dir)
 
 n_runs <- length(model_types) * length(beast_dirs)
-cat(sprintf("Running %d regression(s): %s x {%s}\n",
-            n_runs,
-            paste(model_types, collapse = ", "),
-            paste(names(beast_dirs), collapse = ", ")))
+cat(sprintf(
+    "Running %d regression(s): %s x {%s}\n",
+    n_runs,
+    paste(model_types, collapse = ", "),
+    paste(names(beast_dirs), collapse = ", ")
+))
 cat(sprintf("  speech:  %s\n", speech_beast_dir))
 cat(sprintf("  cognate: %s\n\n", cognate_beast_dir))
 
@@ -123,8 +148,10 @@ for (mt in model_types) {
         cat(sprintf("========================================\n\n"))
 
         cmd <- paste(
-            "Rscript", shQuote(SCRIPTS[[mt]]),
-            "--beast_dir", shQuote(bd),
+            "Rscript",
+            shQuote(SCRIPTS[[mt]]),
+            "--beast_dir",
+            shQuote(bd),
             paste(shQuote(forward_args), collapse = " ")
         )
         cat(sprintf("Running: %s\n\n", cmd))
@@ -137,8 +164,12 @@ for (mt in model_types) {
 }
 
 if (length(failures) > 0) {
-    cat(sprintf("\n%d/%d runs failed: %s\n",
-                length(failures), n_runs, paste(failures, collapse = ", ")))
+    cat(sprintf(
+        "\n%d/%d runs failed: %s\n",
+        length(failures),
+        n_runs,
+        paste(failures, collapse = ", ")
+    ))
     quit(status = 1)
 } else {
     cat(sprintf("\nAll %d runs completed successfully.\n", n_runs))

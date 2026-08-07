@@ -57,6 +57,14 @@ def parse_args():
         help="Reference tree(s).",
     )
     parser.add_argument(
+        "-m",
+        dest="metric",
+        default="all",
+        choices=(*METRICS, "all"),
+        type=str,
+        help="Metric(s) to compute.",
+    )
+    parser.add_argument(
         "-nt",
         dest="n_threads",
         default=4,
@@ -82,7 +90,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def extract_metrics_single(cfg_file, refs, output_tree_name):
+def extract_metrics_single(cfg_file, refs, output_tree_name, metrics):
     # Load config
     with open(cfg_file, "r", encoding="utf-8") as f:
         cfg = pd.Series(json.load(f))
@@ -109,7 +117,7 @@ def extract_metrics_single(cfg_file, refs, output_tree_name):
         if not os.path.exists(ref_tree_file):
             raise FileNotFoundError(f"Reference tree file not found: {ref_tree_file}")
 
-        for metric_name, metric_func in METRICS.items():
+        for metric_name, metric_func in metrics.items():
             key = f"{metric_name}_{ref}"
             try:
                 cfg[key] = metric_func(tree_file, ref_tree_file)
@@ -156,10 +164,16 @@ if __name__ == "__main__":
     else:
         refs = REFERENCE_TREE_NAMES
 
+    if args.metric != "all":
+        metrics = {args.metric: METRICS[args.metric]}
+    else:
+        metrics = METRICS
+
     extract_fn = partial(
         extract_metrics_single,
         refs=refs,
         output_tree_name=output_tree_name,
+        metrics=metrics,
     )
     with multiprocessing.Pool(processes=args.n_threads) as pool:
         work = pool.imap_unordered(extract_fn, cfg_files)

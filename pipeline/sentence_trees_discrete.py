@@ -31,6 +31,12 @@ def parse_args(with_base_args=True):
     parser = get_fleurs_parallel_args(with_common_args=with_base_args)
 
     parser.add_argument(
+        "--dtype",
+        required=True,
+        help="Output subdirectory name under per_sentence/",
+    )
+
+    parser.add_argument(
         "--discretization",
         default="step",
         type=str,
@@ -139,7 +145,7 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    dtype = "discrete3"
+    dtype = args.dtype
     if args.aggregation != "mean":
         dtype += f"+{args.aggregation}"
     if args.decomposition is not None:
