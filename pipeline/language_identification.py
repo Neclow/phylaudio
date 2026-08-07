@@ -1,7 +1,6 @@
 """End-to-end evaluation of embeddings for audio- or text-based LID"""
 
 import json
-import logging
 
 import pandas as pd
 import torch
@@ -10,8 +9,6 @@ from src.data.datasets import EmbeddingDataset
 from src.models.embedding import EmbeddingFeatureExtractor
 from src.tasks.common import prepare_dataset, prepare_model
 from src.tasks.language_identification import fit_predict, parse_lid_args
-
-logger = logging.getLogger(__name__)
 
 torch.set_float32_matmul_precision("high")
 
@@ -31,7 +28,13 @@ def load_cached_datasets(cache_dir):
         return EmbeddingDataset(X, y)
 
     feature_extractor = EmbeddingFeatureExtractor(emb_dim=embeddings.shape[1])
-    return feature_extractor, subset("train"), subset("dev"), subset("test"), num_classes
+    return (
+        feature_extractor,
+        subset("train"),
+        subset("dev"),
+        subset("test"),
+        num_classes,
+    )
 
 
 def main():

@@ -33,21 +33,6 @@ _VAR_DISPLAY = {
     "delta": "delta",
 }
 
-VARIANCE_COMPONENT_ORDER = [
-    "Longitude",
-    "Latitude",
-    "log_n_speakers",
-    "n_phonemes",
-    "delta",
-    "Longitude×Latitude",
-    "Longitude×log_n_speakers",
-    "Longitude×delta",
-    "Latitude×log_n_speakers",
-    "Latitude×delta",
-    "Phylogenetic",
-    "Cov(Fixed, Phylo)",
-    "Residual",
-]
 VARIANCE_COLORS = {
     "Longitude": "#1f77b4",
     "Latitude": "#ff7f0e",
@@ -63,21 +48,7 @@ VARIANCE_COLORS = {
     "Cov(Fixed, Phylo)": "#c8b8b0",
     "Residual": "#7f7f7f",
 }
-CSV_TO_DISPLAY = {
-    "shapley_longitude_norm_mean": "Longitude",
-    "shapley_latitude_norm_mean": "Latitude",
-    "shapley_log_n_speakers_norm_mean": "log_n_speakers",
-    "shapley_n_phonemes_norm_mean": "n_phonemes",
-    "shapley_delta_norm_mean": "delta",
-    "shapley_longitude_norm_latitude_norm_mean": "Longitude×Latitude",
-    "shapley_longitude_norm_log_n_speakers_norm_mean": "Longitude×log_n_speakers",
-    "shapley_longitude_norm_delta_norm_mean": "Longitude×delta",
-    "shapley_latitude_norm_log_n_speakers_norm_mean": "Latitude×log_n_speakers",
-    "shapley_latitude_norm_delta_norm_mean": "Latitude×delta",
-    "prop_phylo_mean": "Phylogenetic",
-    "prop_cov_fix_phy_mean": "Cov(Fixed, Phylo)",
-    "prop_residual_mean": "Residual",
-}
+
 PUBLICATION_LABELS = {
     "Longitude": "Longitude",
     "Latitude": "Latitude",

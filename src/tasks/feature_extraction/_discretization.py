@@ -47,7 +47,7 @@ def load_discretizer(method):
 
 
 def discretize(x, method, idxs=None, q=None) -> np.ndarray:
-    discretization_fn = DISCRETIZATION_METHODS[method]
+    discretization_fn = load_discretizer(method)
 
     output = torch.zeros_like(x, device=x.device, dtype=torch.int64)
 

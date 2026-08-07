@@ -176,8 +176,11 @@ def fit_gp_surface(meta_path, out_dir):
     gpflow.set_trainable(model.likelihood.variance, False)
     pbar = tqdm(desc="Optimizing GP")
 
+    # pylint: disable=unused-argument
     def _step_callback(step, variables, values):
         pbar.update(1)
+
+    # pylint: enable=unused-argument
 
     gpflow.optimizers.Scipy().minimize(
         model.training_loss,
@@ -194,10 +197,12 @@ def fit_gp_surface(meta_path, out_dir):
 
     language_union = gdf_clipped.union_all()
     language_union_prep = prep(language_union)
-    in_mask = np.array([
-        language_union_prep.contains(Point(p[0], p[1]))
-        for p in tqdm(grid_pred, desc="Masking grid points")
-    ])
+    in_mask = np.array(
+        [
+            language_union_prep.contains(Point(p[0], p[1]))
+            for p in tqdm(grid_pred, desc="Masking grid points")
+        ]
+    )
 
     grid_inside = grid_pred[in_mask]
     mean_all = []

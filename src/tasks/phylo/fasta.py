@@ -7,7 +7,7 @@ from Bio import SeqIO
 from tqdm import tqdm
 
 from ..._config import MIN_LANGUAGES
-from ...utils import _count_file_lines, _run_command
+from ...utils import _count_file_lines
 
 
 def merge_fastas(input_files, sequence_ids, filler="?", output_file=None):
@@ -137,15 +137,6 @@ def from_beast(input_file, output_file):
             sequence_content = sequence_elm.attrib
             content = f">{sequence_content['taxon']}\n{sequence_content['value']}\n"
             f.write(content)
-
-
-def zip_fastas(run_id):
-    """Zip all fasta files in a directory"""
-    command = (
-        f"tar -czf data/discrete/{run_id}/_fastas.tar.gz data/discrete/{run_id}/*.fa"
-    )
-
-    _run_command(command)
 
 
 def to_numpy(fa_path):

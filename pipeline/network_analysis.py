@@ -7,7 +7,11 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from Bio import SeqIO
 
-from src._config import DEFAULT_MAPPED_FASTA_FILE, DEFAULT_SPLITSTREE_FASTA_FILE
+from src._config import (
+    DEFAULT_MAPPED_FASTA_FILE,
+    DEFAULT_SPLITSTREE_FASTA_FILE,
+    DEFAULT_SPLITSTREE_WORKFLOW,
+)
 from src.tasks.phylo.beast import resolve_beast_dir
 from src.tasks.phylo.fasta import from_beast
 
@@ -36,7 +40,7 @@ def parse_args():
     parser.add_argument(
         "--workflow",
         type=str,
-        default="src/tasks/phylo/splitstree_default.wflow6",
+        default=DEFAULT_SPLITSTREE_WORKFLOW,
         help="Path to the SplitsTree6 workflow file (.wflow6).",
     )
     parser.add_argument(
