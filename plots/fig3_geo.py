@@ -576,7 +576,7 @@ if __name__ == "__main__":
         ("cognate", COGNATE_BEAST_DIR),
     ]:
         is_main = label == "speech"
-        prefix = "fig3" if is_main else "figS5"
+        prefix = "fig3" if is_main else "figS6"
 
         print(f"Plotting {label}...")
         dat = load_results(beast_dir)
