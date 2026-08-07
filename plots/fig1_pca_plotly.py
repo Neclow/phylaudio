@@ -24,19 +24,8 @@ OUTPUT_FILE = "docs/index.html"
 
 
 def get_sentences(parallel_dataset):
-    """Extract sentences from parallel dataset, filtering to those with >= 4 languages."""
-    sentence_idxs = parallel_dataset.data.sentence_index.unique()
-    sentence_dfs = []
-
-    # pylint: disable=unused-variable
-    for sentence_index in sentence_idxs:
-        sentence_df = parallel_dataset.data.query("sentence_index == @sentence_index")
-        if sentence_df.language.nunique() < 4:
-            continue
-        sentence_dfs.append(sentence_df)
-    # pylint: enable=unused-variable
-
-    return pd.concat(sentence_dfs, axis=0).loc[:, "sentence"]
+    """Extract sentences from parallel dataset."""
+    return parallel_dataset.data["sentence"].reset_index(drop=True)
 
 
 def load_sentences():
