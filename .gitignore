@@ -232,7 +232,6 @@ notebooks/
 paper/
 drafts*.ipynb
 drafts*.R
-ZENODO.md
 
 # CLAUDE and AGENTS
 .claude/
