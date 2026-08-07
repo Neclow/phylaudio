@@ -23,7 +23,10 @@ from tqdm import tqdm
 
 from src._config import DEFAULT_EMBEDDING_DIR
 from src.tasks.common import prepare_dataset, prepare_model
-from src.tasks.feature_extraction.base import get_fleurs_parallel_args
+from src.tasks.feature_extraction.base import (
+    get_fleurs_parallel_args,
+    prepare_classifier,
+)
 
 IGNORE_COLUMNS = ["dbs", "ebs", "device", "Commit"]
 
@@ -44,8 +47,9 @@ def update_summary(dataset_embedding_dir):
         .set_index("run_id")
         .drop(columns=IGNORE_COLUMNS, errors="ignore")
     )
-    df.to_csv(f"{dataset_embedding_dir}/summary.csv")
-    print(f"Updated {dataset_embedding_dir}/summary.csv ({len(df)} runs)")
+    fname = "summary.csv"
+    df.to_csv(f"{dataset_embedding_dir}/{fname}")
+    print(f"Updated {dataset_embedding_dir}/{fname} ({len(df)} runs)")
 
 
 def parse_args():
@@ -129,6 +133,18 @@ def main():
                     break
 
     embeddings = torch.cat(all_emb, dim=0)
+
+    if args.ckpt is not None:
+        classifier = prepare_classifier(
+            args,
+            in_dim=embeddings.shape[1],
+            out_dim=num_classes,
+            dtype=embeddings.dtype,
+        )
+        projector = classifier.projector
+        with torch.no_grad():
+            embeddings = projector[0](embeddings.to(args.device)).cpu()
+
     meta = pd.DataFrame.from_records(records)
 
     assert (

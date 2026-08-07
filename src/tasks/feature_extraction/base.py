@@ -1,6 +1,7 @@
 # pylint: disable=invalid-name
 
 """Base functions for phylogenetic analysis base on the FLEURS dataset."""
+
 import json
 import os
 import uuid
@@ -327,18 +328,19 @@ def post_process_embeddings(fleurs_parallel_input, embeddings, y):
     projection / classifier filtering / decomposition stay identical.
     """
     if fleurs_parallel_input.classifier is not None:
+        projector = fleurs_parallel_input.classifier.projector
         if fleurs_parallel_input.cfg.get("discretization") == "ste":
             # Replace each embedding with its STE bottleneck code (hidden_dim-wide, ±1).
             # Match the projector's dtype (the head is cast to the extractor dtype,
             # which can differ from the pooled embedding's, e.g. half vs float).
-            projector = fleurs_parallel_input.classifier.projector
-            embeddings = projector(
-                embeddings.to(next(projector.parameters()).dtype)
-            )
+            embeddings = projector(embeddings.to(next(projector.parameters()).dtype))
         else:
-            embeddings, y = filter_embeddings(
-                fleurs_parallel_input.classifier, embeddings, y
-            )
+            embeddings = projector[0](embeddings.to(next(projector.parameters()).dtype))
+
+        # if fleurs_parallel_input.cfg.get("filter_classifier"):
+        #     embeddings, y = filter_embeddings(
+        #         fleurs_parallel_input.classifier, embeddings, y
+        #     )
 
     if fleurs_parallel_input.decomposer is not None:
         embeddings = decompose(fleurs_parallel_input.decomposer, embeddings)
@@ -419,18 +421,18 @@ def _sentence_loop_cache(args, inputs, output_folder, downstream_func):
             break
 
 
-def filter_embeddings(classifier, X_emb, y):
-    y_prob = classifier(X_emb)
+# def filter_embeddings(classifier, X_emb, y):
+#     y_prob = classifier(X_emb)
 
-    y_pred = y_prob.argmax(dim=-1)
+#     y_pred = y_prob.argmax(dim=-1)
 
-    correct = y.to(X_emb.device) == y_pred
+#     correct = y.to(X_emb.device) == y_pred
 
-    X_emb = X_emb[correct]
+#     X_emb = X_emb[correct]
 
-    y = y[correct.to(y.device)]
+#     y = y[correct.to(y.device)]
 
-    return X_emb, y
+#     return X_emb, y
 
 
 def resolve_ckpt(ckpt):
@@ -453,9 +455,9 @@ def resolve_ckpt(ckpt):
 
 def prepare_classifier(args, in_dim, out_dim, dtype):
     ckpt_path = resolve_ckpt(args.ckpt)
-    state_dict = torch.load(
-        ckpt_path, map_location=args.device, weights_only=False
-    )["state_dict"]
+    state_dict = torch.load(ckpt_path, map_location=args.device, weights_only=False)[
+        "state_dict"
+    ]
 
     clf_state_dict = {
         k.partition(".")[-1]: v for k, v in state_dict.items() if "classifier" in k

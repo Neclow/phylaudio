@@ -77,7 +77,7 @@ class MLP(nn.Module):
         self.hidden_dim = hidden_dim
 
         if self.hidden_dim is None:
-            self.projector = nn.Identity()
+            self.projector = nn.Sequential(nn.Identity(), nn.Identity())
 
             self.classifier = nn.Linear(self.in_dim, self.out_dim, dtype=dtype)
         else:
