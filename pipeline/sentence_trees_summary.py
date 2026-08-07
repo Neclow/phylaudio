@@ -59,10 +59,10 @@ def parse_args():
     parser.add_argument(
         "-m",
         dest="metric",
-        default="all",
+        default="s2r",
         choices=(*METRICS, "all"),
         type=str,
-        help="Metric(s) to compute.",
+        help="Similarity metric(s) to compute.",
     )
     parser.add_argument(
         "-nt",
@@ -77,6 +77,7 @@ def parse_args():
         default="astral4",
         choices=tuple(OUTPUT_SUFFIXES.keys()),
         type=str,
+        help="Type of output tree to use for metric computation.",
     )
     parser.add_argument(
         "--splits",
@@ -154,7 +155,9 @@ if __name__ == "__main__":
         output_tree_name = base_suffix.replace("_trees_", f"_trees_{splits_label}_")
         if output_tree_name == base_suffix:
             output_tree_name = base_suffix.replace("_trees.", f"_trees_{splits_label}.")
-        output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary_{splits_label}.csv"
+        output_file = (
+            f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary_{splits_label}.csv"
+        )
     else:
         output_tree_name = base_suffix
         output_file = f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary.csv"
@@ -189,11 +192,11 @@ if __name__ == "__main__":
     )
 
     df["rank"] = (
-        df.loc[:, df.columns.str.startswith(("s2r", "rf"))].rank().apply(gmean, axis=1)
+        df.loc[:, df.columns.str.startswith(tuple(metrics))].rank().apply(gmean, axis=1)
     )
 
     df.sort_values(by="rank", ascending=True, inplace=True)
 
     df.to_csv(output_file, float_format="%.4f")
 
-    print("Done")
+    print(f"Done. Saved {output_file}.")
