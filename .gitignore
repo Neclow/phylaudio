@@ -190,40 +190,19 @@ data/models
 # Language identification evaluation
 data/eval/*
 !data/eval/README.md
-!data/eval/*/
-data/eval/*/*
-!data/eval/*/summary.csv
 
 # Embeddings
-data/embeddings/*
-!data/embeddings/fleurs-r/
-data/embeddings/fleurs-r/*
-!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/
-data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/*
-!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/README.md
+data/embeddings/
 
-# Tree data (except README and template)
+# Tree data (track dirs + metadata only)
 data/trees/*
 !data/trees/README.md
-!data/trees/per_sentence/
-data/trees/per_sentence/*
-!data/trees/per_sentence/discrete/
-data/trees/per_sentence/discrete/*
-!data/trees/per_sentence/discrete/summary.csv
-!data/trees/per_sentence/discrete/*/
 !data/trees/beast/
-data/trees/beast/*
-!data/trees/beast/templates/
-!data/trees/beast/speech/
-!data/trees/beast/iecor/
-data/trees/beast/iecor/*
+data/trees/beast/**
+!data/trees/beast/**/
+!data/trees/beast/*/*/metadata*.csv
 !data/trees/beast/iecor/README.md
 !data/trees/beast/iecor/metadata*.csv
-!data/trees/beast/*/
-data/trees/beast/*/*
-!data/trees/beast/*/*/
-data/trees/beast/*/*/*
-!data/trees/beast/*/*/metadata*.csv
 
 # My drafts
 tmp/
