@@ -93,7 +93,9 @@ done
 echo "=== All done. Extracting summary ==="
 
 mkdir -p "${NS_DIR}/results"
-printf "Model\tML\tSD\tH\n" > "${NS_DIR}/results/ns_summary.tsv"
+SUMMARY="${NS_DIR}/results/ns_summary.tsv"
+TMPFILE="${SUMMARY}.tmp"
+printf "Model\tML\tSD\tH\tln_BF\n" > "$SUMMARY"
 for xml_path in "${XMLS[@]}"; do
     xml="$(basename "$xml_path")"
     log="${NS_DIR}/${xml%.xml}_${SEED}.stdout"
@@ -107,6 +109,19 @@ for xml_path in "${XMLS[@]}"; do
     else
         printf "%s\t-\t-\t-\n" "$name"
     fi
-done >> "${NS_DIR}/results/ns_summary.tsv"
+done >> "$SUMMARY"
+
+# Sort by group: M0 (baseline), S* (substitution), C* (constraints+), R* (constraints-), A* (calibrations-)
+# Then compute ln BF = ML_model - ML_M0
+head -1 "$SUMMARY" > "$TMPFILE"
+tail -n +2 "$SUMMARY" | awk -F'\t' '{
+    if ($1 ~ /^M/) o=1; else if ($1 ~ /^S/) o=2; else if ($1 ~ /^C/) o=3;
+    else if ($1 ~ /^R/) o=4; else if ($1 ~ /^A/) o=5; else o=9;
+    print o "\t" $0
+}' | sort -t$'\t' -k1,1n -k2,2 | cut -f2- | awk -F'\t' -v OFS='\t' '
+    NR==1 { ml0=$2 }
+    { print $1, $2, $3, $4, ($2=="-" ? "-" : $2-ml0) }
+' >> "$TMPFILE"
+mv "$TMPFILE" "$SUMMARY"
 
 echo "Summary written to ${NS_DIR}/results/ns_summary.tsv"
