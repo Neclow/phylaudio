@@ -11,7 +11,7 @@ import torchaudio
 from torchaudio.pipelines import SQUIM_OBJECTIVE
 from tqdm import tqdm
 
-from src._config import DEFAULT_METADATA_DIR, DEFAULT_ROOT_DIR, SAMPLE_RATE
+from src._config import DEFAULT_DATA_DIR, DEFAULT_METADATA_DIR, SAMPLE_RATE
 from src.data.datasets import FleursParallelDataset
 
 
@@ -63,7 +63,7 @@ def main():
     # Build dataset with same config as embedding run
     dataset = FleursParallelDataset(
         dataset=args.dataset,
-        root_dir=DEFAULT_ROOT_DIR,
+        root_dir=DEFAULT_DATA_DIR,
         dtype="audio",
         glottocode=None,
         min_speakers=0.0,
