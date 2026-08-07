@@ -190,7 +190,7 @@ data/models
 # Language identification evaluation
 data/eval/*
 !data/eval/README.md
-!data/eval/summary.json
+!data/eval/*/summary.csv
 
 # Embeddings
 data/embeddings/*
