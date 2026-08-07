@@ -422,11 +422,11 @@ EXTRA_IECOR_DATA = {
     },
     "prior_trees": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.trees",
-        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.trees",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior.trees",
     },
     "prior_log": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.log",
-        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.log",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior.log",
     },
 }
 # pylint: enable=line-too-long
