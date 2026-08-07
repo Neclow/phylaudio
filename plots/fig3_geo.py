@@ -1,5 +1,6 @@
 """Figure 3: geographic regression panels (linear_geo model)."""
 
+import json
 import os
 
 import geopandas as gpd
@@ -11,6 +12,19 @@ from matplotlib.colors import Normalize
 from scipy import stats
 
 from src._config import EXCLUDE_LANGUAGES
+
+
+def _load_iecor_to_fleurs():
+    with open("data/metadata/fleurs-r/languages.json") as f:
+        langs = json.load(f)
+    return {
+        info["iecor"]: info["fleurs"]
+        for info in langs.values()
+        if "iecor" in info and info["iecor"] != info["fleurs"]
+    }
+
+
+_LANG_DISPLAY = _load_iecor_to_fleurs()
 
 from ._config import (
     COGNATE_BEAST_DIR,
@@ -121,12 +135,14 @@ def _extract_coefficient_data(summ_df):
 
 def _inset_cbar(ax, sm, label, loc="lower right"):
     rect = (
-        [0.55, 0.10, 0.42, 0.06] if loc == "lower right" else [0.03, 0.10, 0.42, 0.06]
+        [0.68, 0.10, 0.21, 0.03] if loc == "lower right" else [0.11, 0.10, 0.21, 0.03]
     )
     cax = ax.inset_axes(rect)
     cbar = plt.colorbar(sm, cax=cax, orientation="horizontal")
-    cbar.set_label(label, fontsize=12, labelpad=3)
-    cbar.ax.tick_params(labelsize=11, length=3, pad=3)
+    cbar.set_label(label, fontsize=8, labelpad=2)
+    cbar.ax.tick_params(labelsize=7, length=2, pad=2)
+    cbar.locator = plt.MaxNLocator(nbins=4)
+    cbar.update_ticks()
     cbar.ax.xaxis.set_label_position("top")
     cbar.ax.xaxis.set_ticks_position("bottom")
     cax.set_zorder(10)
@@ -309,7 +325,7 @@ def plot_panel_b(dat, comp_order, output_stem):
 
 
 # Panel c: delta vs rate scatter
-def plot_panel_c(dat, output_stem):
+def plot_panel_c(dat, output_stem, label_langs=None):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=FIGSIZE)
 
@@ -334,7 +350,9 @@ def plot_panel_c(dat, output_stem):
         ax.fill_between(
             delta_seq, lo95, hi95, color="#aaaaaa", alpha=0.30, linewidth=0, zorder=2
         )
-        ax.plot(delta_seq, med, color="#555555", linewidth=1.4, zorder=3)
+        ax.plot(
+            delta_seq, med, color="#555555", linewidth=1.4, linestyle="--", zorder=3
+        )
 
         langs = list(meta.index)
 
@@ -396,70 +414,22 @@ def plot_panel_c(dat, output_stem):
         xs = meta.loc[langs, "delta"].values
         ys = meta.loc[langs, "log_rate"].values
 
-        lo95_at_x = np.interp(xs, delta_seq, lo95)
-        hi95_at_x = np.interp(xs, delta_seq, hi95)
-        label_mask = (ys < lo95_at_x) | (ys > hi95_at_x)
-
-        renderer = fig.canvas.get_renderer()
-        inv = ax.transData.inverted()
-        placed_boxes = []
-
-        def _get_bbox_data(txt):
-            bb = txt.get_window_extent(renderer=renderer)
-            (dx0, dy0), (dx1, dy1) = inv.transform([(bb.x0, bb.y0), (bb.x1, bb.y1)])
-            return (dx0, dy0, dx1, dy1)
-
-        def _overlaps(box):
-            for pb in placed_boxes:
-                if (
-                    box[0] < pb[2]
-                    and box[2] > pb[0]
-                    and box[1] < pb[3]
-                    and box[3] > pb[1]
-                ):
-                    return True
-            return False
-
-        offsets_pt = [
-            (6, 6),
-            (-6, 6),
-            (6, -10),
-            (-6, -10),
-            (12, 0),
-            (-12, 0),
-            (0, 10),
-            (0, -14),
-        ]
+        label_mask = np.array([lang in label_langs for lang in langs])
 
         for i, lang in enumerate(langs):
             if not label_mask[i]:
                 continue
-            best_txt = None
-            for dx, dy in offsets_pt:
-                txt = ax.annotate(
-                    lang,
-                    (xs[i], ys[i]),
-                    xytext=(dx, dy),
-                    textcoords="offset points",
-                    color="#333333",
-                    clip_on=True,
-                )
-                box = _get_bbox_data(txt)
-                if not _overlaps(box):
-                    placed_boxes.append(box)
-                    best_txt = txt
-                    break
-                txt.remove()
-            if best_txt is None:
-                txt = ax.annotate(
-                    lang,
-                    (xs[i], ys[i]),
-                    xytext=offsets_pt[0],
-                    textcoords="offset points",
-                    color="#333333",
-                    clip_on=True,
-                )
-                placed_boxes.append(_get_bbox_data(txt))
+            display = _LANG_DISPLAY.get(lang, lang)
+            ax.annotate(
+                display,
+                (xs[i], ys[i]),
+                xytext=(4, 4),
+                textcoords="offset points",
+                ha="left",
+                va="bottom",
+                color="#333333",
+                fontsize=8,
+            )
 
         sm_dot = ScalarMappable(norm=dot_norm, cmap=SCMAP)
         sm_dot.set_array([])
@@ -542,9 +512,34 @@ def plot_panel_d(gp_result, output_stem):
 if __name__ == "__main__":
     os.makedirs(IMG_DIR, exist_ok=True)
 
-    for label, beast_dir in [
-        ("speech", SPEECH_BEAST_DIR),
-        ("cognate", COGNATE_BEAST_DIR),
+    _SPEECH_LABELS = {
+        "Pashto",
+        "Ukrainian",
+        "Persian",
+        "Greek",
+        "Spanish",
+        "French",
+        "Galician",
+        "Bengali",
+        "Assamese",
+        "Catalan",
+    }
+    _COGNATE_LABELS = {
+        "Urdu",
+        "Pashto",
+        "Assamese",
+        "English",
+        "Luxembourgish",
+        "Catalan",
+        "German",
+        "Icelandic",
+        "ArmenianEastern",
+        "Greek",
+    }
+
+    for label, beast_dir, panel_c_labels in [
+        ("speech", SPEECH_BEAST_DIR, _SPEECH_LABELS),
+        ("cognate", COGNATE_BEAST_DIR, _COGNATE_LABELS),
     ]:
         is_main = label == "speech"
         prefix = "fig3" if is_main else "figS7"
@@ -555,7 +550,7 @@ if __name__ == "__main__":
 
         plot_panel_a(dat, comp_order, f"{prefix}a_coef_{label}")
         plot_panel_b(dat, comp_order, f"{prefix}b_shapley_{label}")
-        plot_panel_c(dat, f"{prefix}c_delta_vs_rate_{label}")
+        plot_panel_c(dat, f"{prefix}c_delta_vs_rate_{label}", panel_c_labels)
 
         gp = load_gp_surface(beast_dir)
         plot_panel_d(gp, f"{prefix}d_gp_map_{label}")
