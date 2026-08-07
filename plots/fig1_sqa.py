@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
 """Extended Figure: Silhouette score vs SI-SDR + audio quality correlation matrix."""
+
+# pylint: disable=redefined-outer-name, invalid-name
 
 import json
 import os
@@ -15,40 +16,15 @@ from scipy.stats import linregress, pearsonr
 from src._config import DEFAULT_METADATA_DIR, MIN_LANGUAGES
 from src.data.glottolog import filter_languages
 
-from ._config import DEFAULT_IMG_DIR, DEFAULT_STYLE, XLS_R_EMBEDDING_DIR
+from ._config import (
+    DATASET,
+    DEFAULT_IMG_DIR,
+    DEFAULT_STYLE,
+    TAXONSET_PALETTE,
+    XLS_R_EMBEDDING_DIR,
+)
 
-# Configuration
-DATASET = "fleurs-r"
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
-PALETTE_MAP = {
-    "germanic": "Reds_r",
-    "celtic": ["orange", "darkorange"],
-    "indoaryan": "Purples",
-    "slavic": "Greens_r",
-    "baltic": "blend:mediumpurple,lavender",
-    "romance": "blend:darkkhaki,olive",
-    "iranian": "blend:midnightblue,steelblue",
-    "greek": ["gold"],
-    "armenian": ["cyan"],
-}
-
-
-# Helpers
-def clear_axes(
-    ax=None, top=True, right=True, left=False, bottom=False, minorticks_off=True
-):
-    if ax is None:
-        axes = plt.gcf().axes
-    else:
-        axes = [ax]
-    for ax_i in axes:
-        sns.despine(ax=ax_i, top=top, right=right, left=left, bottom=bottom)
-        if minorticks_off:
-            ax_i.minorticks_off()
-        ax_i.tick_params(axis="x", which="both", top=not top)
-        ax_i.tick_params(axis="y", which="both", right=not right)
-        ax_i.tick_params(axis="y", which="both", left=not left)
-        ax_i.tick_params(axis="x", which="both", bottom=not bottom)
 
 
 @torch.jit.script
@@ -65,6 +41,7 @@ def silhouette_scores(X: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         intra_dist[where] = distances.sum(dim=1) / (distances.shape[0] - 1)
 
     inter_dist = torch.full((n_samples,), torch.inf, dtype=X.dtype, device=X.device)
+    # pylint: disable=consider-using-enumerate
     for i in range(len(unique_labels)):
         for j in range(i + 1, len(unique_labels)):
             label_a = unique_labels[i]
@@ -79,6 +56,7 @@ def silhouette_scores(X: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
 
             inter_dist[where_a] = torch.minimum(dist_a, inter_dist[where_a])
             inter_dist[where_b] = torch.minimum(dist_b, inter_dist[where_b])
+    # pylint: enable=consider-using-enumerate
 
     sil_samples = (inter_dist - intra_dist) / torch.maximum(intra_dist, inter_dist)
     return sil_samples.nan_to_num()
@@ -94,7 +72,7 @@ def sig_stars(p):
     return ""
 
 
-# ── Data loading ──────────────────────────────────────────────────────────────
+# Data loading
 def load_data():
     device = "cuda:1" if torch.cuda.is_available() else "cpu"
 
@@ -151,7 +129,7 @@ def load_data():
     taxonset_mapping = {
         v["fleurs"]: v["taxonset"] for v in mapping.values() if "taxonset" in v
     }
-    palette = {k: sns.color_palette(v)[0] for k, v in PALETTE_MAP.items()}
+    palette = {k: sns.color_palette(v)[0] for k, v in TAXONSET_PALETTE.items()}
 
     audio_and_scores = pd.concat([audio_df_mean, scores_df_mean], axis=1).reset_index()
     audio_and_scores["taxonset"] = audio_and_scores.fleurs.map(taxonset_mapping)
@@ -162,7 +140,7 @@ def load_data():
     return audio_and_scores, palette
 
 
-# ── Plot: Silhouette vs SI-SDR ───────────────────────────────────────────────
+# Plot: Silhouette vs SI-SDR
 def plot_silhouette_vs_sisdr(audio_and_scores, palette):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=(6, 4))
@@ -305,11 +283,13 @@ def plot_silhouette_vs_sisdr(audio_and_scores, palette):
         )
 
         fig.subplots_adjust(right=0.78)
-        fig.savefig(f"{IMG_DIR}/ext_fig1_silhouette_vs_sisdr.pdf", bbox_inches="tight")
+        stem = f"{IMG_DIR}/figS2b_silhouette_vs_sisdr"
+        fig.savefig(f"{stem}.pdf", bbox_inches="tight")
+        print(f"Saved {stem}.pdf")
         plt.show()
 
 
-# ── Plot: Correlation heatmap ─────────────────────────────────────────────────
+# Plot: Correlation heatmap
 def plot_correlation_heatmap(audio_and_scores):
     corr_cols = ["stoi", "pesq", "si_sdr", "silhouette_score"]
     corr_labels = ["STOI", "PESQ", "SI-SDR", "Silhouette"]
@@ -353,8 +333,10 @@ def plot_correlation_heatmap(audio_and_scores):
             cbar_kws={"shrink": 0.8, "label": "Pearson r"},
         )
 
-        fig.savefig(f"{IMG_DIR}/figS1_audio_corr_heatmap.pdf", bbox_inches="tight")
-        fig.savefig(f"{IMG_DIR}/figS1_audio_corr_heatmap.svg", bbox_inches="tight")
+        stem = f"{IMG_DIR}/figS2c_audio_corr_heatmap"
+        fig.savefig(f"{stem}.pdf", bbox_inches="tight")
+        fig.savefig(f"{stem}.svg", bbox_inches="tight")
+        print(f"Saved {stem}.{{pdf,svg}}")
         plt.show()
 
 

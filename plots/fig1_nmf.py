@@ -1,4 +1,4 @@
-"""Figure 1b: sNMF structure plot + Supp Figs 2–3."""
+"""Figure 1b: sNMF structure plot + Supp Figs 3–4."""
 
 import os
 import re
@@ -116,17 +116,13 @@ def plot_structure(P_sorted, labels_sorted):
         leg.get_title().set_position((0, 1))
         ax.grid(axis="x", linestyle="dashed", alpha=0.1, color="k")
 
-        output_path = f"{IMG_DIR}/fig1b_nmf_structure_K{K:02d}.pdf"
-        plt.savefig(
-            output_path,
-            bbox_inches="tight",
-            pad_inches=0.05,
-        )
-        print(f"Saved figure to {output_path}")
+        stem = f"{IMG_DIR}/fig1b_nmf_structure_K{K:02d}"
+        plt.savefig(f"{stem}.pdf", bbox_inches="tight", pad_inches=0.05)
+        print(f"Saved {stem}.pdf")
         plt.show()
 
 
-# Supp Fig. 2
+# Supp Fig. 3
 def plot_ce(df_ce):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=(4, 3))
@@ -147,9 +143,9 @@ def plot_ce(df_ce):
         ax.legend(fontsize=7)
         ax.grid(axis="y", alpha=0.15)
 
-        output_path = f"{IMG_DIR}/figS2_nmf_ce_vs_k.pdf"
-        fig.savefig(output_path, bbox_inches="tight")
-        print(f"Saved figure to {output_path}")
+        stem = f"{IMG_DIR}/figS3_nmf_ce_vs_k"
+        fig.savefig(f"{stem}.pdf", bbox_inches="tight")
+        print(f"Saved {stem}.pdf")
         plt.show()
 
 
@@ -189,7 +185,7 @@ def load_brms(brms_dir=BRMS_DIR):
     return feat_labels, coef, ci_lo, ci_hi, sig, r2
 
 
-# Supp Fig. 3a
+# Supp Fig. 4a
 def plot_phoible_heatmap(feat_labels, coef, sig):
     with plt.style.context(DEFAULT_STYLE):
         alpha_idx = np.argsort(feat_labels)
@@ -221,13 +217,13 @@ def plot_phoible_heatmap(feat_labels, coef, sig):
         ax.set_xlabel("Acoustic component")
         ax.set_ylabel("")
 
-        output_path = f"{IMG_DIR}/figS3a_nmf_phoible_heatmap.pdf"
-        fig.savefig(output_path, bbox_inches="tight")
-        print(f"Saved figure to {output_path}")
+        stem = f"{IMG_DIR}/figS4a_nmf_phoible_heatmap"
+        fig.savefig(f"{stem}.pdf", bbox_inches="tight")
+        print(f"Saved {stem}.pdf")
         plt.show()
 
 
-# Supp Fig. 3b
+# Supp Fig. 4b
 def _darken(hex_color, factor=0.7):
     r, g, b = to_rgb(hex_color)
     return (r * factor, g * factor, b * factor)
@@ -285,9 +281,9 @@ def plot_phoible_forest(feat_labels, coef, ci_lo, ci_hi, sig, r2):
 
         fig.supxlabel("Posterior mean (standardized)")
 
-        output_path = f"{IMG_DIR}/figS3b_nmf_phoible_forest.pdf"
-        fig.savefig(output_path, bbox_inches="tight")
-        print(f"Saved figure to {output_path}")
+        stem = f"{IMG_DIR}/figS4b_nmf_phoible_forest"
+        fig.savefig(f"{stem}.pdf", bbox_inches="tight")
+        print(f"Saved {stem}.pdf")
         plt.show()
 
 
@@ -299,12 +295,12 @@ if __name__ == "__main__":
     print(f"Loaded Q matrix: {len(labels_sorted)} languages x {K} components")
     plot_structure(P_sorted, labels_sorted)
 
-    # Supp Fig. 2
+    # Supp Fig. 3
     df_ce = load_ce()
     print(f"Loaded cross-entropy for K={df_ce['K'].min()}..{df_ce['K'].max()}")
     plot_ce(df_ce)
 
-    # Supp Fig. 3
+    # Supp Fig. 4
     feat_labels, coef, ci_lo, ci_hi, sig, r2 = load_brms()
     print(f"Loaded brms: {len(feat_labels)} features x {K} components")
     plot_phoible_heatmap(feat_labels, coef, sig)

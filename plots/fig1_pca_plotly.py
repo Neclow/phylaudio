@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
 """Interactive PCA of XLS-R embeddings (Plotly HTML)."""
+
+# pylint: disable=redefined-outer-name, invalid-name
 
 import json
 from types import SimpleNamespace
@@ -9,13 +10,15 @@ import pandas as pd
 import plotly.graph_objects as go
 import torch
 
-from plots.fig1_pca import EMB_DIR, TAXONSET_DISPLAY, TAXONSET_ORDER, load_data
 from src._config import (
     RANDOM_STATE,
     SAMPLE_RATE,
 )
 from src.models.audio import AudioProcessor
 from src.tasks.feature_extraction.base import prepare_dataset
+
+from ._config import TAXONSET_DISPLAY, TAXONSET_ORDER, XLS_R_EMBEDDING_DIR
+from .fig1_pca import load_data
 
 OUTPUT_FILE = "docs/index.html"
 
@@ -25,18 +28,20 @@ def get_sentences(parallel_dataset):
     sentence_idxs = parallel_dataset.data.sentence_index.unique()
     sentence_dfs = []
 
+    # pylint: disable=unused-variable
     for sentence_index in sentence_idxs:
         sentence_df = parallel_dataset.data.query("sentence_index == @sentence_index")
         if sentence_df.language.nunique() < 4:
             continue
         sentence_dfs.append(sentence_df)
+    # pylint: enable=unused-variable
 
     return pd.concat(sentence_dfs, axis=0).loc[:, "sentence"]
 
 
 def load_sentences():
     """Load the parallel dataset to get sentence transcripts."""
-    run_dir = EMB_DIR
+    run_dir = XLS_R_EMBEDDING_DIR
     with open(f"{run_dir}/cfg.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
 
@@ -170,7 +175,12 @@ def plot_plotly(X_pca, y_emb, var_exp, labels_pca, mapping, color_map, sentences
 if __name__ == "__main__":
     X_pca, y_emb, var_exp, labels_pca, mapping, color_map, _ = load_data()
     print(
-        f"PCA: {X_pca.shape}, PC1: {var_exp[0]*100:.1f}%, PC2: {var_exp[1]*100:.1f}%, PC3: {var_exp[2]*100:.1f}"
+        (
+            f"PCA: {X_pca.shape}, "
+            f"PC1: {var_exp[0]*100:.1f}%, "
+            f"PC2: {var_exp[1]*100:.1f}%, "
+            f"PC3: {var_exp[2]*100:.1f}"
+        )
     )
 
     sentences, _ = load_sentences()

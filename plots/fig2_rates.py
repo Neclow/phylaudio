@@ -1,4 +1,4 @@
-"""Figure 2b / Supp Fig S4b / S5: rate over time + speech vs cognate scatter."""
+"""Figure 2b / Supp Fig S5b / S6: rate over time + speech vs cognate scatter."""
 
 # pylint: disable=redefined-outer-name, invalid-name
 
@@ -334,7 +334,7 @@ def plot_rates_overlaid(
     t_grid_c,
     raw_rates_c,
     tmax_c,
-    output_name="figS4b_rates",
+    output_name="figS5b_rates",
 ):
     tmax = max(tmax_s, tmax_c)
     color_s, color_c = FIG2_COLOR_SPEECH, FIG2_COLOR_COGNATE
@@ -392,7 +392,7 @@ def plot_rates_overlaid(
         plt.show()
 
 
-def plot_rate_scatter(output_name="figS5_speech_vs_cognate_rates"):
+def plot_rate_scatter(output_name="figS6_speech_vs_cognate_rates"):
     speech = pd.read_csv(f"{SPEECH_BEAST_DIR}/metadata_with_inventory.csv")
     cognate = pd.read_csv(f"{COGNATE_BEAST_DIR}/metadata_with_inventory.csv")
 
@@ -479,8 +479,8 @@ if __name__ == "__main__":
     # Load cognate rates (reused by S4b and S5)
     t_grid_c, raw_rates_c, tmax_c = load_rates(COGNATE_TREES_FILE)
 
-    # Fig S4b: overlaid speech + cognate rates
+    # Fig S5b: overlaid speech + cognate rates
     plot_rates_overlaid(t_grid, raw_rates, tmax, t_grid_c, raw_rates_c, tmax_c)
 
-    # Fig S5: speech vs cognate rate scatter
+    # Fig S6: speech vs cognate rate scatter
     plot_rate_scatter()

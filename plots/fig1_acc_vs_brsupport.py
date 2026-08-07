@@ -214,7 +214,7 @@ def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
         plt.show()
 
 
-def plot_f1_vs_brsupport(data, output_name="figS_f1_vs_brsupport"):
+def plot_f1_vs_brsupport(data, output_name="figS1_f1_vs_brsupport"):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=(3.5, 3))
         legends = _plot(ax, fig, data, "test_f1", "Macro F1 score (%)")

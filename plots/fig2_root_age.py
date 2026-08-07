@@ -1,4 +1,4 @@
-"""Figure 2a / Supp Fig S4a: posterior root age distributions."""
+"""Figure 2a / Supp Fig S5a: posterior root age distributions."""
 
 import os
 
@@ -80,7 +80,7 @@ def plot_root_age(output_name="fig2a_root_age"):
         plt.show()
 
 
-def plot_root_age_overlaid(output_name="figS4a_root_age"):
+def plot_root_age_overlaid(output_name="figS5a_root_age"):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=FIG2_SIZE)
 
