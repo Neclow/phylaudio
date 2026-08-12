@@ -64,6 +64,74 @@ def merge_fastas(input_files, sequence_ids, filler="?", output_file=None):
         return seqs
 
 
+def vote_fastas(input_files, output_file=None):
+    """Aggregate several fastas into one alignment by per-site majority vote.
+
+    All input fastas must share the same alignment length. For each sequence id
+    and site, the output character is the majority state ('0' or '1') across the
+    files where that sequence is present and the site is not missing; exact ties
+    and all-missing sites become '?'.
+    """
+    skipped = []
+
+    ones = {}
+    known = {}
+    length = None
+
+    for file in tqdm(input_files, desc="Voting over FASTA files"):
+        n_lines = _count_file_lines(file)
+        if n_lines < 2 * MIN_LANGUAGES:
+            skipped.append(
+                (
+                    Path(file).stem,
+                    f"File has less than {MIN_LANGUAGES} sequences ({n_lines})",
+                )
+            )
+            continue
+
+        for record in SeqIO.parse(file, "fasta"):
+            language = str(record.id)
+            seq = np.frombuffer(str(record.seq).encode(), dtype=np.uint8)
+
+            if length is None:
+                length = seq.size
+            elif seq.size != length:
+                raise ValueError(
+                    f"Alignment length mismatch in {file}: {seq.size} != {length}"
+                )
+
+            if language not in ones:
+                ones[language] = np.zeros(length, dtype=np.int64)
+                known[language] = np.zeros(length, dtype=np.int64)
+
+            is_one = seq == ord("1")
+            ones[language] += is_one
+            known[language] += is_one | (seq == ord("0"))
+
+    if len(skipped) > 0:
+        warnings.warn(f"{len(skipped)} warnings encountered: {skipped}", UserWarning)
+
+    seqs = {}
+    for language, n_ones in ones.items():
+        n_known = known[language]
+        chars = np.where(
+            2 * n_ones > n_known, "1", np.where(2 * n_ones < n_known, "0", "?")
+        )
+        seqs[language] = "".join(chars)
+
+    print(
+        f"After vote: {len(seqs)} sequences; alignment length: {length}."
+    )
+
+    if output_file is not None:
+        with open(output_file, "w", encoding="utf-8") as f_out:
+            for language, seq in seqs.items():
+                if set(seq) != {"?"}:
+                    f_out.write(f">{language}\n{seq}\n")
+    else:
+        return seqs
+
+
 def to_beast(input_file, output_file, template_beast_file, taxonsets=None):
     """Convert a FASTA file to a BEAST XML file.
 
@@ -94,6 +162,27 @@ def to_beast(input_file, output_file, template_beast_file, taxonsets=None):
 
     tree = xml.etree.ElementTree.parse(template_beast_file)
     root = tree.getroot()
+
+    # Prune template taxonset members that are absent from the alignment
+    # (e.g. Afrikaans in datasets restricted to dev/test sentences)
+    for taxonset_elm in root.iter("taxonset"):
+        for taxon_elm in list(taxonset_elm.findall("taxon")):
+            name = taxon_elm.get("id") or taxon_elm.get("idref")
+            if name not in sequences:
+                taxonset_elm.remove(taxon_elm)
+                warnings.warn(
+                    (
+                        f"Pruned taxon '{name}' (absent from '{input_file}') "
+                        f"from taxonset '{taxonset_elm.get('id')}'"
+                    ),
+                    UserWarning,
+                )
+        if len(taxonset_elm.findall("taxon")) == 1:
+            warnings.warn(
+                f"Taxonset '{taxonset_elm.get('id')}' has a single taxon after pruning",
+                UserWarning,
+            )
+
     data_elm = root.findall("data")[-1]
 
     # Clear existing sequence elements from the data section

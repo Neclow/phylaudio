@@ -22,7 +22,7 @@ from src._config import (
     DEFAULT_METADATA_KEY,
     DEFAULT_PER_SENTENCE_DIR,
 )
-from src.tasks.phylo.fasta import merge_fastas, to_beast
+from src.tasks.phylo.fasta import merge_fastas, to_beast, vote_fastas
 
 XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/input_v1.xml"
 PRIOR_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/prior_v1.xml"
@@ -45,11 +45,19 @@ def parse_args():
         help="Run ID (or path to run directory)",
     )
     parser.add_argument(
+        "--mode",
+        type=str,
+        default="concat",
+        choices=("concat", "vote"),
+        help="concat: concatenate the top-p%% sentences ranked by --by; "
+        "vote: per-site majority vote over all sentences (ignores -p/--by)",
+    )
+    parser.add_argument(
         "-p",
         "--p",
         type=float,
-        required=True,
-        help="%% of sequences to keep",
+        default=None,
+        help="%% of sequences to keep (required for --mode concat)",
     )
     parser.add_argument(
         "--by",
@@ -101,15 +109,20 @@ def resolve_splits(include, exclude):
 def main():
     args = parse_args()
 
-    assert 0 < args.p <= 1.0
+    if args.mode == "concat":
+        if args.p is None:
+            raise ValueError("-p is required for --mode concat")
+        assert 0 < args.p <= 1.0
 
-    # Higher is better for brsupport/stemmy; lower is better for clock (CoV)
-    ascending_by = {"brsupport": False, "stemmy": False, "clock": True}
-    if args.by not in ascending_by:
-        raise ValueError(
-            f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
-        )
-    ascending = ascending_by[args.by]
+        # Higher is better for brsupport/stemmy; lower is better for clock (CoV)
+        ascending_by = {"brsupport": False, "stemmy": False, "clock": True}
+        if args.by not in ascending_by:
+            raise ValueError(
+                f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
+            )
+        ascending = ascending_by[args.by]
+    elif args.p is not None:
+        warnings.warn("-p is ignored with --mode vote", UserWarning)
 
     splits_label = resolve_splits(args.include, args.exclude)
 
@@ -135,9 +148,12 @@ def main():
     print(f"Using run directory: {run_dir}")
     stats_file = f"{run_dir}/_stats_{splits_label}.csv" if splits_label else f"{run_dir}/_stats.csv"
     df = pd.read_csv(stats_file, index_col=0)
-    sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
-        : int(args.p * df.shape[0])
-    ]
+    if args.mode == "vote":
+        sub_df = df
+    else:
+        sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
+            : int(args.p * df.shape[0])
+        ]
     print(sub_df.describe())
     input_files = [f"{run_dir}/{x}" for x in sub_df.index.to_list()]
 
@@ -150,20 +166,41 @@ def main():
     ) as f:
         languages = json.load(f)
 
-    beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
-    beast_p_dir += f"_{args.by}"
+    if args.mode == "vote":
+        beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/vote"
+    else:
+        beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
+        beast_p_dir += f"_{args.by}"
     if splits_label:
         beast_p_dir += f"_{splits_label}"
     os.makedirs(beast_p_dir, exist_ok=True)
 
-    # Merge FASTA files
+    with open(f"{beast_p_dir}/cfg.json", "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "run_dir": run_dir,
+                "mode": args.mode,
+                "p": args.p if args.mode == "concat" else None,
+                "by": args.by if args.mode == "concat" else None,
+                "splits": splits_label,
+                "key": args.key,
+                "n_sentences": len(input_files),
+            },
+            f,
+            indent=4,
+        )
+
+    # Aggregate FASTA files into one alignment
     merged_file = f"{beast_p_dir}/{DEFAULT_MERGED_FASTA_FILE}"
 
-    merge_fastas(
-        input_files=input_files,
-        output_file=merged_file,
-        sequence_ids=list(languages.keys()),
-    )
+    if args.mode == "vote":
+        vote_fastas(input_files=input_files, output_file=merged_file)
+    else:
+        merge_fastas(
+            input_files=input_files,
+            output_file=merged_file,
+            sequence_ids=list(languages.keys()),
+        )
 
     # Map sequence IDs to reference names in mapped FASTA file
     mapped_file = f"{beast_p_dir}/{DEFAULT_MAPPED_FASTA_FILE}"
