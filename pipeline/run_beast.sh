@@ -184,3 +184,17 @@ if [[ ${#HOME_STATE_FILES[@]} -gt 0 ]]; then
         echo "  $(basename "$f") -> $(basename "$DEST")"
     done
 fi
+
+TREES_FILE="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.trees"
+MCC_FILE="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.mcc"
+
+if [[ -f "$TREES_FILE" ]]; then
+    echo ""
+    echo "Running TreeAnnotator (MCC)..."
+    pixi run treeannotator "$TREES_FILE" "$MCC_FILE"
+    echo "MCC tree written to: $MCC_FILE"
+else
+    echo ""
+    echo "Warning: Trees file not found: $TREES_FILE"
+    echo "Skipping TreeAnnotator."
+fi
