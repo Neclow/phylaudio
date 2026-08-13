@@ -20,7 +20,7 @@ class AudioProcessor(BaseProcessor):
     All classes have ```process``` function to process audio files for data loading
     """
 
-    def __init__(self, sr, max_length, **kwargs):
+    def __init__(self, sr, max_length=None, **kwargs):
         self.sr = sr
         self.max_length = max_length
 

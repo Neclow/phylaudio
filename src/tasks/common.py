@@ -5,7 +5,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import torch
 from lightning.pytorch import seed_everything
 
-from .._config import DEFAULT_CACHE_DIR, DEFAULT_ROOT_DIR, RANDOM_STATE, SAMPLE_RATE
+from .._config import DEFAULT_CACHE_DIR, DEFAULT_DATA_DIR, RANDOM_STATE, SAMPLE_RATE
 from ..data import load_dataset
 from ..models._model_zoo import MODEL_ZOO
 
@@ -45,14 +45,6 @@ def get_common_args():
         help="Whether to load a finetuned XLS-R model",
     )
     parser.add_argument(
-        "--average-pool",
-        action="store_true",
-        help=(
-            "Whether to perform average pooling on the last hidden state "
-            "for `transformers`-based models"
-        ),
-    )
-    parser.add_argument(
         "--with-vad",
         action="store_true",
         help="Whether to transform the data using VAD",
@@ -77,7 +69,7 @@ def prepare_model(args, training=False):
     if processor_cls is not None:
         processor_kwargs = {
             **base_kwargs,
-            "max_length": args.max_length or MODEL_ZOO[args.model_id]["max_length"],
+            "max_length": args.max_length,
             "sr": SAMPLE_RATE,
         }
         processor = processor_cls(**processor_kwargs)
@@ -93,7 +85,7 @@ def prepare_model(args, training=False):
         "device": args.device,
         "training": training,
         "finetuned": args.finetuned,
-        "average_pool": args.average_pool,
+        "layer": getattr(args, "layer", -1),
     }
 
     feature_extractor = feature_extractor_cls(**feature_extractor_kwargs)
@@ -109,7 +101,7 @@ def prepare_dataset(args, processor, **kwargs):
     core_dataset_args = {
         "dataset": args.dataset,
         "dtype": MODEL_ZOO[args.model_id]["dtype"],
-        "root_dir": DEFAULT_ROOT_DIR,
+        "root_dir": DEFAULT_DATA_DIR,
         "with_vad": args.with_vad,
         "processor": processor,
     }

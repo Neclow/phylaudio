@@ -164,6 +164,7 @@ cython_debug/
 
 # BEAST2
 extern/beast2
+extern/beagle-lib
 .beast
 
 # DensiTree
@@ -177,8 +178,11 @@ extern/splitstree
 # Lightning
 lightning_logs/
 
-# Datasets
+# Audio datasets
 data/datasets
+
+# Geographical data
+data/geo
 
 # Models
 data/models
@@ -186,32 +190,19 @@ data/models
 # Language identification evaluation
 data/eval/*
 !data/eval/README.md
-!data/eval/summary.json
 
 # Embeddings
-data/embeddings/*
-!data/embeddings/fleurs-r/
-data/embeddings/fleurs-r/*
-!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/
-data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/*
-!data/embeddings/fleurs-r/facebook_wav2vec2-xls-r-300m/README.md
+data/embeddings/
 
-# Tree data (except README and template)
+# Tree data (track dirs + metadata only)
 data/trees/*
 !data/trees/README.md
-!data/trees/per_sentence/
-data/trees/per_sentence/*
-!data/trees/per_sentence/discrete/
-data/trees/per_sentence/discrete/*
-!data/trees/per_sentence/discrete/summary.csv
-!data/trees/per_sentence/discrete/*/
 !data/trees/beast/
-data/trees/beast/*
-!data/trees/beast/template.xml
-!data/trees/beast/speech/
-!data/trees/beast/iecor/
-data/trees/beast/iecor/*
+data/trees/beast/**
+!data/trees/beast/**/
+!data/trees/beast/*/*/metadata*.csv
 !data/trees/beast/iecor/README.md
+!data/trees/beast/iecor/metadata*.csv
 
 # My drafts
 tmp/
@@ -220,7 +211,6 @@ notebooks/
 paper/
 drafts*.ipynb
 drafts*.R
-ZENODO.md
 
 # CLAUDE and AGENTS
 .claude/
@@ -244,3 +234,13 @@ node_modules/
 
 # Compressed data files
 data/**/*.tar.gz
+
+# BEAST2 output dumped outside data/trees/beast/
+/input_*.log*
+/input_*.trees
+/input_*.posterior.trees
+/input_*.state
+/input_*.*state
+
+# CmdStan compiled binaries
+src/tasks/phylo/additive_phylo_gp

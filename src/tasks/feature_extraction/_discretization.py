@@ -31,6 +31,9 @@ DISCRETIZATION_METHODS = {
     "kmeans": kmeans_bucketize,
     "quantile": qcut,
     "step": lambda x, _: x.gt(0).long(),
+    # Embeddings are first projected through the trained LID head's STE
+    # bottleneck (see get_embeddings); the sign output is mapped to {0, 1}.
+    "ste": lambda x, _: x.gt(0).long(),
 }
 
 
@@ -44,7 +47,7 @@ def load_discretizer(method):
 
 
 def discretize(x, method, idxs=None, q=None) -> np.ndarray:
-    discretization_fn = DISCRETIZATION_METHODS[method]
+    discretization_fn = load_discretizer(method)
 
     output = torch.zeros_like(x, device=x.device, dtype=torch.int64)
 

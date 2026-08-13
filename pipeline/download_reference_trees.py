@@ -20,7 +20,7 @@ from src._config import (
     DEFAULT_REFERENCE_TREE_PROCESSED_DIR,
     DEFAULT_REFERENCE_TREE_RAW_DIR,
 )
-from src.data.glottolog import filter_languages_from_glottocode
+from src.data.glottolog import filter_languages
 
 
 class BaseTreeProcessor(ABC):
@@ -422,11 +422,11 @@ EXTRA_IECOR_DATA = {
     },
     "prior_trees": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.trees",
-        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.trees",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior.trees",
     },
     "prior_log": {
         "url": "https://share.eva.mpg.de/public.php/dav/files/E4Am2bbBA3qLngC/01_Main_Analysis_M3/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin/IECoR_Main_M3_Binary_Covarion_Rates_By_Mg_Bin_combined_PRIOR.log",
-        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior/raw.log",
+        "file": f"{DEFAULT_BEAST_DIR}/iecor/prior.log",
     },
 }
 # pylint: enable=line-too-long
@@ -459,7 +459,9 @@ def prune_iecor_posterior(input_path, output_path, overwrite=False):
         print(f"Posterior trees {input_path} not found. Skipping pruning.")
         return
 
-    print(f"Loading posterior trees from {input_path} (this may take several minutes)...")
+    print(
+        f"Loading posterior trees from {input_path} (this may take several minutes)..."
+    )
     trees = dendropy.TreeList.get(
         path=input_path,
         schema="nexus",
@@ -475,11 +477,12 @@ def prune_iecor_posterior(input_path, output_path, overwrite=False):
     }
     max_dist = max(leaf_distances.values())
     labels_to_keep = {
-        label for label, dist in leaf_distances.items()
-        if (max_dist - dist) <= 1e-6
+        label for label, dist in leaf_distances.items() if (max_dist - dist) <= 1e-6
     }
     n_removed = len(leaf_distances) - len(labels_to_keep)
-    print(f"  Removing {n_removed} historical taxa, keeping {len(labels_to_keep)} modern taxa.")
+    print(
+        f"Removing {n_removed} historical taxa, keeping {len(labels_to_keep)} modern taxa."
+    )
 
     task = partial(_prune_one_tree, labels=labels_to_keep)
     num_workers = min(64, max(1, os.cpu_count() - 4))
@@ -545,7 +548,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     # Get json language data
-    languages_filtered = filter_languages_from_glottocode(
+    languages_filtered = filter_languages(
         dataset=args.dataset,
         glottocode=args.glottocode,
         min_speakers=args.min_speakers,
@@ -592,6 +595,16 @@ if __name__ == "__main__":
             response.raise_for_status()
             with open(extra_iecor_info["file"], "wb") as f:
                 f.write(response.content)
+
+    # Symlink IECoR MCC tree into its BEAST dir so regression scripts find it
+    iecor_link = f"{DEFAULT_BEAST_DIR}/iecor/iecor.nex"
+    iecor_target = os.path.relpath(
+        f"{DEFAULT_REFERENCE_TREE_RAW_DIR}/iecor.nex",
+        os.path.dirname(iecor_link),
+    )
+    if not os.path.exists(iecor_link):
+        os.symlink(iecor_target, iecor_link)
+        print(f"Symlinked {iecor_link} -> {iecor_target}")
 
     # Prune IECoR posterior trees to modern (contemporary) taxa only
     prune_iecor_posterior(

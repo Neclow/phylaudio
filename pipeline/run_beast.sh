@@ -97,7 +97,11 @@ if [[ ${#MATCHES[@]} -gt 1 ]]; then
     exit 1
 fi
 
-WORKING_DIR="${MATCHES[0]}/${SIZE}_brsupport"
+if [[ "$SIZE" =~ ^[0-9.]+$ ]]; then
+    WORKING_DIR="${MATCHES[0]}/${SIZE}_brsupport"
+else
+    WORKING_DIR="${MATCHES[0]}/${SIZE}"
+fi
 if [[ ! -d "$WORKING_DIR" ]]; then
     echo "Error: Directory not found: $WORKING_DIR"
     exit 1
@@ -163,3 +167,36 @@ fi
 
 cd "$BEAST_DIR"
 pixi run beast2 "${BEAST_ARGS[@]}" "$INPUT_FILE"
+
+# CoupledMCMC/NS runs dump state files outside WORKING_DIR despite -working
+INPUT_BASENAME="$(basename "$INPUT_FILE" .xml)"
+STATE_BASENAME="${INPUT_BASENAME}_${SEED}"
+shopt -s nullglob
+STRAY_STATE_FILES=(
+    "$BEAST_DIR/${STATE_BASENAME}.xml."*state*
+    "$HOME/${STATE_BASENAME}.xml."*state*
+)
+shopt -u nullglob
+
+if [[ ${#STRAY_STATE_FILES[@]} -gt 0 ]]; then
+    echo ""
+    echo "Moving ${#STRAY_STATE_FILES[@]} state file(s) to $WORKING_DIR"
+    for f in "${STRAY_STATE_FILES[@]}"; do
+        mv "$f" "$WORKING_DIR/"
+        echo "  $(basename "$f") -> $WORKING_DIR/"
+    done
+fi
+
+TREES_FILE="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.trees"
+MCC_FILE="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.mcc"
+
+if [[ -f "$TREES_FILE" ]]; then
+    echo ""
+    echo "Running TreeAnnotator (MCC)..."
+    pixi run treeannotator "$TREES_FILE" "$MCC_FILE"
+    echo "MCC tree written to: $MCC_FILE"
+else
+    echo ""
+    echo "Warning: Trees file not found: $TREES_FILE"
+    echo "Skipping TreeAnnotator."
+fi

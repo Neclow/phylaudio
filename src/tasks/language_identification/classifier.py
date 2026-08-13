@@ -3,7 +3,6 @@
 """Downstream LID classification"""
 
 import torch
-import torch.nn.functional as F
 from lightning.pytorch import LightningModule
 from torch import autograd, nn, optim
 from torchmetrics import MetricCollection
@@ -18,11 +17,13 @@ class STEFunction(autograd.Function):
 
     @staticmethod
     def forward(ctx, i):
+        ctx.save_for_backward(i)
         return i.sign()
 
     @staticmethod
     def backward(ctx, grad_output):
-        return F.hardtanh(grad_output)
+        (i,) = ctx.saved_tensors
+        return grad_output * (i.abs() <= 1).to(grad_output.dtype)
 
 
 class STE(nn.Module):
@@ -64,7 +65,7 @@ class MLP(nn.Module):
         torch dtype, by default None
     """
 
-    def __init__(self, in_dim, out_dim, hidden_dim=None, ste=False, dtype=None):
+    def __init__(self, in_dim, out_dim, hidden_dim=None, dtype=None):
         super().__init__()
 
         # TODO: add num_layers as arg for classifier?
@@ -76,11 +77,11 @@ class MLP(nn.Module):
         self.hidden_dim = hidden_dim
 
         if self.hidden_dim is None:
-            self.projector = nn.Identity()
+            self.projector = nn.Sequential(nn.Identity(), nn.Identity())
 
             self.classifier = nn.Linear(self.in_dim, self.out_dim, dtype=dtype)
         else:
-            self.activation = STE() if ste else nn.ReLU()
+            self.activation = STE()
 
             self.projector = nn.Sequential(
                 nn.Linear(self.in_dim, self.hidden_dim, dtype=dtype),

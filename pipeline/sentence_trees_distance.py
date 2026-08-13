@@ -23,6 +23,12 @@ def parse_args(with_base_args=True):
     parser = get_fleurs_parallel_args(with_common_args=with_base_args)
 
     parser.add_argument(
+        "--dtype",
+        required=True,
+        help="Output subdirectory name under per_sentence/",
+    )
+
+    parser.add_argument(
         "--dbs",
         type=int,
         default=64,
@@ -40,12 +46,6 @@ def parse_args(with_base_args=True):
         default="fastme",
         type=str,
         help="Distance-based phylogenetic method",
-    )
-    parser.add_argument(
-        "--layer",
-        default=-1,
-        type=int,
-        help="Layer to use for distance calculation",
     )
 
     return parser.parse_args()
@@ -85,7 +85,7 @@ def main():
     inputs = prepare_everything(args)
 
     # Save metadata
-    dtype = f"pdist+{args.method}"
+    dtype = f"{args.dtype}+{args.method}"
     if args.decomposition is not None:
         dtype += f"+{args.decomposition}"
     pdist_dir = f"{DEFAULT_PER_SENTENCE_DIR}/{dtype}"

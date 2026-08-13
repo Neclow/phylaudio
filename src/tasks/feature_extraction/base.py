@@ -1,20 +1,28 @@
 # pylint: disable=invalid-name
 
 """Base functions for phylogenetic analysis base on the FLEURS dataset."""
+
 import json
 import os
 import uuid
 from argparse import ArgumentParser, ArgumentTypeError
 from dataclasses import dataclass
+from glob import glob
 from typing import List, Optional, Union
 
 import git
 import joblib
+import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from ..._config import DEFAULT_THREADS_NEXUS, MIN_LANGUAGES, NONE_TENSOR
+from ..._config import DEFAULT_EVAL_DIR, DEFAULT_THREADS_NEXUS, MIN_LANGUAGES
+from ...data.glottolog import (
+    add_language_filter_args,
+    filter_languages,
+    read_exclude_file,
+)
 from ..common import get_common_args, prepare_dataset, prepare_model
 from ..language_identification.classifier import MLP
 from ._decomposition import decompose, fit_decomposer
@@ -36,11 +44,14 @@ class FleursParallelInput:
     num_batches: int
     num_classes: int
     labels: List[str]
-    feature_extractor: Union[torch.nn.Module, List[torch.nn.Module]]
-    parallel_loader: DataLoader
+    feature_extractor: Optional[Union[torch.nn.Module, List[torch.nn.Module]]] = None
+    parallel_loader: Optional[DataLoader] = None
     classifier: Optional[torch.nn.Module] = None
     decomposer: Optional[torch.nn.Module] = None
     fast_dev_run: bool = False
+    # (embeddings, meta) loaded from an extract_embeddings cache; when set, the
+    # sentence loop reads pre-computed embeddings instead of running the backbone.
+    embedding_cache: Optional[tuple] = None
 
 
 def get_fleurs_parallel_args(with_common_args=True):
@@ -111,17 +122,26 @@ def get_fleurs_parallel_args(with_common_args=True):
         help="Number of threads to use for parallel processing of iqtree",
     )
     parser.add_argument(
-        "--glottocode",
-        type=str,
-        default="indo1319",
-        help="Glottocode to filter languages",
+        "--layer",
+        type=int,
+        default=-1,
+        help=(
+            "Transformer hidden-state index to use for the embedding. -1 (default) "
+            "uses the last layer (last_hidden_state). Only honoured by "
+            "wav2vec2/MMS-style extractors."
+        ),
     )
     parser.add_argument(
-        "--min-speakers",
-        type=float,
-        default=0.0,
-        help="Minimum number of speakers per language",
+        "--embeddings-cache",
+        type=str,
+        default=None,
+        help=(
+            "Path to an extract_embeddings run dir (embeddings.pt + meta.parquet "
+            "+ taxa.json). If set, read cached embeddings instead of running the "
+            "backbone; language filters apply at read time."
+        ),
     )
+    add_language_filter_args(parser)
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -132,6 +152,12 @@ def get_fleurs_parallel_args(with_common_args=True):
 
 
 def prepare_everything(args, verbose=True):
+    if getattr(args, "discretization", None) == "ste" and args.ckpt is None:
+        raise ValueError(
+            "--discretization ste requires --ckpt (the trained LID head to "
+            "project embeddings through)."
+        )
+
     cfg = vars(args)
     cfg["Commit"] = git.Repo(search_parent_directories=True).head.object.hexsha
 
@@ -143,7 +169,12 @@ def prepare_everything(args, verbose=True):
         for k, v in cfg.items():
             print(f"\t{k}: {v}")
 
+    if getattr(args, "embeddings_cache", None):
+        return _prepare_from_cache(args, cfg, run_id)
+
     processor, feature_extractor = prepare_model(args, training=False)
+
+    exclude = read_exclude_file(args.exclude_languages_file)
 
     parallel_dataset = prepare_dataset(
         args,
@@ -152,6 +183,8 @@ def prepare_everything(args, verbose=True):
         fleurs_parallel=True,
         glottocode=args.glottocode,
         min_speakers=args.min_speakers,
+        exclude=exclude,
+        gender=args.gender,
     )[0]
 
     num_classes = len(parallel_dataset.label_encoder)
@@ -191,6 +224,68 @@ def prepare_everything(args, verbose=True):
     return fleurs_parallel_input
 
 
+def _prepare_from_cache(args, cfg, run_id):
+    """Build a FleursParallelInput from a cached extract_embeddings run.
+
+    Reads pre-computed per-utterance embeddings + aligned meta, applies the
+    phylo language filter (glottocode/min_speakers/exclude) to the rows at read
+    time while keeping the full label space (matching the live path), and
+    attaches the STE head via --ckpt if given. No backbone is loaded.
+    """
+    cache_dir = args.embeddings_cache
+
+    # Cached embeddings may be float16 (models run half-precision on CUDA); use
+    # float32 so the STE projector / downstream run on any device (incl. CPU).
+    embeddings = torch.load(f"{cache_dir}/embeddings.pt", map_location="cpu").float()
+    meta = pd.read_parquet(f"{cache_dir}/meta.parquet").reset_index(drop=True)
+    with open(f"{cache_dir}/taxa.json", "r", encoding="utf-8") as f:
+        taxa = json.load(f)
+
+    num_classes = taxa["num_classes"]
+    labels = taxa["labels"]
+
+    # Read-time language filter: restrict rows to the analysis languages, keep
+    # the full label space (the live FleursParallelDataset filters rows too but
+    # does not rebuild the label encoder). Encoded labels map via taxa labels.
+    if getattr(args, "glottocode", None) is not None:
+        exclude = read_exclude_file(args.exclude_languages_file)
+        languages_to_keep = filter_languages(
+            args.dataset,
+            glottocode=args.glottocode,
+            min_speakers=args.min_speakers,
+            exclude=exclude,
+        )
+        name_to_idx = {name: i for i, name in enumerate(labels)}
+        keep = {name_to_idx[n] for n in languages_to_keep if n in name_to_idx}
+        mask = meta["label"].isin(keep).to_numpy()
+        meta = meta[mask].reset_index(drop=True)
+        embeddings = embeddings[torch.from_numpy(mask)]
+        print(
+            f"(cache) {args.glottocode}: kept {len(keep)} languages "
+            f"-> {len(meta)} utterances"
+        )
+
+    inputs = FleursParallelInput(
+        run_id=run_id,
+        cfg=cfg,
+        num_batches=meta["sentence_index"].nunique(),
+        num_classes=num_classes,
+        labels=labels,
+        fast_dev_run=args.dry_run,
+        embedding_cache=(embeddings, meta),
+    )
+
+    if args.ckpt is not None:
+        inputs.classifier = prepare_classifier(
+            args,
+            in_dim=embeddings.shape[1],
+            out_dim=num_classes,
+            dtype=embeddings.dtype,
+        )
+
+    return inputs
+
+
 def save_state(fleurs_parallel_input, output_folder):
     os.makedirs(output_folder, exist_ok=True)
 
@@ -205,43 +300,47 @@ def save_state(fleurs_parallel_input, output_folder):
         )
 
 
-def get_embeddings(
-    fleurs_parallel_input,
-    X,
-    y,
-    attention_mask,
-    device="cpu",
-    batch_size=16,
-):
+def get_embeddings(fleurs_parallel_input, X, y, device="cpu"):
+    """Extract one embedding per utterance.
+
+    Each ``x_i`` is a ``(1, T_i)`` tensor at the utterance's natural length,
+    so every extractor runs B=1 over real audio only — no padding, no need
+    for attention_mask/lengths/wav_lens plumbing.
+    """
+    extractor = fleurs_parallel_input.feature_extractor
     all_embeddings = []
 
-    for i in tqdm(
-        range(0, len(X), batch_size), desc="Extracting embeddings", leave=False
-    ):
-        # X_batch: List
-        X_batch = X[i : i + batch_size]
-
-        if isinstance(X_batch[0], list):
-            X_batch = [x[0] for x in X_batch]
-        else:
-            X_batch = torch.stack(X_batch, dim=0).to(device)[:, 0, :]
-
-        # attention_mask: torch.Tensor
-        a_batch = attention_mask[i : i + batch_size].to(device)
-
-        if torch.equal(a_batch[0], NONE_TENSOR.to(a_batch.device)):
-            embedding = fleurs_parallel_input.feature_extractor(X_batch)
-        else:
-            embedding = fleurs_parallel_input.feature_extractor(X_batch, a_batch)
-
+    for x_i in tqdm(X, desc="Extracting embeddings", leave=False):
+        if isinstance(x_i, list):
+            x_i = x_i[0]
+        embedding = extractor(x_i.to(device))
         all_embeddings.append(embedding)
 
-    embeddings = torch.cat(all_embeddings, axis=0).to(device)
+    embeddings = torch.cat(all_embeddings, dim=0).to(device)
 
+    return post_process_embeddings(fleurs_parallel_input, embeddings, y)
+
+
+def post_process_embeddings(fleurs_parallel_input, embeddings, y):
+    """Turn raw embeddings into the representation downstream tasks consume.
+
+    Shared by the live (get_embeddings) and cached sentence-loop paths so STE
+    projection / classifier filtering / decomposition stay identical.
+    """
     if fleurs_parallel_input.classifier is not None:
-        embeddings, y = filter_embeddings(
-            fleurs_parallel_input.classifier, embeddings, y
-        )
+        projector = fleurs_parallel_input.classifier.projector
+        if fleurs_parallel_input.cfg.get("discretization") == "ste":
+            # Replace each embedding with its STE bottleneck code (hidden_dim-wide, ±1).
+            # Match the projector's dtype (the head is cast to the extractor dtype,
+            # which can differ from the pooled embedding's, e.g. half vs float).
+            embeddings = projector(embeddings.to(next(projector.parameters()).dtype))
+        else:
+            embeddings = projector[0](embeddings.to(next(projector.parameters()).dtype))
+
+        # if fleurs_parallel_input.cfg.get("filter_classifier"):
+        #     embeddings, y = filter_embeddings(
+        #         fleurs_parallel_input.classifier, embeddings, y
+        #     )
 
     if fleurs_parallel_input.decomposer is not None:
         embeddings = decompose(fleurs_parallel_input.decomposer, embeddings)
@@ -250,6 +349,15 @@ def get_embeddings(
 
 
 def sentence_loop(args, inputs, output_folder, downstream_func):
+    """Drive ``downstream_func`` per sentence from either the live backbone or a
+    cached embedding run (``inputs.embedding_cache``)."""
+    if inputs.embedding_cache is not None:
+        _sentence_loop_cache(args, inputs, output_folder, downstream_func)
+    else:
+        _sentence_loop_live(args, inputs, output_folder, downstream_func)
+
+
+def _sentence_loop_live(args, inputs, output_folder, downstream_func):
     for batch in tqdm(
         inputs.parallel_loader,
         total=inputs.num_batches,
@@ -263,7 +371,6 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
         # T*: number of tokens
         X_input = batch["input"]
         y = batch["label"][0].to(args.device)
-        attention_mask = batch["attention_mask"][0].to(args.device)
         sentence_index = batch["sentence_index"][0]
 
         # Ignore if less than 4 languages ==> cannot build a tree
@@ -271,17 +378,10 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
             continue
 
         with torch.no_grad():
-            # Audio : embedding shape: N x (C) x D
-            # Text: embedding shape: N x (T) x D
-            # C: number of chunks
-            # T: number of tokens
-            # D: embedding dimension
             X_emb, y = get_embeddings(
                 fleurs_parallel_input=inputs,
                 X=X_input,
                 y=y,
-                attention_mask=attention_mask,
-                batch_size=args.ebs,
                 device=args.device,
             )
 
@@ -291,28 +391,85 @@ def sentence_loop(args, inputs, output_folder, downstream_func):
             break
 
 
-def filter_embeddings(classifier, X_emb, y):
-    y_prob = classifier(X_emb)
+def _sentence_loop_cache(args, inputs, output_folder, downstream_func):
+    """Per-sentence loop reading row-aligned (embeddings, meta) from the cache.
 
-    y_pred = y_prob.argmax(dim=-1)
+    `meta.parquet` is the linker: group by `sentence_index`, slice the matching
+    embedding rows, then apply the same post-processing as the live path.
+    """
+    embeddings, meta = inputs.embedding_cache
 
-    correct = y.to(X_emb.device) == y_pred
+    for sentence_index, grp in tqdm(
+        meta.groupby("sentence_index"),
+        total=inputs.num_batches,
+        desc="(cache) Processing sentence data",
+    ):
+        y = torch.as_tensor(grp["label"].to_numpy(), device=args.device)
 
-    X_emb = X_emb[correct]
+        # Ignore if less than 4 languages ==> cannot build a tree
+        if y.unique().shape[0] < MIN_LANGUAGES:
+            continue
 
-    y = y[correct.to(y.device)]
+        X_emb = embeddings[grp.index.to_numpy()].to(args.device)
 
-    return X_emb, y
+        with torch.no_grad():
+            X_emb, y = post_process_embeddings(inputs, X_emb, y)
+
+        downstream_func(X_emb, y, sentence_index, args, inputs, output_folder)
+
+        if args.dry_run:
+            break
+
+
+# def filter_embeddings(classifier, X_emb, y):
+#     y_prob = classifier(X_emb)
+
+#     y_pred = y_prob.argmax(dim=-1)
+
+#     correct = y.to(X_emb.device) == y_pred
+
+#     X_emb = X_emb[correct]
+
+#     y = y[correct.to(y.device)]
+
+#     return X_emb, y
+
+
+def resolve_ckpt(ckpt):
+    """Accept a checkpoint path or a bare W&B run id (e.g. ``ye1dk63c``).
+
+    A run id is resolved to its checkpoint under
+    ``data/eval/<project>/<run_id>/checkpoints/*.ckpt`` (latest if several).
+    """
+    if os.path.isfile(ckpt):
+        return ckpt
+
+    matches = sorted(glob(f"{DEFAULT_EVAL_DIR}/*/{ckpt}/checkpoints/*.ckpt"))
+    if not matches:
+        raise FileNotFoundError(
+            f"--ckpt '{ckpt}' is neither a file nor a run id with a checkpoint "
+            f"under {DEFAULT_EVAL_DIR}/*/{ckpt}/checkpoints/"
+        )
+    return matches[-1]
 
 
 def prepare_classifier(args, in_dim, out_dim, dtype):
-    state_dict = torch.load(args.ckpt, map_location=args.device)["state_dict"]
+    ckpt_path = resolve_ckpt(args.ckpt)
+    state_dict = torch.load(ckpt_path, map_location=args.device, weights_only=False)[
+        "state_dict"
+    ]
 
     clf_state_dict = {
         k.partition(".")[-1]: v for k, v in state_dict.items() if "classifier" in k
     }
 
-    classifier = MLP(in_dim=in_dim, out_dim=out_dim)
+    # Infer the STE-projector (hidden) dim from the checkpoint so its weights
+    # load; absent -> linear probe (hidden_dim=None), as before.
+    hidden_dim = None
+    if "projector.0.weight" in clf_state_dict:
+        hidden_dim = clf_state_dict["projector.0.weight"].shape[0]
+
+    classifier = MLP(in_dim=in_dim, out_dim=out_dim, hidden_dim=hidden_dim)
 
     # Strict = False to ignore missing keys (due to prev versions)
     missing_keys, unexpected_keys = classifier.load_state_dict(

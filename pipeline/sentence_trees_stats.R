@@ -5,8 +5,13 @@ OUTPUT_FILE <- "_stats.csv"
 
 source("src/tasks/phylo/stats.R")
 
-get_iqtree_stats <- function(run_dir, pattern = "*.treefile") {
+get_iqtree_stats <- function(run_dir, pattern = "*.treefile", splits = NULL) {
   files <- list.files(path = run_dir, pattern = pattern, full.names = TRUE)
+
+  if (!is.null(splits)) {
+    split_regex <- paste0("^(", paste(splits, collapse = "|"), ")_")
+    files <- files[grepl(split_regex, basename(files))]
+  }
 
   if (length(files) == 0) {
     stop(
@@ -43,7 +48,12 @@ get_iqtree_stats <- function(run_dir, pattern = "*.treefile") {
   # Sort by clock-likeness (lower = more clock-like)
   result <- as.data.frame(tree_stats) %>% arrange(clock)
 
-  output_file <- file.path(run_dir, OUTPUT_FILE)
+  if (!is.null(splits)) {
+    splits_label <- paste(sort(splits), collapse = "_")
+    output_file <- file.path(run_dir, sub("\\.csv$", paste0("_", splits_label, ".csv"), OUTPUT_FILE))
+  } else {
+    output_file <- file.path(run_dir, OUTPUT_FILE)
+  }
 
   write.csv(result, output_file)
 
@@ -67,7 +77,8 @@ if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat("  pattern    File extension to match (default: treefile)\n")
   cat("             Will be automatically prefixed with '*.' if not present\n")
   cat("\nOptions:\n")
-  cat("  --overwrite  Overwrite existing ", OUTPUT_FILE, " files\n", sep = "")
+  cat("  --splits s1,s2  Only include files from these splits (comma-separated)\n")
+  cat("  --overwrite     Overwrite existing ", OUTPUT_FILE, " files\n", sep = "")
   cat("\nExample:\n")
   cat("  Rscript sentence_trees_stats.R discrete\n")
   quit(status = 0)
@@ -82,6 +93,14 @@ if (length(args) < 1) {
 
 # Parse arguments
 overwrite <- "--overwrite" %in% args
+
+splits <- NULL
+splits_idx <- which(args == "--splits")
+if (length(splits_idx) > 0) {
+  splits <- strsplit(args[splits_idx[1] + 1], ",")[[1]]
+  args <- args[-c(splits_idx[1], splits_idx[1] + 1)]
+}
+
 positional_args <- args[!grepl("^--", args)]
 
 dirname <- positional_args[1]
@@ -114,13 +133,19 @@ for (i in seq_along(run_dirs)) {
   cat(paste0("\n[", i, "/", length(run_dirs), "] ", basename(run_dir), "\n"))
 
   # Skip if output already exists
-  if (!overwrite && file.exists(file.path(run_dir, OUTPUT_FILE))) {
-    cat(paste("  ", OUTPUT_FILE, "already exists. Skipping...\n"))
+  if (!is.null(splits)) {
+    splits_label <- paste(sort(splits), collapse = "_")
+    out_name <- sub("\\.csv$", paste0("_", splits_label, ".csv"), OUTPUT_FILE)
+  } else {
+    out_name <- OUTPUT_FILE
+  }
+  if (!overwrite && file.exists(file.path(run_dir, out_name))) {
+    cat(paste("  ", out_name, "already exists. Skipping...\n"))
     next
   }
 
   tryCatch(
-    get_iqtree_stats(run_dir, pattern),
+    get_iqtree_stats(run_dir, pattern, splits),
     error = function(e) cat(paste("  Skipped:", e$message, "\n"))
   )
 }

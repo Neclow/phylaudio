@@ -15,15 +15,18 @@ from Bio import SeqIO
 from src._config import (
     _FLEURS_TO_INDO1319_FAMILIES,
     DEFAULT_BEAST_DIR,
+    DEFAULT_BEAST_TEMPLATE_DIR,
     DEFAULT_MAPPED_FASTA_FILE,
     DEFAULT_MERGED_FASTA_FILE,
     DEFAULT_METADATA_DIR,
     DEFAULT_METADATA_KEY,
     DEFAULT_PER_SENTENCE_DIR,
 )
-from src.tasks.phylo.fasta import merge_fastas, to_beast
+from src.tasks.phylo.fasta import merge_fastas, to_beast, vote_fastas
 
-XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_DIR}/template.xml"
+XML_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/input_v1.xml"
+PRIOR_TEMPLATE_FILE = f"{DEFAULT_BEAST_TEMPLATE_DIR}/prior_v1.xml"
+NS_TEMPLATE_DIR = f"{DEFAULT_BEAST_TEMPLATE_DIR}/ns"
 
 
 class MixedFormatter(ArgumentDefaultsHelpFormatter, MetavarTypeHelpFormatter):
@@ -42,11 +45,19 @@ def parse_args():
         help="Run ID (or path to run directory)",
     )
     parser.add_argument(
+        "--mode",
+        type=str,
+        default="concat",
+        choices=("concat", "vote"),
+        help="concat: concatenate the top-p%% sentences ranked by --by; "
+        "vote: per-site majority vote over all sentences (ignores -p/--by)",
+    )
+    parser.add_argument(
         "-p",
         "--p",
         type=float,
-        required=True,
-        help="%% of sequences to keep",
+        default=None,
+        help="%% of sequences to keep (required for --mode concat)",
     )
     parser.add_argument(
         "--by",
@@ -60,21 +71,60 @@ def parse_args():
         default=DEFAULT_METADATA_KEY,
         help="Reference field in language metadata to use for taxon names",
     )
+    parser.add_argument(
+        "--include",
+        type=str,
+        default=None,
+        help="Comma-separated splits to include (e.g. dev,test)",
+    )
+    parser.add_argument(
+        "--exclude",
+        type=str,
+        default=None,
+        help="Comma-separated splits to exclude (e.g. train)",
+    )
     return parser.parse_args()
+
+
+VALID_SPLITS = ("train", "dev", "test")
+
+
+def resolve_splits(include, exclude):
+    """Resolve --include/--exclude to a sorted splits label (or None for all)."""
+    if include and exclude:
+        raise ValueError("--include and --exclude are mutually exclusive")
+    if include:
+        splits = sorted(include.split(","))
+    elif exclude:
+        excluded = set(exclude.split(","))
+        splits = sorted(s for s in VALID_SPLITS if s not in excluded)
+    else:
+        return None
+    for s in splits:
+        if s not in VALID_SPLITS:
+            raise ValueError(f"Invalid split '{s}' (must be one of {VALID_SPLITS})")
+    return "_".join(splits)
 
 
 def main():
     args = parse_args()
 
-    assert 0 < args.p <= 1.0
+    if args.mode == "concat":
+        if args.p is None:
+            raise ValueError("-p is required for --mode concat")
+        assert 0 < args.p <= 1.0
 
-    # Higher is better for brsupport/stemmy; lower is better for clock (CoV)
-    ascending_by = {"brsupport": False, "stemmy": False, "clock": True}
-    if args.by not in ascending_by:
-        raise ValueError(
-            f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
-        )
-    ascending = ascending_by[args.by]
+        # Higher is better for brsupport/stemmy; lower is better for clock (CoV)
+        ascending_by = {"brsupport": False, "stemmy": False, "clock": True}
+        if args.by not in ascending_by:
+            raise ValueError(
+                f"Unknown sort criterion '{args.by}'. Choose from: {list(ascending_by.keys())}"
+            )
+        ascending = ascending_by[args.by]
+    elif args.p is not None:
+        warnings.warn("-p is ignored with --mode vote", UserWarning)
+
+    splits_label = resolve_splits(args.include, args.exclude)
 
     if not os.path.isdir(args.run_id):
         potential_run_dirs = glob(f"{DEFAULT_PER_SENTENCE_DIR}/*/{args.run_id}")
@@ -96,10 +146,14 @@ def main():
         run_dir = args.run_id
 
     print(f"Using run directory: {run_dir}")
-    df = pd.read_csv(f"{run_dir}/_stats.csv", index_col=0)
-    sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
-        : int(args.p * df.shape[0])
-    ]
+    stats_file = f"{run_dir}/_stats_{splits_label}.csv" if splits_label else f"{run_dir}/_stats.csv"
+    df = pd.read_csv(stats_file, index_col=0)
+    if args.mode == "vote":
+        sub_df = df
+    else:
+        sub_df = df.sort_values(by=args.by, ascending=ascending).iloc[
+            : int(args.p * df.shape[0])
+        ]
     print(sub_df.describe())
     input_files = [f"{run_dir}/{x}" for x in sub_df.index.to_list()]
 
@@ -112,18 +166,41 @@ def main():
     ) as f:
         languages = json.load(f)
 
-    beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
-    beast_p_dir += f"_{args.by}"
+    if args.mode == "vote":
+        beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/vote"
+    else:
+        beast_p_dir = f"{DEFAULT_BEAST_DIR}/{Path(args.run_id).stem}/{args.p:.2f}"
+        beast_p_dir += f"_{args.by}"
+    if splits_label:
+        beast_p_dir += f"_{splits_label}"
     os.makedirs(beast_p_dir, exist_ok=True)
 
-    # Merge FASTA files
+    with open(f"{beast_p_dir}/cfg.json", "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "run_dir": run_dir,
+                "mode": args.mode,
+                "p": args.p if args.mode == "concat" else None,
+                "by": args.by if args.mode == "concat" else None,
+                "splits": splits_label,
+                "key": args.key,
+                "n_sentences": len(input_files),
+            },
+            f,
+            indent=4,
+        )
+
+    # Aggregate FASTA files into one alignment
     merged_file = f"{beast_p_dir}/{DEFAULT_MERGED_FASTA_FILE}"
 
-    merge_fastas(
-        input_files=input_files,
-        output_file=merged_file,
-        sequence_ids=list(languages.keys()),
-    )
+    if args.mode == "vote":
+        vote_fastas(input_files=input_files, output_file=merged_file)
+    else:
+        merge_fastas(
+            input_files=input_files,
+            output_file=merged_file,
+            sequence_ids=list(languages.keys()),
+        )
 
     # Map sequence IDs to reference names in mapped FASTA file
     mapped_file = f"{beast_p_dir}/{DEFAULT_MAPPED_FASTA_FILE}"
@@ -150,6 +227,30 @@ def main():
         template_beast_file=XML_TEMPLATE_FILE,
         taxonsets=taxonsets,
     )
+
+    if os.path.exists(PRIOR_TEMPLATE_FILE):
+        prior_output = f"{beast_p_dir}/prior_v1.xml"
+        print(f"Generating prior XML: {prior_output}")
+        to_beast(
+            input_file=mapped_file,
+            output_file=prior_output,
+            template_beast_file=PRIOR_TEMPLATE_FILE,
+            taxonsets=taxonsets,
+        )
+
+    ns_templates = sorted(glob(f"{NS_TEMPLATE_DIR}/input_ns_*.xml"))
+    if ns_templates:
+        ns_dir = f"{beast_p_dir}/ns"
+        os.makedirs(ns_dir, exist_ok=True)
+        print(f"Generating {len(ns_templates)} NS XML files in {ns_dir}...")
+        for template in ns_templates:
+            ns_output = f"{ns_dir}/{Path(template).name}"
+            to_beast(
+                input_file=mapped_file,
+                output_file=ns_output,
+                template_beast_file=template,
+                taxonsets=taxonsets,
+            )
 
     print("Done")
 

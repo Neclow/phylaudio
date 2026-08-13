@@ -130,11 +130,15 @@ def load_transforms(
     if with_vad:
         transforms.append(Vad(sample_rate=sr))
 
-    transforms.extend(
-        [
-            Trim(max_length=max_length, direction=trim_direction),
-            Pad(max_length=max_length, direction=pad_direction),
-        ]
-    )
+    if max_length is not None:
+        transforms.extend(
+            [
+                Trim(max_length=max_length, direction=trim_direction),
+                Pad(max_length=max_length, direction=pad_direction),
+            ]
+        )
+
+    if not transforms:
+        return None
 
     return torch.nn.Sequential(*transforms)

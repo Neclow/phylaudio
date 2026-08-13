@@ -7,16 +7,16 @@
 # No phylogenetic covariance — just standard Bayesian linear regression.
 #
 # Usage:
-#   Rscript pipeline/nmf_brms.R <run_id> [dataset]
+#   Rscript pipeline/nmf_brms.R <run_id> [K] [dataset]
 #
 # Examples:
 #   Rscript pipeline/nmf_brms.R speech
-#   Rscript pipeline/nmf_brms.R speech fleurs-r
+#   Rscript pipeline/nmf_brms.R speech 12
+#   Rscript pipeline/nmf_brms.R speech 12 fleurs-r
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
 
 suppressPackageStartupMessages({
-  library(hdf5r)
   library(dplyr)
   library(jsonlite)
 })
@@ -30,23 +30,27 @@ args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\n\n"
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> <subdir> [K] [dataset]\n\n"
   )
   cat("Arguments:\n")
   cat("  run_id    BEAST run UUID, prefix, or full path\n")
+  cat("  subdir    Subdirectory name or prefix (e.g. 0.05)\n")
+  cat("  K         Number of components (default: k_star from sweep)\n")
   cat("  dataset   Dataset name (default: fleurs-r)\n")
   quit(status = 0)
 }
 
-if (length(args) < 1) {
+if (length(args) < 2) {
   stop(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> [dataset]\nUse -h or --help for more information",
+    "Usage: Rscript pipeline/nmf_brms.R <run_id> <subdir> [K] [dataset]",
     call. = FALSE
   )
 }
 
 run_id <- args[1]
-dataset <- ifelse(length(args) >= 2, args[2], "fleurs-r")
+subdir <- args[2]
+k_override <- if (length(args) >= 3) as.integer(args[3]) else NULL
+dataset <- ifelse(length(args) >= 4, args[4], "fleurs-r")
 
 # Resolve run_id to BEAST directory
 if (dir.exists(run_id)) {
@@ -73,36 +77,28 @@ if (dir.exists(run_id)) {
   beast_dir <- matches[1]
 }
 
-# Find sweep HDF5 file inside beast dir
-h5_hits <- Sys.glob(file.path(beast_dir, "**", "nmf", "sweep_k*_k*.h5"))
-if (length(h5_hits) == 0) {
-  stop(sprintf("No NMF sweep HDF5 found in %s/", beast_dir), call. = FALSE)
+# Find sNMF results RDS in matching subdirectory
+rds_hits <- Sys.glob(file.path(beast_dir, paste0(subdir, "*"), "nmf", "snmf_results.rds"))
+if (length(rds_hits) == 0) {
+  stop(sprintf("No snmf_results.rds found in %s/%s*/nmf/", beast_dir, subdir), call. = FALSE)
 }
-if (length(h5_hits) > 1) {
-  cat("Multiple sweeps found:\n")
-  cat(paste(" ", h5_hits, collapse = "\n"), "\n")
-  cat("Using first match.\n")
+if (length(rds_hits) > 1) {
+  stop(
+    sprintf("Ambiguous subdir '%s': matches %s", subdir, paste(rds_hits, collapse = ", ")),
+    call. = FALSE
+  )
 }
-nmf_h5 <- h5_hits[1]
-cat(sprintf("Using %s\n", nmf_h5))
 
-# ─── Load NMF proportions from HDF5 ──────────────────────────────────────────
+# ─── Load sNMF proportions ──────────────────────────────────────────────────
 
-cat("Loading NMF results...\n")
-h5 <- hdf5r::H5File$new(nmf_h5, mode = "r")
-
-K <- as.integer(h5attr(h5, "k_star"))
-nmf_labels <- h5[["labels"]]$read()
-group_name <- sprintf("K%02d", K)
-W <- t(h5[[paste0(group_name, "/W")]]$read())
-h5$close_all()
-cat(sprintf("  Using K = %d (from k_star attr)\n", K))
-
-# Row-normalize to proportions
-row_sums <- rowSums(W) + 1e-12
-P <- W / row_sums
-
-cat(sprintf("  NMF: %d languages x %d components\n", nrow(P), ncol(P)))
+rds_path <- rds_hits[1]
+cat(sprintf("Loading sNMF results from %s\n", rds_path))
+res <- readRDS(rds_path)
+K <- if (!is.null(k_override)) k_override else res$k_star
+nmf_labels <- res$labels
+P <- res$Q[[as.character(K)]]
+cat(sprintf("  Using K = %d\n", K))
+cat(sprintf("  Proportions: %d languages x %d components\n", nrow(P), ncol(P)))
 
 # ─── Load language metadata ──────────────────────────────────────────────────
 
@@ -178,10 +174,7 @@ variable_feats_clean <- colnames(X_scaled)
 # ─── Output directory ────────────────────────────────────────────────────────
 
 # Output as sibling of nmf/ (e.g. .../0.01_brsupport/brms_phoible/)
-output_dir <- file.path(
-  dirname(dirname(nmf_h5)),
-  "brms_phoible"
-)
+output_dir <- file.path(dirname(dirname(rds_path)), "brms_phoible")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # ─── Fit one brms model per component ────────────────────────────────────────
