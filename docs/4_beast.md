@@ -69,7 +69,8 @@ baseline model.
   BEAST run directory
 
 Extracts the alignment from a BEAST2 input XML and runs a SplitsTree6
-NeighborNet workflow to produce a phylogenetic network.
+NeighborNet workflow to produce a phylogenetic network. Note: SplitsTree doesn't
+work on a headless display; on Linux, we used MobaXTerm.
 
 ```bash
 pixi run network_analysis -- ba9f2d2a 0.05_brsupport_dev_test
