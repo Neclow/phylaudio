@@ -168,20 +168,22 @@ fi
 cd "$BEAST_DIR"
 pixi run beast2 "${BEAST_ARGS[@]}" "$INPUT_FILE"
 
-# CoupledMCMC/NS runs dump state files in $HOME despite -working
+# CoupledMCMC/NS runs dump state files outside WORKING_DIR despite -working
 INPUT_BASENAME="$(basename "$INPUT_FILE" .xml)"
+STATE_BASENAME="${INPUT_BASENAME}_${SEED}"
 shopt -s nullglob
-HOME_STATE_FILES=("$HOME/${INPUT_BASENAME}.xml."*state*)
+STRAY_STATE_FILES=(
+    "$BEAST_DIR/${STATE_BASENAME}.xml."*state*
+    "$HOME/${STATE_BASENAME}.xml."*state*
+)
 shopt -u nullglob
 
-if [[ ${#HOME_STATE_FILES[@]} -gt 0 ]]; then
+if [[ ${#STRAY_STATE_FILES[@]} -gt 0 ]]; then
     echo ""
-    echo "Moving ${#HOME_STATE_FILES[@]} state file(s) from \$HOME to $WORKING_DIR"
-    for f in "${HOME_STATE_FILES[@]}"; do
-        SUFFIX="${f##*.xml.}"
-        DEST="$WORKING_DIR/${INPUT_BASENAME}_${SEED}.xml.${SUFFIX}"
-        mv "$f" "$DEST"
-        echo "  $(basename "$f") -> $(basename "$DEST")"
+    echo "Moving ${#STRAY_STATE_FILES[@]} state file(s) to $WORKING_DIR"
+    for f in "${STRAY_STATE_FILES[@]}"; do
+        mv "$f" "$WORKING_DIR/"
+        echo "  $(basename "$f") -> $WORKING_DIR/"
     done
 fi
 
