@@ -84,10 +84,18 @@ def paired_sqeuclidean(x1: torch.Tensor, x2: torch.Tensor) -> torch.Tensor:
     return torch.clamp(dist, 0.0, torch.inf)
 
 
+def paired_mean_squared_error(x1: torch.Tensor, x2: torch.Tensor) -> torch.Tensor:
+    """
+    Computes the pairwise mean squared error distance matrix between x1 and x2.
+    """
+    return paired_sqeuclidean(x1, x2) / x1.shape[-1]
+
+
 PAIRED_DISTANCE_FUNCTIONS = {
     "angular": paired_angular,
     "cosine": paired_cosine,
     "manhattan": paired_manhattan,
+    "mean_squared_error": paired_mean_squared_error,
     "euclidean": paired_euclidean,
     "sqeuclidean": paired_sqeuclidean,
     "neuclidean": paired_normalized_euclidean,
@@ -95,6 +103,7 @@ PAIRED_DISTANCE_FUNCTIONS = {
     "l2": paired_euclidean,
     "l2_squared": paired_sqeuclidean,
     "l2_norm": paired_normalized_euclidean,
+    "mse": paired_mean_squared_error,
 }
 
 
