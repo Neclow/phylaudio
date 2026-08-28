@@ -4,6 +4,7 @@ import json
 
 import pandas as pd
 import torch
+from lightning.pytorch import seed_everything
 
 from src.data.datasets import EmbeddingDataset
 from src.models.embedding import EmbeddingFeatureExtractor
@@ -47,6 +48,9 @@ def main():
         print(f"\t{k}: {v}")
 
     if args.embeddings_cache:
+        # prepare_model (which seeds) is skipped in cache mode; seed here so
+        # head init and shuffling are reproducible per --seed
+        seed_everything(args.seed, workers=True)
         feature_extractor, train_dataset, valid_dataset, test_dataset, num_classes = (
             load_cached_datasets(args.embeddings_cache)
         )
