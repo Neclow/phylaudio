@@ -49,6 +49,13 @@ def parse_lid_args(with_common_args=True):
     )
     parser.add_argument("--hidden-dim", type=int, help="Downstream hidden layer size")
     parser.add_argument(
+        "--activation",
+        type=str,
+        default="ste",
+        choices=("ste", "gelu"),
+        help="Bottleneck activation function (only used with --hidden-dim)",
+    )
+    parser.add_argument(
         "--embeddings-cache",
         type=str,
         default=None,
@@ -87,6 +94,7 @@ def fit_predict(
         lr=args.lr,
         weight_decay=args.weight_decay,
         hidden_dim=args.hidden_dim,
+        activation=args.activation,
     )
 
     torch.compile(lit_mlp)
@@ -110,15 +118,21 @@ def fit_predict(
                 "model_id": args.model_id,
                 "finetuned": args.finetuned,
                 "max_duration": args.max_length,
+                "activation": args.activation,
+                "seed": args.seed,
             }
         )
     else:
-        train_logger = WandbLogger(project=args.project, save_dir=DEFAULT_EVAL_DIR)
+        train_logger = WandbLogger(
+            entity="phylo2vec", project=args.project, save_dir=DEFAULT_EVAL_DIR
+        )
         train_logger.experiment.config.update(
             {
                 "model_id": args.model_id,
                 "finetuned": args.finetuned,
                 "max_duration": args.max_length,
+                "activation": args.activation,
+                "seed": args.seed,
             }
         )
 

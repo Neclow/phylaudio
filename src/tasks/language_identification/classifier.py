@@ -59,13 +59,13 @@ class MLP(nn.Module):
         Output dimension
     hidden_dim : int, optional
         Hidden dimension (for multiple layers), by default None
-    ste : bool, optional
-        Whether to use the STE activation function, by default False
+    activation : str, optional
+        Bottleneck activation function ("ste" or "gelu"), by default "ste"
     dtype : torch.dtype, optional
         torch dtype, by default None
     """
 
-    def __init__(self, in_dim, out_dim, hidden_dim=None, dtype=None):
+    def __init__(self, in_dim, out_dim, hidden_dim=None, activation="ste", dtype=None):
         super().__init__()
 
         # TODO: add num_layers as arg for classifier?
@@ -81,7 +81,12 @@ class MLP(nn.Module):
 
             self.classifier = nn.Linear(self.in_dim, self.out_dim, dtype=dtype)
         else:
-            self.activation = STE()
+            if activation == "ste":
+                self.activation = STE()
+            elif activation == "gelu":
+                self.activation = nn.GELU()
+            else:
+                raise ValueError(f"Unknown activation '{activation}'")
 
             self.projector = nn.Sequential(
                 nn.Linear(self.in_dim, self.hidden_dim, dtype=dtype),
@@ -133,7 +138,14 @@ class MLP(nn.Module):
 
 class LightningMLP(LightningModule):
     def __init__(
-        self, feature_extractor, num_classes, loss_fn, lr, weight_decay, hidden_dim=None
+        self,
+        feature_extractor,
+        num_classes,
+        loss_fn,
+        lr,
+        weight_decay,
+        hidden_dim=None,
+        activation="ste",
     ):
         super().__init__()
 
@@ -145,6 +157,7 @@ class LightningMLP(LightningModule):
             out_dim=num_classes,
             dtype=self.feature_extractor.dtype,
             hidden_dim=hidden_dim,
+            activation=activation,
         )
         self.classifier.train()
 
