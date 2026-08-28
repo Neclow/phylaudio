@@ -244,3 +244,6 @@ data/**/*.tar.gz
 
 # CmdStan compiled binaries
 src/tasks/phylo/additive_phylo_gp
+
+# Revision files
+revision/
