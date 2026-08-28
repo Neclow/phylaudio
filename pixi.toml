@@ -95,6 +95,7 @@ black = ">=25.1.0,<26"
 uv = ">=0.8.13,<0.9"
 pre-commit = ">=4.5.0,<5"
 pylint = ">=4.0.5,<5"
+scikit-bio = ">=0.7.3,<0.8"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"
@@ -114,6 +115,23 @@ regression = { features = [
 ], solve-group = "regression", no-default-feature = true }
 gp = { features = ["gp"], solve-group = "gp", no-default-feature = true }
 viz = { features = ["viz"], solve-group = "viz" }
+v3 = { features = ["v3"], solve-group = "v3", no-default-feature = true }
+
+[feature.v3.dependencies]
+revbayes = { version = ">=1.2,<2", channel = "bioconda" }
+python = "3.10.12.*"
+numpy = ">=1.26,<2"
+pandas = ">=2.3.2,<3"
+matplotlib-base = ">=3.9,<4"
+pytorch = ">=2.7.1,<2.8"
+py-pcha = ">=0.1,<1"
+scikit-learn = ">=1.7.2,<2"
+ipykernel = ">=7.3.0,<8"
+ipywidgets = ">=8.1.9,<9"
+seaborn = ">=0.13.2,<0.14"
+
+[feature.v3.tasks]
+rb = "rb"
 
 [feature.regression.dependencies]
 python = "3.10.12.*"
@@ -156,6 +174,8 @@ scipy = ">=1.15.2,<2"
 geopandas = ">=1.0,<2"
 dendropy = ">=5.0,<6"
 matplotlib-base = ">=3.9,<4"
+ipykernel = ">=7.3.0,<8"
+ipywidgets = ">=8.1.9,<9"
 
 [feature.viz.tasks]
 fig1_acc_vs_brsupport = "python -m plots.fig1_acc_vs_brsupport"
