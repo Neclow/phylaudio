@@ -95,6 +95,7 @@ black = ">=25.1.0,<26"
 uv = ">=0.8.13,<0.9"
 pre-commit = ">=4.5.0,<5"
 pylint = ">=4.0.5,<5"
+spacy = ">=3.8.14,<4"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"
@@ -167,4 +168,3 @@ fig1_sqa = "python -m plots.fig1_sqa"
 fig2_root_age = "python -m plots.fig2_root_age"
 fig2_rates = "python -m plots.fig2_rates"
 fig3_geo = "python -m plots.fig3_geo"
-ext_rates_and_maps = "python -m plots.ext_rates_and_maps"
