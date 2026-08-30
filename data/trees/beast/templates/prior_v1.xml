@@ -22,6 +22,7 @@
       </tree>
       <parameter id="mutationRate.s:five" spec="parameter.RealParameter" name="stateNode">1.0</parameter>
       <parameter id="ORCsigma.c:clock" spec="parameter.RealParameter" lower="0.0" name="stateNode">0.2</parameter>
+      <parameter id="ucldMean.c:clock" spec="parameter.RealParameter" lower="0.0" name="stateNode" upper="10.0">1.0</parameter>
       <parameter id="ORCRates.c:clock" spec="parameter.RealParameter" dimension="70" lower="0.0" name="stateNode">0.5</parameter>
       <parameter id="bcov_alpha.s:five" spec="parameter.RealParameter" lower="1.0E-2" name="stateNode" upper="1.0">0.5</parameter>
       <parameter id="bcov_s.s:five" spec="parameter.RealParameter" lower="1.0E-4" name="stateNode" upper="Infinity">0.5</parameter>
@@ -71,7 +72,10 @@
           <LogNormal name="distr" M="1.0" S="@ORCsigma.c:clock" meanInRealSpace="true" />
         </prior>
         <prior id="ORCsigmaPrior.c:clock" name="distribution" x="@ORCsigma.c:clock">
-          <Gamma name="distr" alpha="0.5396" beta="0.3819" />
+          <Gamma name="distr" alpha="5.0" beta="0.05" />
+        </prior>
+        <prior id="ucldMeanPrior.c:clock" name="distribution" x="@ucldMean.c:clock">
+          <Uniform name="distr" upper="10.0" />
         </prior>
         <distribution id="indoiranian.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
           <taxonset id="indoiranian" spec="TaxonSet">
@@ -90,7 +94,7 @@
             <taxon id="Tajik" spec="Taxon" />
             <taxon id="Persian" spec="Taxon" />
           </taxonset>
-          <Normal name="distr" mean="3.9" sigma="0.25" />
+          <LogNormal name="distr" M="0.3" S="0.4" offset="3.4" meanInRealSpace="true" />
         </distribution>
         <distribution id="iranian.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
           <taxonset id="iranian" spec="TaxonSet">
@@ -122,7 +126,6 @@
         </distribution>
         <distribution id="germanic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
           <taxonset id="germanic" spec="TaxonSet">
-            <taxon id="Afrikaans" spec="Taxon" />
             <taxon id="Danish" spec="Taxon" />
             <taxon id="Dutch" spec="Taxon" />
             <taxon id="English" spec="Taxon" />
@@ -134,7 +137,7 @@
           </taxonset>
           <Normal name="distr" mean="2.0" sigma="0.2" />
         </distribution>
-        <distribution id="northgermanic.prior" spec="beast.base.evolution.tree.MRCAPrior" tree="@Tree.t:tree">
+        <distribution id="northgermanic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
           <taxonset id="northgermanic" spec="TaxonSet">
             <taxon idref="Danish" />
             <taxon idref="Icelandic" />
@@ -165,7 +168,7 @@
           </taxonset>
           <Normal name="distr" mean="1.4" sigma="0.1" />
         </distribution>
-        <distribution id="baltoslavic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" useOriginate="true" tree="@Tree.t:tree">
+        <distribution id="baltoslavic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
           <taxonset id="baltoslavic" spec="TaxonSet">
             <taxon id="Lithuanian" spec="Taxon" />
             <taxon id="Latvian" spec="Taxon" />
@@ -182,7 +185,7 @@
             <taxon id="Slovenian" spec="Taxon" />
             <taxon id="Ukrainian" spec="Taxon" />
           </taxonset>
-          <Normal name="distr" mean="4.0" sigma="0.15" />
+          <Normal name="distr" mean="3.8" sigma="0.1" />
         </distribution>
         <distribution id="baltic.prior" spec="beast.base.evolution.tree.MRCAPrior" monophyletic="true" tree="@Tree.t:tree">
           <taxonset id="baltic" spec="TaxonSet">
@@ -220,7 +223,7 @@
               <frequencies id="dummyfrequencies.s:five" spec="Frequencies" data="@five" estimate="false" />
             </substModel>
           </siteModel>
-          <branchRateModel id="RelaxedClock.c:clock" spec="beast.base.evolution.branchratemodel.UCRelaxedClockModel" rates="@ORCRates.c:clock" tree="@Tree.t:tree">
+          <branchRateModel id="RelaxedClock.c:clock" spec="beast.base.evolution.branchratemodel.UCRelaxedClockModel" clock.rate="@ucldMean.c:clock" rates="@ORCRates.c:clock" tree="@Tree.t:tree">
             <LogNormal id="LogNormalDistributionModel.c:clock" S="@ORCsigma.c:clock" meanInRealSpace="true" name="distr">
               <parameter estimate="false" name="M">1.0</parameter>
             </LogNormal>
@@ -238,6 +241,15 @@
     </operator>
     <operator id="TreeScaler.t:tree" spec="BactrianScaleOperator" scaleFactor="0.95" tree="@Tree.t:tree" weight="3.0" />
     <operator id="TreeRootScaler.t:tree" spec="BactrianScaleOperator" rootOnly="true" scaleFactor="0.95" tree="@Tree.t:tree" weight="3.0" />
+    <operator id="ucldMeanScaler.c:clock" spec="BactrianScaleOperator" parameter="@ucldMean.c:clock" scaleFactor="0.75" weight="3.0" />
+    <operator id="relaxedUpDownOperator.c:clock" spec="BactrianUpDownOperator" scaleFactor="0.9" weight="5.0">
+      <up idref="ucldMean.c:clock" />
+      <down idref="Tree.t:tree" />
+    </operator>
+    <operator id="ucldMeanRatesUpDown.c:clock" spec="BactrianUpDownOperator" scaleFactor="0.9" weight="10.0">
+      <up idref="ucldMean.c:clock" />
+      <down idref="ORCRates.c:clock" />
+    </operator>
     <operator id="UniformOperator.t:tree" spec="BactrianNodeOperator" tree="@Tree.t:tree" weight="30.0" />
     <operator id="SubtreeSlide.t:tree" spec="BactrianSubtreeSlide" tree="@Tree.t:tree" weight="15.0" />
     <operator id="Narrow.t:tree" spec="Exchange" tree="@Tree.t:tree" weight="0.0" />
@@ -290,6 +302,7 @@
       <log idref="bcov_alpha.s:five" />
       <log idref="bcov_s.s:five" />
       <log idref="ORCsigma.c:clock" />
+      <log idref="ucldMean.c:clock" />
       <log idref="frequencies.s:five" />
       <log idref="mutationRate.s:five" />
       <log id="rate.c:clock" spec="beast.base.evolution.RateStatistic" branchratemodel="@RelaxedClock.c:clock" tree="@Tree.t:tree" />
