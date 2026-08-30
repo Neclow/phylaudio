@@ -86,6 +86,13 @@ def parse_args():
         help="Comma-separated splits label (e.g. dev,test). "
         "Matches the --include/--exclude used in sentence_trees_astral.sh.",
     )
+    parser.add_argument(
+        "--filter",
+        type=str,
+        default=None,
+        choices=(None, "ner"),
+        help="Sentence filter (must match --filter used in sentence_trees_astral.sh)",
+    )
     parser.add_argument("--overwrite", action="store_true")
 
     return parser.parse_args()
@@ -148,15 +155,21 @@ if __name__ == "__main__":
     assert n_files > 0, f"No runs found in {DEFAULT_PER_SENTENCE_DIR}/{args.indir}"
     print(f"Found {n_files} runs.")
 
-    # Build output tree filename from method + splits
+    # Build output tree filename from method + splits + filter
     base_suffix = OUTPUT_SUFFIXES[args.output_type]
+    label_parts = []
     if args.splits:
-        splits_label = "_".join(sorted(args.splits.split(",")))
-        output_tree_name = base_suffix.replace("_trees_", f"_trees_{splits_label}_")
+        label_parts.append("_".join(sorted(args.splits.split(","))))
+    if args.filter:
+        label_parts.append(args.filter)
+
+    if label_parts:
+        label = "_".join(label_parts)
+        output_tree_name = base_suffix.replace("_trees_", f"_trees_{label}_")
         if output_tree_name == base_suffix:
-            output_tree_name = base_suffix.replace("_trees.", f"_trees_{splits_label}.")
+            output_tree_name = base_suffix.replace("_trees.", f"_trees_{label}.")
         output_file = (
-            f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary_{splits_label}.csv"
+            f"{DEFAULT_PER_SENTENCE_DIR}/{args.indir}/summary_{label}.csv"
         )
     else:
         output_tree_name = base_suffix
