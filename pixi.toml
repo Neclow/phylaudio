@@ -26,6 +26,8 @@ download_speakerpop = "python -m pipeline.download_speakerpop fleurs-r"
 download_fleurs_metadata = "python -m pipeline.download_fleurs_metadata fleurs-r"
 beast_generate_xml = "python -m pipeline.beast_generate_xml"
 beazt = "bash pipeline/run_beast.sh"
+beazt_ns = "bash pipeline/run_beast_ns.sh"
+beazt_combine = "bash pipeline/run_beast_combine.sh"
 extract_embeddings = "python -m pipeline.extract_embeddings"
 lid = "python -m pipeline.language_identification"
 lid_summary = "python -m pipeline.language_identification_summary"
@@ -47,6 +49,9 @@ cmd = "extern/beast2/bin/beast"
 
 [tasks.loganalyser]
 cmd = "extern/beast2/bin/loganalyser"
+
+[tasks.logcombiner]
+cmd = "extern/beast2/bin/logcombiner"
 
 [tasks.packagemanager]
 cmd = "extern/beast2/bin/packagemanager"
