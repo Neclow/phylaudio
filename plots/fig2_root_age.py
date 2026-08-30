@@ -18,8 +18,8 @@ from ._config import (
 )
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
-SPEECH_LOG_FILE = f"{SPEECH_BEAST_DIR}/input_v1_101.log"
-SPEECH_PRIOR_LOG = f"{SPEECH_BEAST_DIR}/prior_v1_101.log"
+SPEECH_LOG_FILE = f"{SPEECH_BEAST_DIR}/combined_v2/input_v2_combined.log"
+SPEECH_PRIOR_LOG = f"{SPEECH_BEAST_DIR}/prior_v2_1.log"
 COGNATE_LOG_FILE = f"{COGNATE_BEAST_DIR}/raw.log"
 COGNATE_PRIOR_LOG = f"{COGNATE_BEAST_DIR}/prior.log"
 

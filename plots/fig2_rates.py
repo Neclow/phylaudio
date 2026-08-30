@@ -34,7 +34,7 @@ EVENTS = [
     ("Chariots", 4.1, 3.5, "#7297b5"),
 ]
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
-SPEECH_TREES_FILE = f"{SPEECH_BEAST_DIR}/input_v1_101.trees"
+SPEECH_TREES_FILE = f"{SPEECH_BEAST_DIR}/combined_v2/input_v2_resampled.trees"
 COGNATE_TREES_FILE = f"{COGNATE_BEAST_DIR}/prunedtomodern.trees"
 NTIMES = 200
 MAX_TREES = 2500

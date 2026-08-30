@@ -15,7 +15,7 @@ from src._config import EXCLUDE_LANGUAGES
 
 
 def _load_iecor_to_fleurs():
-    with open("data/metadata/fleurs-r/languages.json") as f:
+    with open("data/metadata/fleurs-r/languages.json", "r", encoding="utf-8") as f:
         langs = json.load(f)
     return {
         info["iecor"]: info["fleurs"]
