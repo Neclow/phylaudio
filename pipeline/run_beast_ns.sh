@@ -3,30 +3,32 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") <uuid> <size> [seed]
+Usage: $(basename "$0") <uuid> <size> <version> [seed]
 
 Run all nested sampling (NS) models for a BEAST2 run.
 
 Arguments:
-  uuid    Run UUID under data/trees/beast/ (supports partial matching)
-          e.g., "ba9" matches "ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc"
-  size    Branch support threshold (e.g., 0.05_brsupport_dev_test)
-  seed    Random seed (default: 101)
+  uuid      Run UUID under data/trees/beast/ (supports partial matching)
+            e.g., "ba9" matches "ba9f2d2a-27f3-4100-a1c0-43f8fe1c39fc"
+  size      Branch support threshold (e.g., 0.05_brsupport_dev_test)
+  version   NS version number — runs XMLs in ns_v{version}/
+  seed      Random seed (default: 101)
 
-All input_ns_*.xml files in the ns/ subdirectory are auto-discovered.
+All input_ns_*.xml files in the ns_v{version}/ subdirectory are auto-discovered.
 
 Examples:
-  run_beast_ns.sh ba9 0.05_brsupport_dev_test
-  run_beast_ns.sh ba9 0.05_brsupport_dev_test 42
+  run_beast_ns.sh ba9 0.05_brsupport_dev_test 3
+  run_beast_ns.sh ba9 0.05_brsupport_dev_test 3 42
 EOF
     exit 1
 }
 
-[[ $# -lt 2 || "$1" == "-h" || "$1" == "--help" ]] && usage
+[[ $# -lt 3 || "$1" == "-h" || "$1" == "--help" ]] && usage
 
 UUID_PATTERN=$1
 SIZE=$2
-SEED=${3:-101}
+VERSION=$3
+SEED=${4:-101}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BEAST_DIR="$(dirname "$SCRIPT_DIR")"
@@ -47,7 +49,7 @@ if [[ ${#MATCHES[@]} -gt 1 ]]; then
     exit 1
 fi
 
-NS_DIR="${MATCHES[0]}/${SIZE}/ns"
+NS_DIR="${MATCHES[0]}/${SIZE}/ns_v${VERSION}"
 if [[ ! -d "$NS_DIR" ]]; then
     echo "Error: NS directory not found: $NS_DIR"
     exit 1
@@ -63,9 +65,9 @@ if [[ ${#XMLS[@]} -eq 0 ]]; then
     exit 1
 fi
 
-BEAST_FLAGS=(-overwrite -working -beagle_GPU -beagle_order 1 -seed "${SEED}")
+BEAST_FLAGS=(-overwrite -working -beagle_GPU -beagle_order 1 -packagedir "$BEAST_DIR/.beast" -seed "${SEED}")
 
-echo "=== NS production runs (seed=${SEED}) ==="
+echo "=== NS production runs (v${VERSION}, seed=${SEED}) ==="
 echo "=== Directory: $NS_DIR ==="
 echo "=== ${#XMLS[@]} models ==="
 echo ""
