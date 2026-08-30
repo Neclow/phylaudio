@@ -43,7 +43,7 @@ pixi install -e viz         # publication figures (plotly, seaborn)
 ## Usage
 
 Data download and pipeline steps are documented in
-[docs/README.md](docs/README.md).
+[the documentation section](docs).
 
 ## Citation
 
