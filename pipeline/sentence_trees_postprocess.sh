@@ -15,6 +15,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Options:"
     echo "  --include s1[,s2]    Only include these splits (comma-separated: train,dev,test)"
     echo "  --exclude s1[,s2]    Exclude these splits (comma-separated: train,dev,test)"
+    echo "  --filter TYPE        Sentence filter: 'ner' removes proper nouns + named entities"
     echo "  --method METHOD      Species-tree method: astral4 or wastral (default: astral4)"
     echo "  -t, --threads N      Number of threads (default: 16)"
     echo "  --overwrite          Overwrite existing output files"
@@ -23,6 +24,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
     echo "Examples:"
     echo "  $0 discrete3+vote --exclude train"
     echo "  $0 discrete3+vote --include dev,test --method wastral"
+    echo "  $0 discrete3+vote --exclude train --filter ner"
     exit 0
 fi
 
@@ -30,6 +32,7 @@ fi
 DIRNAME=""
 INCLUDE=""
 EXCLUDE=""
+FILTER=""
 METHOD="astral4"
 NUM_THREADS=16
 OVERWRITE=false
@@ -39,6 +42,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --include)   INCLUDE="$2";    shift 2 ;;
         --exclude)   EXCLUDE="$2";    shift 2 ;;
+        --filter)    FILTER="$2";     shift 2 ;;
         --method)    METHOD="$2";     shift 2 ;;
         -t|--threads) NUM_THREADS="$2"; shift 2 ;;
         --overwrite) OVERWRITE=true;  shift ;;
@@ -68,6 +72,11 @@ elif [ -n "$EXCLUDE" ]; then
     SPLIT_FLAGS="--exclude $EXCLUDE"
 fi
 
+FILTER_FLAG=""
+if [ -n "$FILTER" ]; then
+    FILTER_FLAG="--filter $FILTER"
+fi
+
 OVERWRITE_FLAG=""
 if [ "$OVERWRITE" = true ]; then
     OVERWRITE_FLAG="--overwrite"
@@ -77,6 +86,7 @@ fi
 echo "=== Step 1/3: $METHOD ==="
 bash pipeline/sentence_trees_astral.sh "$DIRNAME" \
     $SPLIT_FLAGS \
+    $FILTER_FLAG \
     --method "$METHOD" \
     -t "$NUM_THREADS" \
     $OVERWRITE_FLAG
@@ -109,6 +119,7 @@ echo "=== Step 3/3: Summary ==="
 python -m pipeline.sentence_trees_summary "$DIRNAME" \
     -ot "$METHOD" \
     $SUMMARY_SPLIT_FLAG \
+    $FILTER_FLAG \
     -nt "$NUM_THREADS" \
     $OVERWRITE_FLAG
 
