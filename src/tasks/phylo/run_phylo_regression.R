@@ -24,6 +24,7 @@ source("src/tasks/phylo/phylo_regression_helpers.R")
 parse_args <- function(args = commandArgs(trailingOnly = TRUE)) {
     defaults <- list(
         beast_dir    = NULL,
+        tree_file    = NULL,
         variant      = "with_inventory",
         iter         = 100000,
         warmup       = 20000,
@@ -216,7 +217,7 @@ if (cfg$seed != 20231103L) {
 }
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-loaded <- load_regression_data(beast_dir, variant)
+loaded <- load_regression_data(beast_dir, variant, cfg$tree_file)
 df    <- loaded$df
 tr    <- loaded$tr
 V_raw <- loaded$V_raw

@@ -65,22 +65,27 @@ shapley_one_sample <- function(components) {
     )
 }
 
-find_tree_file <- function(beast_dir) {
+find_tree_file <- function(beast_dir, tree_file = NULL) {
+    if (!is.null(tree_file)) {
+        if (!file.exists(tree_file))
+            stop(sprintf("Specified tree file does not exist: %s", tree_file))
+        return(tree_file)
+    }
     for (ext in c("*.mcc", "*.nex")) {
         hits <- Sys.glob(file.path(beast_dir, ext))
         if (length(hits) == 1) return(hits[1])
         if (length(hits) > 1) {
             stop(sprintf(
-                "Multiple %s files in %s:\n  %s",
+                "Multiple %s files in %s:\n  %s\nUse --tree_file to specify which one.",
                 ext, beast_dir, paste(hits, collapse = "\n  ")))
         }
     }
     stop(sprintf("No .mcc or .nex tree file in %s", beast_dir))
 }
 
-load_regression_data <- function(beast_dir, variant) {
+load_regression_data <- function(beast_dir, variant, tree_file = NULL) {
     source("src/tasks/phylo/beast.R")
-    tree_file <- find_tree_file(beast_dir)
+    tree_file <- find_tree_file(beast_dir, tree_file)
     cat(sprintf("  tree_file: %s\n", tree_file))
     tr <- read.annot.beast(tree_file)
 

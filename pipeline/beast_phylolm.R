@@ -4,7 +4,7 @@
 # By default runs all 4 combinations; use --model_type to restrict to one model.
 #
 # Usage:
-#   Rscript pipeline/beast_phylolm.R <run_id> <subdir> [options]
+#   pixi run -e regression beast_phylolm <run_id> <subdir> [options]
 #
 # Arguments:
 #   run_id    BEAST run UUID, prefix, or full path (speech tree)
@@ -12,13 +12,15 @@
 #
 # Options:
 #   --model_type <type>        Run only this model (linear_geo or gp_geo; default: both)
+#   --tree_file <path>         Explicit tree file for speech (when multiple .mcc exist)
 #   --cognate_beast_dir <path> (default: data/trees/beast/iecor)
 #   --variant with_inventory|no_inventory  (default: with_inventory)
 #   ... plus model-specific options forwarded to the regression scripts
 #
 # Examples:
-#   Rscript pipeline/beast_phylolm.R ba9f2d2a 0.05
-#   Rscript pipeline/beast_phylolm.R ba9f2d2a 0.05 --model_type linear_geo
+#   pixi run -e regression beast_phylolm ba9 0.05
+#   pixi run -e regression beast_phylolm ba9 0.05 --model_type linear_geo
+#   pixi run -e regression beast_phylolm ba9 0.05 --tree_file data/trees/beast/ba9f2d2a-.../0.05_.../input_v2.mcc
 
 BEAST_DIR <- "data/trees/beast"
 COGNATE_BEAST_DIR_DEFAULT <- "data/trees/beast/iecor"
@@ -32,14 +34,14 @@ all_args <- commandArgs(trailingOnly = TRUE)
 args <- all_args[all_args != "--"]
 
 if (length(args) > 0 && args[1] %in% c("-h", "--help")) {
-    cat("Usage: Rscript pipeline/beast_phylolm.R <run_id> <subdir> [options]\n")
+    cat("Usage: pixi run -e regression beast_phylolm <run_id> <subdir> [options]\n")
     cat("\nSee header of this script for full documentation.\n")
     quit(status = 0)
 }
 
 if (length(args) < 2) {
     stop(
-        "Usage: Rscript pipeline/beast_phylolm.R <run_id> <subdir> [options]",
+        "Usage: pixi run -e regression beast_phylolm <run_id> <subdir> [options]",
         call. = FALSE
     )
 }
@@ -50,6 +52,7 @@ subdir <- args[2]
 # Parse remaining named options
 cognate_beast_dir <- COGNATE_BEAST_DIR_DEFAULT
 model_type <- NULL
+tree_file <- NULL
 forward_args <- character(0)
 
 i <- 3
@@ -60,6 +63,9 @@ while (i <= length(args)) {
         i <- i + 2
     } else if (key == "model_type" && i + 1 <= length(args)) {
         model_type <- args[i + 1]
+        i <- i + 2
+    } else if (key == "tree_file" && i + 1 <= length(args)) {
+        tree_file <- args[i + 1]
         i <- i + 2
     } else {
         forward_args <- c(forward_args, args[i])
@@ -147,11 +153,16 @@ for (mt in model_types) {
         cat(sprintf("  %s\n  %s\n", run_label, bd))
         cat(sprintf("========================================\n\n"))
 
+        tree_arg <- ""
+        if (label == "speech" && !is.null(tree_file)) {
+            tree_arg <- paste("--tree_file", shQuote(tree_file))
+        }
         cmd <- paste(
             "Rscript",
             shQuote(SCRIPTS[[mt]]),
             "--beast_dir",
             shQuote(bd),
+            tree_arg,
             paste(shQuote(forward_args), collapse = " ")
         )
         cat(sprintf("Running: %s\n\n", cmd))
