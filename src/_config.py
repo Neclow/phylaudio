@@ -30,6 +30,7 @@ DEFAULT_BEAST_DIR: Final = f"{DEFAULT_TREE_DIR}/beast"
 DEFAULT_BEAST_TEMPLATE_DIR: Final = f"{DEFAULT_BEAST_DIR}/templates"
 DEFAULT_PER_SENTENCE_DIR: Final = f"{DEFAULT_TREE_DIR}/per_sentence"
 DEFAULT_GEO_DIR: Final = f"{DEFAULT_DATA_DIR}/geo"
+COGNATE_BEAST_DIR: Final = f"{DEFAULT_BEAST_DIR}/iecor"
 GEOJSON_PATH: Final = f"{DEFAULT_GEO_DIR}/language_polygons.geojson"
 NE_COUNTRIES_PATH: Final = (
     f"{DEFAULT_GEO_DIR}/naturalearth/ne_110m_admin_0_countries.shp"

@@ -241,17 +241,13 @@ if __name__ == "__main__":
     # Report
     missing_inv = set(speech_df_inv[speech_df_inv["n_phonemes"].isna()]["language"])
     speech_inv_final = len(speech_df_inv) - len(missing_inv)
-    print(
-        f"Speech (no inv):   {len(speech_df_no_inv)}/{len(speech_taxa)} taxa matched"
-    )
+    print(f"Speech (no inv):   {len(speech_df_no_inv)}/{len(speech_taxa)} taxa matched")
     print(
         f"Speech (with inv): {speech_inv_final} languages "
         f"(dropped {len(missing_inv)} missing n_phonemes: {missing_inv or 'none'})"
     )
 
-    missing_inv_c = set(
-        cognate_df_inv[cognate_df_inv["n_phonemes"].isna()]["language"]
-    )
+    missing_inv_c = set(cognate_df_inv[cognate_df_inv["n_phonemes"].isna()]["language"])
     cognate_inv_final = len(cognate_df_inv) - len(missing_inv_c)
     print(f"\nCognate (no inv):   {len(cognate_df_no_inv)} languages")
     print(
@@ -293,7 +289,7 @@ if __name__ == "__main__":
         df_inv.to_csv(path_inv, index=False)
 
         print(f"\n--- {stem} ---")
-        print(
-            f"  without inventory ({len(df_no_inv)} languages) -> {path_no_inv}"
-        )
+        print(f"  without inventory ({len(df_no_inv)} languages) -> {path_no_inv}")
         print(f"  with inventory    ({len(df_inv)} languages) -> {path_inv}")
+
+    print("\nDone.")
