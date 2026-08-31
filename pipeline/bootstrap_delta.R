@@ -2,15 +2,15 @@
 # from a binary FASTA alignment.
 #
 # Usage:
-#   Rscript pipeline/bootstrap_delta.R <run_id> <subdir> [n_boot] [seed]
+#   pixi run bootstrap_delta <run_id> <subdir> [n_boot] [seed]
 #
 # Looks for __merged_mapped.fa inside the resolved BEAST directory,
 # saves _delta.csv next to it.
 #
 # Examples:
-#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.05_brsupport_dev_test
-#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.01_brsupport 500
-#   Rscript pipeline/bootstrap_delta.R ba9f2d2a 0.01_brsupport 1000 123
+#   pixi run bootstrap_delta ba9f2d2a 0.05_brsupport_dev_test
+#   pixi run bootstrap_delta ba9f2d2a 0.01_brsupport 500
+#   pixi run bootstrap_delta ba9f2d2a 0.01_brsupport 1000 123
 
 library(parallel)
 
@@ -20,7 +20,7 @@ BEAST_BASE <- "data/trees/beast"
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 2) {
   stop(
-    "Usage: Rscript pipeline/bootstrap_delta.R <run_id> <subdir> [n_boot] [seed]"
+    "Usage: pixi run bootstrap_delta <run_id> <subdir> [n_boot] [seed]"
   )
 }
 

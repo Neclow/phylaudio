@@ -7,12 +7,12 @@
 # No phylogenetic covariance — just standard Bayesian linear regression.
 #
 # Usage:
-#   Rscript pipeline/nmf_brms.R <run_id> [K] [dataset]
+#   pixi run nmf_brms <run_id> <subdir> [K] [dataset]
 #
 # Examples:
-#   Rscript pipeline/nmf_brms.R speech
-#   Rscript pipeline/nmf_brms.R speech 12
-#   Rscript pipeline/nmf_brms.R speech 12 fleurs-r
+#   pixi run nmf_brms ba9f 0.05
+#   pixi run nmf_brms ba9f 0.05 12
+#   pixi run nmf_brms ba9f 0.05 12 fleurs-r
 
 # ─── Setup ───────────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> <subdir> [K] [dataset]\n\n"
+    "Usage: pixi run nmf_brms <run_id> <subdir> [K] [dataset]\n\n"
   )
   cat("Arguments:\n")
   cat("  run_id    BEAST run UUID, prefix, or full path\n")
@@ -42,7 +42,7 @@ if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
 
 if (length(args) < 2) {
   stop(
-    "Usage: Rscript pipeline/nmf_brms.R <run_id> <subdir> [K] [dataset]",
+    "Usage: pixi run nmf_brms <run_id> <subdir> [K] [dataset]",
     call. = FALSE
   )
 }

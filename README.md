@@ -14,7 +14,8 @@ compare them against established linguistic phylogenies.
 
 ### Prerequisites
 
-All code was developed and tested on Ubuntu 24.04 (linux-64) with CUDA 12+.
+All code was developed and tested on Ubuntu 24.04 (linux-64) with CUDA 12+ (used
+version: 13.2).
 
 Install [pixi](https://pixi.sh), a conda-based package manager:
 

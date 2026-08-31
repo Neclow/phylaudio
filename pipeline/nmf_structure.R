@@ -6,11 +6,11 @@
 # and produces STRUCTURE-style admixture bar plots.
 #
 # Usage:
-#   Rscript pipeline/nmf_structure.R <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]
+#   pixi run nmf_structure <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]
 #
 # Examples:
-#   Rscript pipeline/nmf_structure.R ba9f2d2a
-#   Rscript pipeline/nmf_structure.R ba9f2d2a 2 20 10
+#   pixi run nmf_structure ba9f2d2a 0.05
+#   pixi run nmf_structure ba9f2d2a 0.05 2 20 10
 
 suppressPackageStartupMessages({
   library(LEA)
@@ -27,7 +27,7 @@ args <- all_args[!all_args %in% c("--plot")]
 
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat(
-    "Usage: Rscript pipeline/nmf_structure.R <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]\n\n"
+    "Usage: pixi run nmf_structure <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]\n\n"
   )
   cat("Arguments:\n")
   cat("  run_id    BEAST run UUID, prefix, or full path\n")
@@ -41,7 +41,7 @@ if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
 
 if (length(args) < 2) {
   stop(
-    "Usage: Rscript pipeline/nmf_structure.R <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]",
+    "Usage: pixi run nmf_structure <run_id> <subdir> [k_min] [k_max] [n_reps] [--plot]",
     call. = FALSE
   )
 }

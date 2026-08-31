@@ -1,11 +1,11 @@
 """Prepare regression metadata from BEAST MCC trees.
 
 Usage:
-    python -m pipeline.prepare_regression_data <run_id> <subdir> [options]
+    pixi run -e regression prepare_regression_data <run_id> <subdir> [options]
 
 Examples:
-    python -m pipeline.prepare_regression_data ba9f 0.05
-    python -m pipeline.prepare_regression_data ba9f 0.05 --version 2
+    pixi run -e regression prepare_regression_data ba9f 0.05
+    pixi run -e regression prepare_regression_data ba9f 0.05 --version 2
 """
 
 import argparse

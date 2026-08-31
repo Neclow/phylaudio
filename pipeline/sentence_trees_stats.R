@@ -66,7 +66,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check for help flag
 if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
-  cat("Usage: Rscript sentence_trees_stats.R <dirname> [pattern]\n\n")
+  cat("Usage: pixi run sentence_stats <dirname> [pattern]\n\n")
   cat("Arguments:\n")
   cat(
     "  dirname    Name of the subdirectory in ",
@@ -80,13 +80,13 @@ if (length(args) > 0 && (args[1] == "-h" || args[1] == "--help")) {
   cat("  --splits s1,s2  Only include files from these splits (comma-separated)\n")
   cat("  --overwrite     Overwrite existing ", OUTPUT_FILE, " files\n", sep = "")
   cat("\nExample:\n")
-  cat("  Rscript sentence_trees_stats.R discrete\n")
+  cat("  pixi run sentence_stats discrete\n")
   quit(status = 0)
 }
 
 if (length(args) < 1) {
   stop(
-    "Usage: Rscript sentence_trees_stats.R <dirname> [pattern]\nUse -h or --help for more information",
+    "Usage: pixi run sentence_stats <dirname> [pattern]\nUse -h or --help for more information",
     call. = FALSE
   )
 }

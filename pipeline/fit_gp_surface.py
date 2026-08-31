@@ -1,11 +1,11 @@
 """Fit a gpflow GP surface for the geographic regression map (Fig 3d).
 
 Usage:
-    python -m pipeline.fit_gp_surface <run_id> <subdir> [options]
+    pixi run -e gp fit_gp_surface <run_id> <subdir> [options]
 
 Examples:
-    python -m pipeline.fit_gp_surface ba9f 0.05
-    python -m pipeline.fit_gp_surface ba9f 0.05 --cognate_beast_dir data/trees/beast/iecor
+    pixi run -e gp fit_gp_surface ba9f 0.05
+    pixi run -e gp fit_gp_surface ba9f 0.05 --cognate_beast_dir data/trees/beast/iecor
 
 Saves grid predictions (.npz), per-language GP rates (.csv), and clipped
 land polygons (.geojson) so the plot script can render without TensorFlow.
