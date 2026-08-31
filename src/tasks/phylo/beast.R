@@ -256,13 +256,13 @@ get_ancestors <- function(phy, tips) {
 #' tr$ordered.edges <- order.edges(tr)
 #' plot(tr)
 #' edgelabels(edge = tr$ordered.edges, text = round(tr$posterior, 2), cex = 0.5)
-read.annot.beast <- function(file) {
+read.annot.beast <- function(file, stride = 37) {
   tree <- scan(file = file, what = character(), sep = "\n", quiet = T)
   tree <- tree[grep("^[[:space:]]*tree", tree)]
   if (length(tree) > 1) {
     trs <- read.nexus(file)
     for (itr in seq_along(tree)) {
-      if ((itr - 1) %% 37 != 0) {
+      if ((itr - 1) %% stride != 0) {
         next
       }
       tr <- tree[[itr]]
