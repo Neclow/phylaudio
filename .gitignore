@@ -247,3 +247,6 @@ src/tasks/phylo/additive_phylo_gp
 
 # Revision files
 revision/
+papers/
+manuscript/
+img_v*/
