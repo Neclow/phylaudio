@@ -8,4 +8,5 @@ The `data` directory should contain the following subdirectories:
   subsubdirectories: `wandbprojectname`and `wandb`
 - `metadata`: metadata on each audio dataset
 - `models`: audio models
+- `resources`: reference papers and language code tables (see `resources/README.md`)
 - `trees`: phylogenetic trees, alignments and other downstream outputs

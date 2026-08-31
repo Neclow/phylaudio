@@ -42,7 +42,8 @@ pixi install -e viz         # publication figures (plotly, seaborn)
 
 ## Usage
 
-See [docs/](docs) for detailed instructions. The pipeline runs in six stages:
+See [docs/](docs) for detailed instructions for the pipeline scripts. The
+pipeline runs in six stages:
 
 1. **Download** — audio, metadata, pre-trained models, reference trees
 2. **Language identification** — embedding extraction, MLP-based LID training,
@@ -53,6 +54,9 @@ See [docs/](docs) for detailed instructions. The pipeline runs in six stages:
 5. **Post-BEAST** — NMF population structure, phylogenetic regression,
    geographic rate surfaces
 6. **Plots** — publication figures
+
+The `data/` directory has its own READMEs for subdirectories (`eval/`,
+`metadata/fleurs-r/`, `resources/`, `trees/`).
 
 ## Citation
 
