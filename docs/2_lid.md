@@ -58,3 +58,15 @@ optionally filters by glottocode/min-speakers/gender.
 Runs torchaudio's SQUIM objective model over the full FLEURS-R dataset to
 estimate non-intrusive speech quality metrics (STOI, PESQ, SI-SDR) per
 utterance.
+
+## Sentence annotation (optional)
+
+- **Command:** `python -m pipeline.spacy_annotate [dataset]`
+- **Requires:** spaCy (`en_core_web_sm`)
+- **Inputs:** FLEURS-R transcript TSVs
+- **Outputs:** `data/metadata/<dataset>/spacy.csv`
+
+Annotates FLEURS sentences with POS tags, named-entity flags (11 NER types), and
+a Heylighen & Dewaele (1999) formality F-score using spaCy's English model. Not
+used in the main analysis pipeline but available for exploratory sentence-level
+filtering.

@@ -24,6 +24,9 @@ additional dependencies use a named environment (`pixi run -e <env> ...`).
 | 4. BEAST2                  | [4_beast.md](4_beast.md)                   | `default`                     |
 | 5. Post-BEAST analysis     | [5_post_beast.md](5_post_beast.md)         | `default`, `regression`, `gp` |
 | 6. Plots                   | [6_plots.md](6_plots.md)                   | `viz`                         |
+| 7. Tables                  | [7_tables.md](7_tables.md)                 | —                             |
+| 8. Core library            | [8_core.md](8_core.md)                     | —                             |
+| 9. Extras                  | [9_extras.md](9_extras.md)                 | —                             |
 
 See also the READMEs in `data/` (`eval/`, `metadata/fleurs-r/`, `resources/`,
 `trees/`) for dataset and output descriptions.

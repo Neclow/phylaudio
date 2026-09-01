@@ -46,6 +46,31 @@ Flags:
 - `-o`: overwrite existing output
 - `-v`: validate XML only (no sampling)
 
+## Combine runs
+
+- **Command:**
+  `pixi run beazt_combine [-o] [-b burnin_pct] [-n samples_per_run] <uuid> <size> <version>`
+- **Requires:** BEAST2 LogCombiner, TreeAnnotator
+- **Inputs:** `input_v<version>_*.log` and `.trees` files from multiple MCMC
+  runs
+- **Outputs:** `combined_v<version>/` directory containing
+  `input_v<version>_combined.log`, `.trees`, optionally `_resampled.log`,
+  `.trees`, and an MCC summary tree (`.mcc`)
+
+Combines independent MCMC runs using LogCombiner (discarding the first
+`burnin_pct`% of each), optionally resamples to a fixed number of states per
+run, and produces an MCC (maximum clade credibility) tree via TreeAnnotator.
+
+Flags:
+
+- `-b <pct>`: burn-in percentage (default: 10)
+- `-n <count>`: resample to this many states per run (optional)
+- `-o`: overwrite existing combined output
+
+```bash
+pixi run beazt_combine ba9 0.05_brsupport_dev_test 2 -b 10 -n 2500
+```
+
 ## Nested sampling (model selection)
 
 - **Command:** `bash pipeline/run_beast_ns.sh <uuid> <size> [seed]`
@@ -74,4 +99,23 @@ work on a headless display; on Linux, we used MobaXTerm.
 
 ```bash
 pixi run network_analysis -- ba9f2d2a 0.05_brsupport_dev_test
+```
+
+## BEAST2 utilities
+
+Thin wrappers around BEAST2 and SplitsTree binaries in `extern/`, exposed as
+pixi tasks for convenience:
+
+| Task             | Binary                             |
+| ---------------- | ---------------------------------- |
+| `beast2`         | `extern/beast2/bin/beast`          |
+| `loganalyser`    | `extern/beast2/bin/loganalyser`    |
+| `logcombiner`    | `extern/beast2/bin/logcombiner`    |
+| `treeannotator`  | `extern/beast2/bin/treeannotator`  |
+| `packagemanager` | `extern/beast2/bin/packagemanager` |
+| `splitstree`     | `extern/splitstree/SplitsTree`     |
+
+```bash
+pixi run loganalyser input_v2_101.log
+pixi run treeannotator combined.trees combined.mcc
 ```

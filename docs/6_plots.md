@@ -22,13 +22,14 @@ pixi install -e viz
 | Fig 3 (geo regression)                 | `fig3_geo.py`                       | `beast_phylolm`, `fit_gp_surface`                                                                     | `data/phyloregression/`                                     |
 | Supp Fig 1 (F1 vs. brsupport)          | `fig1_acc_vs_brsupport.py`          | (same as Fig 1a)                                                                                      | (same as Fig 1a)                                            |
 | Supp Fig 2a (PCA)                      | `fig1_pca.py`                       | `extract_embeddings`                                                                                  | XLS-R embeddings                                            |
+| Supp Fig 2a-alt (PCA, interactive)     | `fig1_pca_plotly.py`                | `extract_embeddings`                                                                                  | XLS-R embeddings                                            |
 | Supp Fig 2b (audio quality)            | `fig1_sqa.py`                       | `extract_embeddings`, `squim`                                                                         | XLS-R embeddings, `squim.csv`                               |
 | Supp Fig 3 (NMF K selection)           | `fig1_nmf.py`                       | `nmf_structure`                                                                                       | `{beast_run}/nmf/cross_entropy.csv`                         |
 | Supp Fig 4 (PHOIBLE regression)        | `fig1_nmf.py`                       | `nmf_brms`                                                                                            | `{beast_run}/brms_phoible/`                                 |
 | Supp Fig 5 (cognate root age + rates)  | `fig2_root_age.py`, `fig2_rates.py` | BEAST runs                                                                                            | `iecor/raw.log`, `iecor/prunedtomodern.trees`               |
 | Supp Fig 6 (speech vs cognate scatter) | `fig2_rates.py`                     | `prepare_regression_data`                                                                             | `{beast_dir}/metadata_with_inventory.csv`                   |
 | Supp Fig 7 (geo regression, cognates)  | `fig3_geo.py`                       | (same as Fig 3)                                                                                       | (same as Fig 3)                                             |
-| Supp Fig 8 (BEAST2 sensitivity)        | DensiTree                           | BEAST runs                                                                                            | 2 BEAST runs                                                |
+| Supp Fig 8 (BEAST2 sensitivity)        | `fig2_densitree.R`                  | BEAST runs                                                                                            | 2 BEAST runs                                                |
 | Supp Table 1 (FLEURS-R metadata)       | -                                   | `download_fleurs_metadata`                                                                            | `metadata/fleurs-r/n_speakers.csv`, `glottolog.csv`         |
 | Supp Table 2 (non-IE metadata)         | -                                   | `download_fleurs_metadata`                                                                            | `metadata/fleurs-r/n_speakers.csv`, `glottolog.csv`         |
 | Supp Table 3 (model zoo)               | -                                   | -                                                                                                     | `src/models/transformers.py`, `fig1_acc_vs_brsupport.py`    |
@@ -50,8 +51,9 @@ pixi run -e viz fig1_pca
 pixi run -e viz fig1_sqa
 pixi run -e viz fig2_root_age
 pixi run -e viz fig2_rates
+pixi run -e viz fig1_pca_plotly
+pixi run -e viz fig2_densitree
 pixi run -e viz fig3_geo
 ```
 
-Fig 1c (network) and Supp Fig 8 (sensitivity) are rendered in SplitsTree and
-DensiTree respectively, not from Python scripts.
+Fig 1c (network) is rendered in SplitsTree, not from a Python script.
