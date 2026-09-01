@@ -4,7 +4,7 @@ import opensmile
 import torch
 
 from .._config import SAMPLE_RATE
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class openSmileFeatureExtractor(BaseFeatureExtractor):

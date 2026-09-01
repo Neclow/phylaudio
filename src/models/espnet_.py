@@ -1,5 +1,5 @@
 from .audio import AudioProcessor
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class EspnetProcessor(AudioProcessor):

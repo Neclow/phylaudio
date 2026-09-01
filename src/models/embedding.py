@@ -1,6 +1,6 @@
 import torch
 
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class EmbeddingFeatureExtractor(BaseFeatureExtractor):

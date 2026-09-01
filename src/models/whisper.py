@@ -6,7 +6,7 @@ import whisper
 
 from .._config import NONE_TENSOR
 from .audio import AudioProcessor
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class WhisperProcessor(AudioProcessor):

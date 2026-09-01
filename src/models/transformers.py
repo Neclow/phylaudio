@@ -2,7 +2,7 @@ import torch
 from transformers import AutoFeatureExtractor, HubertModel, Wav2Vec2Model
 
 from .audio import AudioProcessor
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class TransformersAudioProcessor(AudioProcessor):

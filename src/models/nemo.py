@@ -7,7 +7,7 @@ import urllib
 import nemo.collections.asr as nemo_asr
 import torch
 
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 logging.getLogger("nemo_logger").setLevel(logging.ERROR)
 

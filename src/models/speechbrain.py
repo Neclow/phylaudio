@@ -7,7 +7,7 @@ from speechbrain.inference.classifiers import EncoderClassifier
 
 from .._config import NONE_TENSOR
 from .audio import AudioProcessor
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 
 class SpeechbrainProcessor(AudioProcessor):

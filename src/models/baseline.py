@@ -14,7 +14,7 @@ import torch
 from torch import nn
 
 from .._config import SAMPLE_RATE
-from .base import BaseFeatureExtractor
+from ._base import BaseFeatureExtractor
 
 BASELINE_CKPTS = {
     "CNN10": {

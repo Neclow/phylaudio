@@ -5,7 +5,7 @@ import torch
 import whisper
 
 from .._config import NONE_TENSOR
-from .base import BaseFeatureExtractor, BaseProcessor
+from ._base import BaseFeatureExtractor, BaseProcessor
 
 
 class AudioProcessor(BaseProcessor):
