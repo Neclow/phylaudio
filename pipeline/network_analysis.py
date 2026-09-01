@@ -1,5 +1,16 @@
-# 1. Export beast XML to FASTA
-# 2. Run NeighborNet workflow on FASTA files
+"""Phylogenetic network inference via SplitsTree6 NeighborNet.
+
+Inputs:  a BEAST run ID and subdirectory
+Options: --version, --workflow, --char-map
+Flow:    Extract FASTA alignment from BEAST2 input XML
+                    |
+                    v
+         Remap characters for SplitsTree compatibility
+                    |
+                    v
+         Run SplitsTree6 NeighborNet workflow
+Outputs: mapped.fasta, splitstree.fasta, splitstree.stree6 in the BEAST run directory
+"""
 
 import os
 import subprocess

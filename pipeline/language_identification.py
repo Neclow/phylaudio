@@ -1,4 +1,17 @@
-"""End-to-end evaluation of embeddings for audio- or text-based LID"""
+"""Train and evaluate an MLP language identification classifier on audio embeddings.
+
+Inputs:  a model ID and dataset (or --embeddings-cache for pre-cached embeddings)
+Options: --ste for straight-through binarization, --project for wandb logging
+Flow:    Load/extract embeddings
+                    |
+                    v
+         Train MLP classifier (Lightning)
+                    |
+                    v
+         Evaluate on dev/test splits
+Outputs: checkpoints and metrics in data/eval/
+Note:    pass --project <name> to log to Weights & Biases; omit --project for local CSV logging (default)
+"""
 
 import json
 

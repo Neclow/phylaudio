@@ -1,6 +1,18 @@
 # pylint: disable=invalid-name
 
-"""Non-intrusive speech quality estimation using torchaudio SQUIM"""
+"""Non-intrusive speech quality estimation using torchaudio SQUIM.
+
+Inputs:  a dataset name
+Options: --device, --batch-size
+Flow:    Load SQUIM objective model
+                    |
+                    v
+         Batch-process all utterances
+                    |
+                    v
+         Estimate STOI, PESQ, SI-SDR per utterance
+Outputs: data/metadata/<dataset>/squim.csv
+"""
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from glob import glob

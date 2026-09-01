@@ -1,4 +1,13 @@
-"""Download the FLEURS-R dataset"""
+"""Download the FLEURS-R dataset from HuggingFace.
+
+Inputs:  languages.json (committed)
+Options: none
+Flow:    Read language list from metadata
+                    |
+                    v
+         Download audio recordings + transcripts per language and split
+Outputs: data/datasets/fleurs-r/{lang}/{lang}/audio/{split}/, {split}.tsv
+"""
 
 import json
 import os

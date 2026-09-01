@@ -1,14 +1,15 @@
-"""Fit a gpflow GP surface for the geographic regression map (Fig 3d).
+"""Fit a GPflow GP surface for the geographic regression map.
 
-Usage:
-    pixi run -e gp fit_gp_surface <run_id> <subdir> [options]
-
-Examples:
-    pixi run -e gp fit_gp_surface ba9f 0.05
-    pixi run -e gp fit_gp_surface ba9f 0.05 --cognate_beast_dir data/trees/beast/iecor
-
-Saves grid predictions (.npz), per-language GP rates (.csv), and clipped
-land polygons (.geojson) so the plot script can render without TensorFlow.
+Inputs:  a BEAST run ID and subdirectory
+Options: --cognate_beast_dir, --variant
+Flow:    Load regression metadata and language polygons
+                    |
+                    v
+         Fit Matern-3/2 GP over language polygon centroids
+                    |
+                    v
+         Predict on a dense geographic grid
+Outputs: gp_cache/gp_grid.npz, gp_obs.csv, land_clipped.geojson in the BEAST run directory
 """
 
 import argparse

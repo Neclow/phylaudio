@@ -1,11 +1,15 @@
-"""Prepare regression metadata from BEAST MCC trees.
+"""Prepare regression metadata from BEAST MCC trees and reference data.
 
-Usage:
-    pixi run -e regression prepare_regression_data <run_id> <subdir> [options]
-
-Examples:
-    pixi run -e regression prepare_regression_data ba9f 0.05
-    pixi run -e regression prepare_regression_data ba9f 0.05 --version 2
+Inputs:  a BEAST run ID and subdirectory
+Options: --version, --cognate_beast_dir, --dataset
+Flow:    Load MCC trees (speech + cognate)
+                    |
+                    v
+         Extract branch rate medians and SplitsTree delta scores
+                    |
+                    v
+         Join with Glottolog coordinates, speaker counts, PHOIBLE inventories
+Outputs: metadata.csv, metadata_with_inventory.csv in the BEAST run directory
 """
 
 import argparse

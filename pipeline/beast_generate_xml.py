@@ -1,3 +1,26 @@
+"""Generate BEAST2 XML files from per-sentence tree alignments.
+
+Inputs:  a per-sentence run UUID
+Options: a concatenation mode, a selection criterion, and a fraction or number of sentences to keep
+Flow:    Get per-sentence tree statistics
+                    |
+                    |
+                    v
+        Select top-p% by {brsupport,stemminess,clock}
+                    |
+                    |
+                    v
+                Merge/aggregate FASTAs
+                    |
+                    |
+                    v
+                Map taxon IDs
+                    |
+                    |
+                    v fill XML templates
+Outputs: input_vN.xml, prior_vN.xml, ns_vN/*.xml (n: version number)
+"""
+
 import json
 import os
 import sys
@@ -217,9 +240,11 @@ def main():
             f"{DEFAULT_METADATA_DIR}/{dataset}/spacy.csv", index_col="split_id"
         )
         df["fscore"] = df.index.map(
-            lambda x: spacy.loc["_".join(x.split("_")[:2]), "f_score"]
-            if "_".join(x.split("_")[:2]) in spacy.index
-            else float("nan")
+            lambda x: (
+                spacy.loc["_".join(x.split("_")[:2]), "f_score"]
+                if "_".join(x.split("_")[:2]) in spacy.index
+                else float("nan")
+            )
         )
         df = df.dropna(subset=["fscore"])
 

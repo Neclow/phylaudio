@@ -1,4 +1,13 @@
-"""Extract lineages from a language dataset using glottolog"""
+"""Extract Glottolog lineage hierarchies for each dataset language.
+
+Inputs:  a dataset name, a local Glottolog clone (extern/glottolog)
+Options: none
+Flow:    Read language list from metadata
+                    |
+                    v
+         Look up each language's lineage by glottocode
+Outputs: data/metadata/<dataset>/glottolog.csv
+"""
 
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser

@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-#
 # nmf_structure.R - sNMF K-sweep and STRUCTURE-style plots
 #
 # Runs sNMF (LEA) on a BEAST binary alignment, selects K by min cross-entropy,
@@ -16,7 +14,7 @@ suppressPackageStartupMessages({
   library(LEA)
 })
 
-# --- CLI arguments ---
+# CLI arguments
 
 BEAST_DIR <- "data/trees/beast"
 FASTA_FILE <- "__merged_mapped.fa"
@@ -55,7 +53,7 @@ n_reps <- if (length(args) >= 5) as.integer(args[5]) else 20L
 alpha <- 10
 seed <- 42L
 
-# --- Resolve run_id to BEAST directory ---
+# Resolve run_id to BEAST directory
 
 if (dir.exists(run_id)) {
   beast_dir <- run_id
@@ -106,7 +104,7 @@ dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 cat(sprintf("Input:  %s\n", fa_path))
 cat(sprintf("Output: %s/\n", out_dir))
 
-# --- Parse FASTA to .geno ---
+# Parse FASTA to .geno
 
 lines <- readLines(fa_path)
 header_idx <- grep("^>", lines)
@@ -130,7 +128,7 @@ if (!file.exists(geno_path)) {
   cat(sprintf("Using cached %s\n", geno_path))
 }
 
-# --- Run sNMF (or load cached project) ---
+# Run sNMF (or load cached project)
 
 proj_path <- file.path(out_dir, "input.snmfProject")
 if (file.exists(proj_path)) {
@@ -158,7 +156,7 @@ if (file.exists(proj_path)) {
   )
 }
 
-# --- K selection: argmin of min cross-entropy ---
+# K selection: argmin of min cross-entropy
 
 ks <- k_min:k_max
 ce_min <- sapply(ks, function(k) min(cross.entropy(proj, K = k)))
@@ -169,7 +167,7 @@ cat(sprintf(
   min(ce_min)
 ))
 
-# --- Save results for downstream (nmf_brms.R) ---
+# Save results for downstream (nmf_brms.R)
 
 results <- list(
   labels = labels,
@@ -203,7 +201,7 @@ ce_csv_path <- file.path(out_dir, "cross_entropy.csv")
 write.csv(ce_df, ce_csv_path, row.names = FALSE)
 cat(sprintf("Saved %s\n", ce_csv_path))
 
-# --- Diagnostic plots (optional) ---
+# Diagnostic plots (optional)
 
 if (do_plot) {
   suppressPackageStartupMessages({
@@ -315,7 +313,7 @@ if (do_plot) {
   plot_structure(q_mat, labels, k_star, ce_val, out_dir)
 }
 
-# --- Print cluster assignments for all K ---
+# Print cluster assignments for all K
 
 for (k_val in ks) {
   best_run <- which.min(cross.entropy(proj, K = k_val))

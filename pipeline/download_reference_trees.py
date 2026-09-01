@@ -1,5 +1,17 @@
 # pylint: disable=redefined-outer-name
-"""Download and process reference phylogenetic trees."""
+"""Download and process reference phylogenetic trees.
+
+Inputs:  a dataset name, extern/glottolog
+Options: --preserve-branch-length (to keep branch lengths when pruning trees)
+Flow:    Download trees from five sources (Glottolog, GLED, ASJP, IE-CoR MCC, IE-CoR posterior)
+                    |
+                    v
+         Prune each to the dataset's language set
+                    |
+                    v
+         Rename leaves to FLEURS keys
+Outputs: data/trees/references/{raw,processed}/, data/trees/beast/iecor/
+"""
 
 import json
 import os

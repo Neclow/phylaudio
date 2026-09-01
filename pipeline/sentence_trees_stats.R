@@ -1,3 +1,13 @@
+# Per-sentence tree quality statistics.
+#
+# Inputs:  a per-sentence tree directory name
+# Options: --include/--exclude splits
+# Flow:    Load per-sentence .treefile outputs
+#                     |
+#                     v
+#          Compute branch support, clock-likeness, stemminess, n_tips
+# Outputs: _stats.csv per run directory
+
 library(dplyr)
 
 PER_SENTENCE_DIR <- "data/trees/per_sentence"

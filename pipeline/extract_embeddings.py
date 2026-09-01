@@ -1,13 +1,15 @@
-"""Extract a unified frozen-embedding cache for a model.
+"""Extract frozen per-utterance embeddings from a backbone audio model.
 
-One per-utterance pass over ALL languages and ALL splits (train/dev/test),
-saving raw backbone embeddings aligned with metadata so the same cache serves
-both LID (filter on `subset`) and the phylo trees (group on `sentence_index`,
-filter to the analysis languages at read time). No language/min-speaker filter
-and no MIN_LANGUAGES skip are applied here -- those are read-time concerns.
-
-Output (per run): embeddings.pt (N x D), meta.parquet (label, subset,
-sentence_index), labels.pt, taxa.json (full label space), cfg.json.
+Inputs:  a model ID from MODEL_ZOO
+Options: a dataset, an optional checkpoint for classifier-head projection
+Flow:    Load backbone model
+                    |
+                    v
+         Extract per-utterance embeddings over all languages and splits
+                    |
+                    v
+         Save cache + update summary.csv
+Outputs: data/embeddings/<dataset>/<uuid>/ (embeddings.pt, meta.parquet, labels.pt, taxa.json, cfg.json)
 """
 
 import json

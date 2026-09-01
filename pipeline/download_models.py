@@ -1,3 +1,14 @@
+"""Download all pre-trained audio models registered in MODEL_ZOO.
+
+Inputs:  none
+Options: none
+Flow:    Iterate over MODEL_ZOO
+                    |
+                    v
+         Instantiate each extractor + processor (triggers HuggingFace download)
+Outputs: model files in the HuggingFace cache directory
+"""
+
 from src._config import DEFAULT_CACHE_DIR, SAMPLE_RATE
 from src.models._model_zoo import MODEL_ZOO
 

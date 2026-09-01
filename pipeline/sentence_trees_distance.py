@@ -1,6 +1,18 @@
 # pylint: disable=invalid-name
 
-"""Distance-based phylogenetic tree construction from the FLEURS dataset"""
+"""Per-sentence distance-based phylogenetic tree inference.
+
+Inputs:  a model ID, dataset, and output type (--dtype)
+Options: --metric {euclidean,cosine,...}, --method {fastme,nj,upgma}
+Flow:    Extract per-sentence embeddings
+                    |
+                    v
+         Compute pairwise distance matrices
+                    |
+                    v
+         Infer distance-based trees (FastME / NJ / UPGMA)
+Outputs: data/trees/per_sentence/<dtype>/<run_id>/ (matrices, trees, cfg.json)
+"""
 
 import os
 

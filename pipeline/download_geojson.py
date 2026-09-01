@@ -1,4 +1,13 @@
-"""Download GeoJSON and Natural Earth shapefiles."""
+"""Download language polygons and Natural Earth shapefiles.
+
+Inputs:  none
+Options: none
+Flow:    Download Glottography language-area polygons (GeoJSON)
+                    |
+                    v
+         Download Natural Earth shapefiles (110m countries, 50m land)
+Outputs: data/geo/ (language polygons GeoJSON), data/geo/naturalearth/ (shapefiles)
+"""
 
 import os
 import zipfile

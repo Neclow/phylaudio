@@ -16,7 +16,7 @@ library(parallel)
 
 BEAST_BASE <- "data/trees/beast"
 
-# ── CLI args ──────────────────────────────────────────────────────────────────
+# CLI args
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 2) {
   stop(
@@ -64,7 +64,7 @@ output_csv <- file.path(run_dir, "_delta.csv")
 
 stopifnot(file.exists(fasta_file))
 
-# ── Read binary FASTA as integer matrix (0/1/NA) ─────────────────────────────
+# Read binary FASTA as integer matrix (0/1/NA)
 read_fasta_binary <- function(file) {
   lines <- readLines(file)
   headers <- grep("^>", lines)
@@ -93,7 +93,7 @@ read_fasta_binary <- function(file) {
   mat
 }
 
-# ── Pairwise-complete Hamming distance ────────────────────────────────────────
+# Pairwise-complete Hamming distance
 hamming_dist <- function(mat) {
   obs <- (!is.na(mat)) * 1L
   val <- mat
@@ -110,7 +110,7 @@ hamming_dist <- function(mat) {
   D
 }
 
-# ── Per-taxon delta from a distance matrix ────────────────────────────────────
+# Per-taxon delta from a distance matrix
 compute_delta <- function(D) {
   n <- nrow(D)
   quarts <- combn(n, 4L)
@@ -143,7 +143,7 @@ compute_delta <- function(D) {
   list(per_taxon = taxon_delta, overall = mean(delta_q), quarts = quarts)
 }
 
-# ── Single bootstrap replicate ────────────────────────────────────────────────
+# Single bootstrap replicate
 boot_delta_one <- function(aln_mat, quarts) {
   L <- ncol(aln_mat)
   boot_mat <- aln_mat[, sample.int(L, L, replace = TRUE), drop = FALSE]
@@ -175,7 +175,7 @@ boot_delta_one <- function(aln_mat, quarts) {
   )
 }
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# Main
 cat("Reading alignment:", fasta_file, "\n")
 aln <- read_fasta_binary(fasta_file)
 cat(sprintf("Alignment: %d taxa x %d characters\n", nrow(aln), ncol(aln)))

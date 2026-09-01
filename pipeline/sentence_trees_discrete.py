@@ -1,8 +1,20 @@
 # pylint: disable=invalid-name
 
-"""
-Maximum likelihood-based phylogenetic tree construction
-from the FLEURS dataset after embedding discretization
+"""Per-sentence discrete-character phylogenetic tree inference.
+
+Inputs:  a model ID, dataset, and discretization type (--dtype)
+Options: --discretization {ste,step,quantile,kmeans}, --aggregation, --method
+Flow:    Extract per-sentence embeddings
+                    |
+                    v
+         Discretize into binary/multi-state characters
+                    |
+                    v
+         Write FASTA alignments per sentence
+                    |
+                    v
+         Run ML tree inference (IQ-TREE)
+Outputs: data/trees/per_sentence/<dtype>/<run_id>/ (FASTAs, trees, cfg.json)
 """
 
 import os

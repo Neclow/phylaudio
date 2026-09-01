@@ -1,5 +1,19 @@
 # pylint: disable=redefined-outer-name
 
+"""Re-evaluate all LID checkpoints on the analysis language subset.
+
+Inputs:  a wandb project name (or local eval directory)
+Options: language filters (glottocode, min speakers, gender)
+Flow:    Load each checkpoint
+                    |
+                    v
+         Re-evaluate on filtered language subset
+                    |
+                    v
+         Rank by test F1/accuracy
+Outputs: data/eval/<project>/summary.csv
+"""
+
 import json
 import os
 from argparse import ArgumentParser

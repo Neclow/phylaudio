@@ -1,11 +1,18 @@
-"""Download PHOIBLE phoneme inventories and aggregate to one row per language.
+"""Download and aggregate PHOIBLE phoneme inventories.
 
-Outputs a CSV with columns: Glottocode, n_phonemes, n_consonants, n_vowels,
-plus a binary indicator per phonological feature:
-  - has_{feat}: binary (1 if any segment has [+feat], else 0)
-
-Aggregation: computes features per inventory, then takes the median across
-all inventories per language (following Anderson et al. 2023, J. Lang. Evol.).
+Inputs:  a dataset name
+Options: none
+Flow:    Download PHOIBLE data from GitHub (pinned commit)
+                    |
+                    v
+         Apply source-priority hierarchy (Urban & Moran 2021)
+                    |
+                    v
+         Compute binary phonological features per inventory
+                    |
+                    v
+         Aggregate via median across inventories per language (Anderson et al. 2023)
+Outputs: data/metadata/<dataset>/phoible.csv (Glottocode, n_phonemes, n_consonants, n_vowels, has_{feat} columns)
 """
 
 import json

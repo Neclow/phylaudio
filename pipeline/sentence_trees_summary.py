@@ -1,6 +1,18 @@
 # pylint: disable=invalid-name
 
-"""Summarise results from sentence tree inference runs."""
+"""Summarise and score sentence tree inference runs against reference trees.
+
+Inputs:  a per-sentence tree directory name
+Options: -r for specific reference tree, -m for metric, --method for supertree type
+Flow:    Collect cfg.json metadata from all runs
+                    |
+                    v
+         Load each ASTRAL summary tree
+                    |
+                    v
+         Compute RF and quartet-similarity vs reference trees
+Outputs: data/trees/per_sentence/<dirname>/summary.csv
+"""
 
 import json
 import multiprocessing

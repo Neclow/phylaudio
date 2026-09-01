@@ -1,4 +1,18 @@
 # pylint: disable=redefined-outer-name
+"""Download and compile FLEURS-R language metadata.
+
+Inputs:  a dataset name (fleurs or fleurs-r)
+Options: none
+Flow:    Query speaker populations (Wikimedia API, LinguaMeta)
+                    |
+                    v
+         Aggregate gender distributions from FLEURS TSVs
+                    |
+                    v
+         Fetch Glottolog languoid metadata
+Outputs: data/metadata/<dataset>/ (languages.json, n_speakers.csv, genders.csv, glottolog.csv)
+"""
+
 import csv
 import json
 from argparse import ArgumentParser
@@ -16,10 +30,14 @@ from src._config import (
 from src.data.glottolog import get_languoid_data
 from src.data.speakerpop import download_speakerpop
 
-
 _TSV_COLS = [
-    "sentence_index", "fname", "sentence", "sentence_lower",
-    "chars", "num_samples", "gender",
+    "sentence_index",
+    "fname",
+    "sentence",
+    "sentence_lower",
+    "chars",
+    "num_samples",
+    "gender",
 ]
 
 
@@ -39,12 +57,12 @@ def compute_gender_distribution(dataset):
     data = pd.concat(dfs).dropna(subset=["gender"])
     genders = (
         data.groupby(["fleurs_dir", "gender"])
-            .agg(n_recordings=("fname", "count"),
-                 n_samples=("num_samples", "sum"))
-            .reset_index()
-            .pivot(index="fleurs_dir", columns="gender",
-                   values=["n_recordings", "n_samples"])
-            .fillna(0)
+        .agg(n_recordings=("fname", "count"), n_samples=("num_samples", "sum"))
+        .reset_index()
+        .pivot(
+            index="fleurs_dir", columns="gender", values=["n_recordings", "n_samples"]
+        )
+        .fillna(0)
     )
     genders.columns = [f"{a}_{b}".lower() for a, b in genders.columns]
     genders = genders.reset_index()

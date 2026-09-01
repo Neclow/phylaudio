@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-#
 # nmf_brms.R - Bayesian regression of NMF components on PHOIBLE features
 #
 # Fits one brms model per NMF component (K separate regressions).
@@ -14,14 +12,14 @@
 #   pixi run nmf_brms ba9f 0.05 12
 #   pixi run nmf_brms ba9f 0.05 12 fleurs-r
 
-# ─── Setup ───────────────────────────────────────────────────────────────────
+# Setup
 
 suppressPackageStartupMessages({
   library(dplyr)
   library(jsonlite)
 })
 
-# ─── CLI Arguments ───────────────────────────────────────────────────────────
+# CLI Arguments
 
 BEAST_DIR <- "data/trees/beast"
 METADATA_DIR <- "data/metadata"
@@ -89,7 +87,7 @@ if (length(rds_hits) > 1) {
   )
 }
 
-# ─── Load sNMF proportions ──────────────────────────────────────────────────
+# Load sNMF proportions
 
 rds_path <- rds_hits[1]
 cat(sprintf("Loading sNMF results from %s\n", rds_path))
@@ -100,7 +98,7 @@ P <- res$Q[[as.character(K)]]
 cat(sprintf("  Using K = %d\n", K))
 cat(sprintf("  Proportions: %d languages x %d components\n", nrow(P), ncol(P)))
 
-# ─── Load language metadata ──────────────────────────────────────────────────
+# Load language metadata
 
 cat("Loading language metadata...\n")
 meta_dir <- file.path(METADATA_DIR, dataset)
@@ -116,7 +114,7 @@ name_to_dir <- setNames(
 nmf_dirs <- name_to_dir[nmf_labels]
 nmf_glottocodes <- sapply(nmf_dirs, function(d) lang_meta[[d]]$glottolog)
 
-# ─── Load predictor data ──────────────────────────────────────────────────────
+# Load predictor data
 
 cat("Loading PHOIBLE data...\n")
 pred_agg <- read.csv(
@@ -131,7 +129,7 @@ cat(sprintf(
   ncol(pred_agg) - 1
 ))
 
-# ─── Align NMF and predictors ────────────────────────────────────────────────
+# Align NMF and predictors
 
 matched_idx <- which(nmf_glottocodes %in% pred_agg[[join_col]])
 matched_gc <- nmf_glottocodes[matched_idx]
@@ -141,7 +139,7 @@ pred_aligned <- pred_agg %>%
   filter(.data[[join_col]] %in% matched_gc) %>%
   arrange(match(.data[[join_col]], matched_gc))
 
-# ─── Select predictor columns ────────────────────────────────────────────────
+# Select predictor columns
 
 all_cols <- setdiff(colnames(pred_aligned), "Glottocode")
 # has_{feat} binary indicators + inventory size counts
@@ -171,13 +169,13 @@ colnames(X_scaled) <- make.names(colnames(X_scaled))
 variable_feats_clean <- colnames(X_scaled)
 
 
-# ─── Output directory ────────────────────────────────────────────────────────
+# Output directory
 
 # Output as sibling of nmf/ (e.g. .../0.01_brsupport/brms_phoible/)
 output_dir <- file.path(dirname(dirname(rds_path)), "brms_phoible")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-# ─── Fit one brms model per component ────────────────────────────────────────
+# Fit one brms model per component
 
 cat(sprintf("\nFitting %d brms models...\n", K))
 
@@ -257,7 +255,7 @@ for (j in seq_len(K)) {
   cat(sprintf("  Saved: %s\n", model_path))
 }
 
-# ─── Combine and save results ────────────────────────────────────────────────
+# Combine and save results
 
 results_df <- bind_rows(all_results) %>%
   filter(feature != "Intercept") %>%
@@ -296,7 +294,7 @@ cat(sprintf(
   nrow(results_df)
 ))
 
-# ─── LOO-CV (optional, slow) ────────────────────────────────────────────────
+# LOO-CV (optional, slow)
 # Uncomment to compare ridge vs horseshoe or check predictive fit.
 # Requires re-fitting with horseshoe for comparison.
 #
