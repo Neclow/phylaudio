@@ -1,0 +1,17 @@
+Model,Reference,Parameters (M),Architecture,Training objective,Training datasets,Training hours (K),Training languages,IE overlap (of 51),FLEURS in training
+CNN6,"Dinkel, 2020",1.2,2D CNN,LID,VL107,6.6,107,46,No
+CNN10,"Dinkel, 2020",4.7,2D CNN,LID,VL107,6.6,107,46,No
+ECAPA-TDNN,"Desplanques et al., 2020; Valk & Alumäe, 2021",21.2,ECAPA-TDNN,LID,VL107,6.6,107,46,No
+AmberNet,"Jia et al., 2023",28.9,1D CNN,LID,VL107,6.6,107,46,No
+Whisper tiny,"Radford et al., 2023",39,Whisper,Weakly-sup. ASR,Internet audio,680,99,46,No
+Whisper base,"Radford et al., 2023",74,Whisper,Weakly-sup. ASR,Internet audio,680,99,46,No
+mHuBERT-147,"Zanon Boito et al., 2024",94,HuBERT,SSL,"CV v11; VP; MLS; VL107 + 11 smaller corpora",90,147,49,No
+Whisper small,"Radford et al., 2023",241,Whisper,Weakly-sup. ASR,Internet audio,680,99,46,No
+XLS-R 300M,"Babu et al., 2022",315,wav2vec 2.0,SSL,"VP; MLS; CV; BABEL; VL107",436,128,48,No
+MMS-zeroshot-300M,"Zhao et al., 2025",315,wav2vec 2.0,SSL → ASR,"MMS-lab; FL; VP; MLS; CV; VL107; BABEL",491,1406,51,Yes
+Whisper medium,"Radford et al., 2023",762,Whisper,Weakly-sup. ASR,Internet audio,680,99,46,No
+Whisper large-v3-turbo,"Radford et al., 2023",807,Whisper,Weakly-sup. ASR,Internet audio,680,99,46,No
+MMS-LID-126,"Pratap et al., 2023",965,wav2vec 2.0,SSL → LID,"MMS-lab; FL; VP; MLS; CV; VL107; BABEL",491,1406,51,Yes
+MMS-LID-256,"Pratap et al., 2023",965,wav2vec 2.0,SSL → LID,"MMS-lab; FL; VP; MLS; CV; VL107; BABEL; MMS-unlab",491,1406,51,Yes
+MMS-LID-4017,"Pratap et al., 2023",965,wav2vec 2.0,SSL → LID,"MMS-lab; FL; VP; MLS; CV; VL107; BABEL; MMS-unlab",491,1406,51,Yes
+MMS-1B-all,"Pratap et al., 2023",965,wav2vec 2.0,SSL → ASR,"MMS-lab; FL; VP; MLS; CV; VL107; BABEL",491,1406,51,Yes
