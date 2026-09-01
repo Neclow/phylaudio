@@ -18,7 +18,7 @@ from ._config import (
 )
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
-SPEECH_LOG_FILE = f"{SPEECH_BEAST_DIR}/combined_v2/input_v2_combined.log"
+SPEECH_LOG_FILE = f"{SPEECH_BEAST_DIR}/combined_v2/input_v2_resampled.log"
 SPEECH_PRIOR_LOG = f"{SPEECH_BEAST_DIR}/prior_v2_1.log"
 COGNATE_LOG_FILE = f"{COGNATE_BEAST_DIR}/raw.log"
 COGNATE_PRIOR_LOG = f"{COGNATE_BEAST_DIR}/prior.log"
@@ -26,8 +26,13 @@ COGNATE_PRIOR_LOG = f"{COGNATE_BEAST_DIR}/prior.log"
 
 def _load_root_age(log_file):
     df = pd.read_csv(log_file, sep="\t", comment="#")
-    n_burnin = int(len(df) * BURNIN_FRAC)
-    return df["TreeHeight.t:tree"].iloc[n_burnin:]
+    sub_df = df["TreeHeight.t:tree"]
+    if not "combined" in log_file or not "resampled" in log_file:
+        # Remove burn-in for the combined run
+        n_burnin = int(len(df) * BURNIN_FRAC)
+        return sub_df.iloc[n_burnin:]
+    # No burn-in required for combined/resampled runs
+    return sub_df
 
 
 def _plot_root_age(ax, posterior_log_file, color, label, prior_log_file=None):
