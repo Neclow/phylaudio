@@ -74,7 +74,7 @@ that are too large for git. Download from
 
 ```bash
 # TODO: pixi run prepare_zenodo_data
-tar -xzf phylaudio_zenodo.tar.gz
+tar -xzf phylaudio_zenodo_v2.tar.gz
 ```
 
 Unpacks into `data/`.
