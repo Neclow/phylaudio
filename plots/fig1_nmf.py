@@ -1,4 +1,10 @@
-"""Figure 1b: sNMF structure plot + Supp Figs 3–4."""
+"""Figure 1b / Supp Figs 3-4: sNMF structure plot, K selection, and PHOIBLE regression.
+
+Caption: (1b) Sparse NMF of XLS-R embeddings, dividing IE samples into clusters.
+(Supp 3) NMF K selection by cross-entropy stability with local maximum at K=12.
+(Supp 4) Bayesian ridge regression of NMF component proportions on PHOIBLE
+phonological features — heatmap and forest plots of posterior means with 95% CIs.
+"""
 
 import os
 import re

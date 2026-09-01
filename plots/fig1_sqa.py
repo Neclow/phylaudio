@@ -1,4 +1,9 @@
-"""Extended Figure: Silhouette score vs SI-SDR + audio quality correlation matrix."""
+"""Extended Data Fig 1b-c: audio embedding quality diagnostics.
+
+Caption: (b) Mean silhouette score vs. mean SI-SDR per language, with
+regression line. (c) Pearson correlation matrix of audio quality metrics
+(STOI, PESQ, SI-SDR) and silhouette score.
+"""
 
 # pylint: disable=redefined-outer-name, invalid-name
 

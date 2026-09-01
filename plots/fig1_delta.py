@@ -1,4 +1,8 @@
-"""Figure 1d: per-language delta scores colored by NMF component proportions."""
+"""Figure 1d: per-language delta scores colored by NMF component proportions.
+
+Caption: Per-language contribution to disrupting a bifurcating (treelike)
+signal as calculated using Holland's delta-bar with 95% bootstrap CI.
+"""
 
 import os
 from glob import glob

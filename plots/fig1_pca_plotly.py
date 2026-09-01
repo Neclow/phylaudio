@@ -1,4 +1,8 @@
-"""Interactive PCA of XLS-R embeddings (Plotly HTML)."""
+"""Extended Data Fig 1a (interactive): PCA of XLS-R embeddings (Plotly HTML).
+
+Caption: Interactive version of the PCA of XLS-R embeddings coloured by
+language subfamily. Outputs an HTML file with hover tooltips.
+"""
 
 # pylint: disable=redefined-outer-name, invalid-name
 

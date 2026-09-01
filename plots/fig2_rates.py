@@ -1,4 +1,11 @@
-"""Figure 2b / Supp Fig S5b / S6: rate over time + speech vs cognate scatter."""
+"""Figure 2b / Extended Data Figs 5-6: rates through time and speech vs cognate scatter.
+
+Caption: (2b) Mean standardised rates through time with 95% CIs for all
+branches in the posterior at each time point.
+(Ext 5) Acoustic and cognate rates overlaid with archaeological horizons.
+(Ext 6) Speech vs cognate median branch rates are uncorrelated (Spearman
+rho = 0.023), indicating independent dimensions of linguistic change.
+"""
 
 # pylint: disable=redefined-outer-name, invalid-name
 

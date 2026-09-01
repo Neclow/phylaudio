@@ -1,4 +1,11 @@
-"""Figure 3: geographic regression panels (linear_geo model)."""
+"""Figure 3 / Extended Data Fig 7: phylogenetic regression of acoustic evolutionary rates.
+
+Caption: (a) Posterior distributions of standardised regression coefficients
+for five main effects and geographic interactions. (b) Shapley variance
+decomposition from the GP model. (c) Log median rate vs delta with linear
+model posterior. (d) GP-smoothed spatial rate surface with observed language
+rates overlaid. Extended Data Fig 7 shows the same for cognate rates.
+"""
 
 import json
 import os

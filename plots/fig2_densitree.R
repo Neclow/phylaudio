@@ -1,5 +1,8 @@
-#!/usr/bin/env Rscript
-# DensiTree plot for Figure 2a — branches colored by log evolutionary rate
+# Extended Data Fig 8: DensiTree sensitivity comparison (1% vs 5% of sentences).
+#
+# Caption: DensiTree comparison of posterior tree samples from the 1% and 5%
+# runs. The two posteriors are broadly concordant (nRF = 0.021, quartet
+# similarity 0.999); MCC node heights for all major clades differ by 0.8-6.3%.
 
 library(ape)
 library(phangorn)
@@ -25,22 +28,56 @@ FIG_W <- 10
 FIG_H <- 6
 
 TIP_ORDER <- c(
-  "Assamese", "Bengali", "Oriya", "Nepali",
-  "Marathi", "Gujarati", "Punjabi", "Hindi", "Urdu", "Sindhi",
-  "Pashto", "Sorani-Kurdish", "Tajik", "Persian",
+  "Assamese",
+  "Bengali",
+  "Oriya",
+  "Nepali",
+  "Marathi",
+  "Gujarati",
+  "Punjabi",
+  "Hindi",
+  "Urdu",
+  "Sindhi",
+  "Pashto",
+  "Sorani-Kurdish",
+  "Tajik",
+  "Persian",
   "Armenian",
-  "Lithuanian", "Latvian",
-  "Bulgarian", "Macedonian", "Slovenian",
-  "Croatian", "Bosnian", "Serbian",
-  "Ukrainian", "Belarusian", "Russian",
-  "Polish", "Czech", "Slovak",
-  "Icelandic", "Norwegian", "Swedish", "Danish",
-  "German", "Luxembourgish", "Dutch",
-  "English", "Irish", "Welsh",
+  "Lithuanian",
+  "Latvian",
+  "Bulgarian",
+  "Macedonian",
+  "Slovenian",
+  "Croatian",
+  "Bosnian",
+  "Serbian",
+  "Ukrainian",
+  "Belarusian",
+  "Russian",
+  "Polish",
+  "Czech",
+  "Slovak",
+  "Icelandic",
+  "Norwegian",
+  "Swedish",
+  "Danish",
+  "German",
+  "Luxembourgish",
+  "Dutch",
+  "English",
+  "Irish",
+  "Welsh",
   "Greek",
-  "Romanian", "Italian", "French", "Occitan",
-  "Catalan", "Spanish", "Asturian", "Galician",
-  "Portuguese", "Kabuverdianu"
+  "Romanian",
+  "Italian",
+  "French",
+  "Occitan",
+  "Catalan",
+  "Spanish",
+  "Asturian",
+  "Galician",
+  "Portuguese",
+  "Kabuverdianu"
 )
 
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
@@ -68,9 +105,18 @@ all_rates <- all_rates[!is.na(all_rates) & all_rates > 0]
 log_rate_range <- range(log(all_rates))
 
 viridis_hex <- c(
-  "#440154", "#482173", "#433E85", "#38588C", "#2D708E",
-  "#25858E", "#1E9B8A", "#2BB07F", "#51C56A", "#85D54A",
-  "#C2DF23", "#FDE725"
+  "#440154",
+  "#482173",
+  "#433E85",
+  "#38588C",
+  "#2D708E",
+  "#25858E",
+  "#1E9B8A",
+  "#2BB07F",
+  "#51C56A",
+  "#85D54A",
+  "#C2DF23",
+  "#FDE725"
 )
 RATE_PALETTE <- colorRampPalette(viridis_hex)(256)
 RATE_PALETTE_A <- adjustcolor(RATE_PALETTE, alpha.f = EDGE_ALPHA)
@@ -78,7 +124,8 @@ RATE_PALETTE_C <- adjustcolor(RATE_PALETTE, alpha.f = CONSENSUS_ALPHA)
 GREY_A <- adjustcolor("grey50", alpha.f = EDGE_ALPHA)
 
 rate_idx <- function(rates) {
-  idx <- round((log(rates) - log_rate_range[1]) / diff(log_rate_range) * 255) + 1
+  idx <- round((log(rates) - log_rate_range[1]) / diff(log_rate_range) * 255) +
+    1
   idx[is.na(idx) | !is.finite(idx)] <- 128
   pmax(1L, pmin(256L, idx))
 }
@@ -99,7 +146,9 @@ tree_layout <- function(tr, palette) {
   x <- max_height - tree_h + depths
 
   y <- numeric(total)
-  for (i in seq_len(n)) y[i] <- tip_y[tr$tip.label[i]]
+  for (i in seq_len(n)) {
+    y[i] <- tip_y[tr$tip.label[i]]
+  }
 
   tr_po <- reorder(tr, "postorder")
   child_y <- vector("list", total)
@@ -122,10 +171,14 @@ cat("Computing layouts...\n")
 n_edges <- nrow(trees[[1]]$edge)
 n_total <- n_edges * length(trees)
 
-hx0 <- numeric(n_total); hy0 <- numeric(n_total)
-hx1 <- numeric(n_total); hy1 <- numeric(n_total)
-vx0 <- numeric(n_total); vy0 <- numeric(n_total)
-vx1 <- numeric(n_total); vy1 <- numeric(n_total)
+hx0 <- numeric(n_total)
+hy0 <- numeric(n_total)
+hx1 <- numeric(n_total)
+hy1 <- numeric(n_total)
+vx0 <- numeric(n_total)
+vy0 <- numeric(n_total)
+vx1 <- numeric(n_total)
+vy1 <- numeric(n_total)
 seg_col <- character(n_total)
 
 off <- 0L
@@ -135,10 +188,14 @@ for (k in seq_along(trees)) {
   ne <- nrow(e)
   ii <- off + seq_len(ne)
 
-  hx0[ii] <- lay$x[e[, 1]]; hy0[ii] <- lay$y[e[, 2]]
-  hx1[ii] <- lay$x[e[, 2]]; hy1[ii] <- lay$y[e[, 2]]
-  vx0[ii] <- lay$x[e[, 1]]; vy0[ii] <- lay$y[e[, 1]]
-  vx1[ii] <- lay$x[e[, 1]]; vy1[ii] <- lay$y[e[, 2]]
+  hx0[ii] <- lay$x[e[, 1]]
+  hy0[ii] <- lay$y[e[, 2]]
+  hx1[ii] <- lay$x[e[, 2]]
+  hy1[ii] <- lay$y[e[, 2]]
+  vx0[ii] <- lay$x[e[, 1]]
+  vy0[ii] <- lay$y[e[, 1]]
+  vx1[ii] <- lay$x[e[, 1]]
+  vy1[ii] <- lay$y[e[, 2]]
   seg_col[ii] <- lay$cols
 
   off <- off + ne
@@ -161,8 +218,14 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
   par(family = FONT_FAMILY, mar = c(3, 0.5, 0.5, 7), cex = FONT_SIZE_PT / 12)
 
   x_max <- max(max_height, 8)
-  plot(NULL, xlim = c(max_height - x_max, max_height),
-       ylim = c(0.5, n_tips + 0.5), xlab = "", ylab = "", axes = FALSE)
+  plot(
+    NULL,
+    xlim = c(max_height - x_max, max_height),
+    ylim = c(0.5, n_tips + 0.5),
+    xlab = "",
+    ylab = "",
+    axes = FALSE
+  )
 
   ax_vals <- sort(unique(c(pretty(c(x_max, 0)), 8)))
   ax_pos <- max_height - ax_vals
@@ -173,20 +236,46 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
   segments(vx0, vy0, vx1, vy1, col = seg_col, lwd = 0.5)
 
   ce <- con_lay$edge
-  segments(con_lay$x[ce[, 1]], con_lay$y[ce[, 2]],
-           con_lay$x[ce[, 2]], con_lay$y[ce[, 2]],
-           col = con_lay$cols, lwd = CONSENSUS_LWD)
-  segments(con_lay$x[ce[, 1]], con_lay$y[ce[, 1]],
-           con_lay$x[ce[, 1]], con_lay$y[ce[, 2]],
-           col = con_lay$cols, lwd = CONSENSUS_LWD)
+  segments(
+    con_lay$x[ce[, 1]],
+    con_lay$y[ce[, 2]],
+    con_lay$x[ce[, 2]],
+    con_lay$y[ce[, 2]],
+    col = con_lay$cols,
+    lwd = CONSENSUS_LWD
+  )
+  segments(
+    con_lay$x[ce[, 1]],
+    con_lay$y[ce[, 1]],
+    con_lay$x[ce[, 1]],
+    con_lay$y[ce[, 2]],
+    col = con_lay$cols,
+    lwd = CONSENSUS_LWD
+  )
 
-  text(max_height, tip_y, names(tip_y),
-       pos = 4, cex = FONT_SIZE_PT / 12, xpd = TRUE)
+  text(
+    max_height,
+    tip_y,
+    names(tip_y),
+    pos = 4,
+    cex = FONT_SIZE_PT / 12,
+    xpd = TRUE
+  )
 
-  axis(1, at = ax_pos[vis], labels = ax_vals[vis],
-       family = FONT_FAMILY, cex.axis = FONT_SIZE_PT / 12)
-  mtext("Time (kya)", side = 1, line = 2,
-        family = FONT_FAMILY, cex = FONT_SIZE_PT / 12)
+  axis(
+    1,
+    at = ax_pos[vis],
+    labels = ax_vals[vis],
+    family = FONT_FAMILY,
+    cex.axis = FONT_SIZE_PT / 12
+  )
+  mtext(
+    "Time (kya)",
+    side = 1,
+    line = 2,
+    family = FONT_FAMILY,
+    cex = FONT_SIZE_PT / 12
+  )
 
   # --- Inset color bar (horizontal, top-left) ---
   cb_x0 <- max_height - 5.5
@@ -195,18 +284,36 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
   cb_y1 <- n_tips - 0.5
   n_cb <- length(RATE_PALETTE)
   cb_breaks <- seq(cb_x0, cb_x1, length.out = n_cb + 1)
-  rect(cb_breaks[1:n_cb], cb_y0, cb_breaks[2:(n_cb + 1)], cb_y1,
-       col = RATE_PALETTE, border = NA)
+  rect(
+    cb_breaks[1:n_cb],
+    cb_y0,
+    cb_breaks[2:(n_cb + 1)],
+    cb_y1,
+    col = RATE_PALETTE,
+    border = NA
+  )
   rect(cb_x0, cb_y0, cb_x1, cb_y1, col = NA, border = "black", lwd = 0.5)
 
   lr_ticks <- seq(log_rate_range[1], log_rate_range[2], length.out = 3)
-  tick_x <- cb_x0 + (lr_ticks - log_rate_range[1]) /
-    diff(log_rate_range) * (cb_x1 - cb_x0)
+  tick_x <- cb_x0 +
+    (lr_ticks - log_rate_range[1]) /
+      diff(log_rate_range) *
+      (cb_x1 - cb_x0)
   segments(tick_x, cb_y0, tick_x, cb_y0 - 0.3, lwd = 0.5)
-  text(tick_x, cb_y0 - 0.5, sprintf("%.1f", lr_ticks),
-       cex = FONT_SIZE_PT / 14, family = FONT_FAMILY)
-  text(mean(c(cb_x0, cb_x1)), cb_y1 + 0.4, "Log evol. rate",
-       cex = FONT_SIZE_PT / 13, family = FONT_FAMILY)
+  text(
+    tick_x,
+    cb_y0 - 0.5,
+    sprintf("%.1f", lr_ticks),
+    cex = FONT_SIZE_PT / 14,
+    family = FONT_FAMILY
+  )
+  text(
+    mean(c(cb_x0, cb_x1)),
+    cb_y1 + 0.4,
+    "Log evol. rate",
+    cex = FONT_SIZE_PT / 13,
+    family = FONT_FAMILY
+  )
 
   dev.off()
   cat("Saved", outfile, "\n")

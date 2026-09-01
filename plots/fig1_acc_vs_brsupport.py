@@ -1,4 +1,9 @@
-"""Figure 1a / Supp: LID accuracy (or F1) vs. mean bootstrap support."""
+"""Figure 1a / Supp Fig 1: LID accuracy (or F1) vs. mean bootstrap support.
+
+Caption: Language identification performance across speech models versus their
+historical signal derived from phylogenetic branch supports inferred from
+learned binarized embeddings. Supp Fig 1 shows the same with F1.
+"""
 
 import os
 
@@ -52,9 +57,7 @@ def _align_legend_title(fig, leg):
 
 
 def load_data():
-    tree_summary = pd.read_csv(
-        f"{DEFAULT_PER_SENTENCE_DIR}/discrete3+vote/summary.csv"
-    )
+    tree_summary = pd.read_csv(f"{DEFAULT_PER_SENTENCE_DIR}/discrete3+vote/summary.csv")
 
     stat_dfs = []
     for _, row in tree_summary.iterrows():
@@ -85,9 +88,7 @@ def load_data():
 
 
 def _plot(ax, fig, data, x_col, xlabel):
-    arch_palette = dict(
-        zip(ARCH_ORDER, sns.color_palette("viridis", len(ARCH_ORDER)))
-    )
+    arch_palette = dict(zip(ARCH_ORDER, sns.color_palette("viridis", len(ARCH_ORDER))))
     data = data.copy()
     data["_size"] = SIZE_FUNC(np.log10(data.nparam))
 

@@ -1,4 +1,7 @@
-"""Extended Figure: PCA of XLS-R embeddings."""
+"""Extended Data Fig 1a: PCA of XLS-R embeddings.
+
+Caption: PCA of XLS-R embeddings coloured by language subfamily.
+"""
 
 # pylint: disable=redefined-outer-name, invalid-name
 

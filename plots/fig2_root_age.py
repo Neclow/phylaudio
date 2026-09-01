@@ -1,4 +1,10 @@
-"""Figure 2a / Supp Fig S5a: posterior root age distributions."""
+"""Figure 2a / Extended Data Fig 5: posterior root age distributions.
+
+Caption: (2a) Sample of 1,000 posterior trees from a Bayesian analysis of
+divergence times; red dotted line indicates the median root age.
+(Ext 5) Acoustic and cognate root age posteriors overlaid with
+archaeological/cultural horizon date ranges.
+"""
 
 import os
 
