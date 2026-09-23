@@ -1,6 +1,7 @@
 # Phylaudio
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19187043.svg)](https://doi.org/10.5281/zenodo.19187043)
+[![Code DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19224135.svg)](https://doi.org/10.5281/zenodo.19224135)
+[![Data DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19187043.svg)](https://doi.org/10.5281/zenodo.19187043)
 
 Repository for _Indo-European language acoustics through space and time_, Under
 review, 2026.
