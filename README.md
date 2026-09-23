@@ -1,5 +1,7 @@
 # Phylaudio
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19187043.svg)](https://doi.org/10.5281/zenodo.19187043)
+
 Repository for _Indo-European language acoustics through space and time_, Under
 review, 2026.
 
@@ -39,6 +41,18 @@ pixi install -e regression  # phylogenetic regression (R + brms)
 pixi install -e gp          # phylogenetic regression with Gaussian processes (tensorflow, GPflow)
 pixi install -e viz         # publication figures (plotly, seaborn)
 ```
+
+### Data
+
+Pre-computed outputs (BEAST2 posteriors, embeddings, regression results) are
+hosted on [Zenodo](https://doi.org/10.5281/zenodo.19187043). Download and unpack
+into the repository root:
+
+```bash
+tar -xzf phylaudio_zenodo_v2.tar.gz
+```
+
+See [ZENODO.md](ZENODO.md) for the full manifest.
 
 ## Usage
 

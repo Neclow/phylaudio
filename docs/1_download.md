@@ -69,7 +69,7 @@ shapefiles (110m countries, 50m land) for map visualizations.
 
 Pre-computed outputs (BEAST2 posteriors, XLS-R embeddings, regression results)
 that are too large for git. Download from
-[doi:10.5281/zenodo.21838594](https://doi.org/10.5281/zenodo.21838594). See
+[doi:10.5281/zenodo.19187043](https://doi.org/10.5281/zenodo.19187043). See
 [ZENODO.md](../ZENODO.md) for the full manifest.
 
 ```bash
