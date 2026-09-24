@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
+from matplotlib.patches import FancyBboxPatch
 from scipy import stats
 
 from src._config import DEFAULT_METADATA_DIR
@@ -29,17 +30,22 @@ from ._config import (
     DEFAULT_STYLE,
     FIG2_COLOR_COGNATE,
     FIG2_COLOR_SPEECH,
+    FIG2_RATES_HEIGHT,
     FIG2_SIZE,
+    FIG2_WIDTH,
+    FIG2_XMAX,
     SPEECH_BEAST_DIR,
+    fig2_gridspec,
 )
 
 EVENTS = [
-    ("Yamnaya", 5.3, 4.6, "#c2945a"),
-    ("Corded Ware", 4.9, 4.35, "#8aaa5e"),
-    ("Indus Valley Civ.", 5.3, 3.3, "#b07aa1"),
-    ("BMAC", 4.4, 3.6, "#d4a06a"),
-    ("Chariots", 4.1, 3.5, "#7297b5"),
+    ("Yamnaya", 5.3, 4.6),
+    ("Corded Ware", 4.9, 4.35),
+    ("Indus Valley Civilization", 5.3, 3.3),
+    ("BMAC", 4.4, 3.6),
+    ("Age of the Chariots", 4.1, 3.5),
 ]
+EVENT_COLOR = "#8b5e3cb3"
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
 SPEECH_TREES_FILE = f"{SPEECH_BEAST_DIR}/combined_v2/input_v2_resampled.trees"
 COGNATE_TREES_FILE = f"{COGNATE_BEAST_DIR}/prunedtomodern.trees"
@@ -273,29 +279,39 @@ def _plot_rates(
 
 
 def _plot_events(ax, ylow, yhigh):
+    """Pill-shaped event bars, labelled on their older (left) side.
+
+    Call after the final xlim/axes size is set: the rounding is computed in data
+    units, rescaled so the pill ends are semicircles on screen.
+    """
     bar_y_top = yhigh
     bar_h = (yhigh - ylow) * 0.035
     bar_gap = bar_h * 0.15
-    for i, (name, t_start, t_end, ecolor) in enumerate(EVENTS):
+    bbox = ax.get_window_extent()
+    x_per_px = abs(np.diff(ax.get_xlim())[0]) / bbox.width
+    y_per_px = abs(np.diff(ax.get_ylim())[0]) / bbox.height
+    aspect = y_per_px / x_per_px
+    for i, (name, t_start, t_end) in enumerate(EVENTS):
         y_top_i = bar_y_top - i * (bar_h + bar_gap)
-        ax.barh(
-            y_top_i - bar_h / 2,
-            width=t_start - t_end,
-            left=t_end,
-            height=bar_h,
-            color=ecolor,
-            alpha=0.7,
-            edgecolor=ecolor,
-            linewidth=0.5,
-            zorder=5,
+        ax.add_patch(
+            FancyBboxPatch(
+                (t_end, y_top_i - bar_h),
+                t_start - t_end,
+                bar_h,
+                boxstyle=f"round,pad=0,rounding_size={bar_h / aspect / 2}",
+                mutation_aspect=aspect,
+                facecolor=EVENT_COLOR,
+                edgecolor="none",
+                zorder=5,
+            )
         )
-        ax.text(
-            t_end - 0.03,
-            y_top_i - bar_h / 2,
+        ax.annotate(
             name,
+            (t_start, y_top_i - bar_h / 2),
+            xytext=(-3, 0),
+            textcoords="offset points",
             ha="right",
             va="center",
-            fontsize=5,
             color="black",
             zorder=6,
         )
@@ -303,33 +319,46 @@ def _plot_events(ax, ylow, yhigh):
 
 def plot_rates(t_grid, raw_rates, tmax, color, label, output_name):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=FIG2_SIZE)
+        height = FIG2_RATES_HEIGHT
+        fig, ax = plt.subplots(
+            figsize=(FIG2_WIDTH, height),
+            layout="none",
+            gridspec_kw=fig2_gridspec(height),
+        )
 
         norm_counts = Normalize(vmin=0, vmax=100)
-        ylow, yhigh = -3, 3
+        ylow, yhigh = -2, 3
         ax.set_ylim(ylow, yhigh)
 
         _plot_rates(ax, t_grid, raw_rates, tmax, color, label, norm_counts, ylow, yhigh)
-        _plot_events(ax, ylow, yhigh)
-
-        ax.set_xlim(tmax, 0.0)
-        ax.set_ylabel("Standardised rate (z-score)", fontsize=8)
-        ax.set_xlabel("Age (ka BP)", fontsize=8)
+        ax.set_xlim(FIG2_XMAX, 0.0)
+        ax.set_ylabel("Standardised rate (z-score)", fontweight="bold")
+        ax.set_xlabel("Age (ka BP)", fontweight="bold")
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
         ax.spines[["top", "right"]].set_visible(False)
 
         sm = cm.ScalarMappable(norm=norm_counts, cmap=_alpha_cmap(color))
         sm.set_array([])
-        cbar = fig.colorbar(sm, ax=ax, pad=0.01, shrink=0.8, aspect=20)
-        cbar.ax.tick_params(labelsize=6)
-        cbar.set_label("% posterior trees\nat time t", fontsize=6)
+        # Colour bar in the right margin so it doesn't shrink the shared x-frame
+        pos = ax.get_position()
+        cax = fig.add_axes(
+            [
+                pos.x1 + 0.06 / FIG2_WIDTH,
+                pos.y0 + 0.2 * pos.height,
+                0.08 / FIG2_WIDTH,
+                0.6 * pos.height,
+            ]
+        )
+        cbar = fig.colorbar(sm, cax=cax)
+        cbar.ax.tick_params(labelsize=7)
+        cbar.set_label("% posterior trees\nat time t")
 
-        ax.legend(fontsize=6, loc="upper left", frameon=False)
+        _plot_events(ax, ylow, yhigh)
+        ax.legend(loc="upper left", frameon=False)
 
-        plt.tight_layout()
         for ext in ("pdf", "svg"):
             output_path = f"{IMG_DIR}/{output_name}.{ext}"
-            fig.savefig(output_path, dpi=300, bbox_inches="tight")
+            fig.savefig(output_path, dpi=300)
         print(f"Saved figure to {IMG_DIR}/{output_name}.{{pdf,svg}}")
         plt.show()
 
@@ -347,7 +376,7 @@ def plot_rates_overlaid(
     color_s, color_c = FIG2_COLOR_SPEECH, FIG2_COLOR_COGNATE
 
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=FIG2_SIZE)
+        fig, ax = plt.subplots(figsize=(FIG2_SIZE[0], FIG2_RATES_HEIGHT))
 
         norm_counts = Normalize(vmin=0, vmax=100)
         ylow, yhigh = -3, 3
@@ -377,20 +406,19 @@ def plot_rates_overlaid(
             yhigh,
             zorder=3,
         )
-        _plot_events(ax, ylow, yhigh)
-
         ax.set_xlim(tmax, 0.0)
-        ax.set_ylabel("Standardised rate (z-score)", fontsize=8)
-        ax.set_xlabel("Age (ka BP)", fontsize=8)
+        ax.set_ylabel("Standardised rate (z-score)", fontweight="bold")
+        ax.set_xlabel("Age (ka BP)", fontweight="bold")
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
         ax.spines[["top", "right"]].set_visible(False)
-        ax.legend(fontsize=6, loc="upper left", frameon=False)
+        ax.legend(loc="upper left", frameon=False)
 
         sm = cm.ScalarMappable(norm=norm_counts, cmap=_alpha_cmap(color_s))
         sm.set_array([])
-        cbar = fig.colorbar(sm, ax=ax, pad=0.01, shrink=0.8, aspect=20)
+        cbar = fig.colorbar(sm, ax=ax, pad=0.01, shrink=0.6, aspect=20)
         cbar.ax.tick_params(labelsize=7)
-        cbar.set_label("% posterior trees\nat time t", fontsize=7)
+        cbar.set_label("% posterior trees\nat time t")
+        _plot_events(ax, ylow, yhigh)
 
         plt.tight_layout()
         for ext in ("pdf", "svg"):
@@ -441,7 +469,6 @@ def plot_rate_scatter(output_name="figS6_speech_vs_cognate_rates"):
                 (row["speech_rate"], row["cognate_rate"]),
                 xytext=(3, 3),
                 textcoords="offset points",
-                fontsize=7,
                 color="#333333",
                 clip_on=True,
             )
@@ -453,8 +480,8 @@ def plot_rate_scatter(output_name="figS6_speech_vs_cognate_rates"):
         ax.set_xlim(x_vals.min() - x_pad, x_vals.max() + x_pad)
         ax.set_ylim(y_vals.min() - y_pad, y_vals.max() + y_pad)
 
-        ax.set_xlabel("Median rate (speech)")
-        ax.set_ylabel("Median rate (cognate)")
+        ax.set_xlabel("Median rate (speech)", fontweight="bold")
+        ax.set_ylabel("Median rate (cognate)", fontweight="bold")
         ax.spines[["top", "right"]].set_visible(False)
 
         ax.text(

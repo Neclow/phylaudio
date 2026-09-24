@@ -483,7 +483,14 @@ def plot_panel_d(gp_result, output_stem):
 
         if np.isfinite(Z).any():
             ax.pcolormesh(
-                LON, LAT, Z, shading="auto", cmap=MAP_CMAP, norm=shared_norm, zorder=2
+                LON,
+                LAT,
+                Z,
+                shading="auto",
+                cmap=MAP_CMAP,
+                norm=shared_norm,
+                zorder=2,
+                rasterized=True,
             )
 
         ax.scatter(

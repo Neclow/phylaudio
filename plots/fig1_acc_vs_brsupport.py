@@ -13,6 +13,7 @@ import pandas as pd
 import scipy.interpolate as interp
 import seaborn as sns
 from matplotlib.lines import Line2D
+from matplotlib.ticker import MultipleLocator
 
 from src._config import DEFAULT_EVAL_DIR, DEFAULT_PER_SENTENCE_DIR
 from src.tasks.plot import clear_axes
@@ -70,12 +71,12 @@ def load_data():
         stat_dfs.append(df_mean)
     stat_df = pd.DataFrame(stat_dfs)
 
-    eval_df = pd.read_csv(f"{DEFAULT_EVAL_DIR}/phylaudio2_summary.csv")
+    eval_df = pd.read_csv(f"{DEFAULT_EVAL_DIR}/phylaudio2/summary.csv")
 
     model_details = pd.DataFrame.from_dict(MODEL_DETAILS, orient="index").sort_index()
 
     merged = (
-        eval_df.merge(stat_df[["ckpt", "brsupport"]], on="ckpt")
+        eval_df.merge(stat_df[["ckpt", "brsupport"]], left_on="run_id", right_on="ckpt")
         .merge(model_details, left_on="model_id", right_index=True)
         .dropna(subset=["brsupport"])
     )
@@ -191,17 +192,19 @@ def _plot(ax, fig, data, x_col, xlabel):
             arrowprops=dict(arrowstyle="->", color="black", lw=2),
         )
 
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel("Mean bootstrap support")
+    ax.set_xlabel(xlabel, fontweight="bold")
+    ax.set_ylabel("Mean bootstrap support", fontweight="bold")
+    ax.set_xlim(60, 100)
+    ax.set_ylim(bottom=65)
+    ax.yaxis.set_major_locator(MultipleLocator(5))
     clear_axes(ax)
-    ax.grid(alpha=0.2)
 
     return [arch_legend, size_legend]
 
 
 def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=(3.5, 3))
+        fig, ax = plt.subplots(figsize=(4, 3))
         legends = _plot(
             ax, fig, data, "test_accuracy", "Language identification accuracy (%)"
         )
@@ -209,6 +212,7 @@ def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
             fig.savefig(
                 f"{IMG_DIR}/{output_name}.{ext}",
                 bbox_inches="tight",
+                pad_inches=0,
                 bbox_extra_artists=legends,
             )
         print(f"Saved {IMG_DIR}/{output_name}.{{pdf,svg}}")
@@ -217,7 +221,7 @@ def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
 
 def plot_f1_vs_brsupport(data, output_name="figS1_f1_vs_brsupport"):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=(3.5, 3))
+        fig, ax = plt.subplots(figsize=(4, 3.5))
         legends = _plot(ax, fig, data, "test_f1", "Macro F1 score (%)")
         for ext in ("pdf", "svg"):
             fig.savefig(

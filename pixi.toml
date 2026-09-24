@@ -100,6 +100,7 @@ uv = ">=0.8.13,<0.9"
 pre-commit = ">=4.5.0,<5"
 pylint = ">=4.0.5,<5"
 spacy = ">=3.8.14,<4"
+r-png = ">=0.1_9,<0.2"
 
 [pypi-dependencies]
 pyglottolog = ">=3.16.0, <4"
@@ -173,3 +174,22 @@ fig2_root_age = "python -m plots.fig2_root_age"
 fig2_rates = "python -m plots.fig2_rates"
 fig2_densitree = "Rscript plots/fig2_densitree.R"
 fig3_geo = "python -m plots.fig3_geo"
+
+[tasks.fig1]
+cmd = "echo 'All fig1 plots done.'"
+depends-on = [
+    "fig1_acc_vs_brsupport",
+    "fig1_nmf",
+    "fig1_delta",
+    "fig1_pca",
+    "fig1_pca_plotly",
+    "fig1_sqa",
+]
+
+[tasks.fig2]
+cmd = "echo 'All fig2 plots done.'"
+depends-on = ["fig2_root_age", "fig2_rates", "fig2_densitree"]
+
+[tasks.fig3]
+cmd = "echo 'All fig3 plots done.'"
+depends-on = ["fig3_geo"]

@@ -20,7 +20,10 @@ from ._config import (
     FIG2_COLOR_COGNATE,
     FIG2_COLOR_SPEECH,
     FIG2_SIZE,
+    FIG2_WIDTH,
+    FIG2_XMAX,
     SPEECH_BEAST_DIR,
+    fig2_gridspec,
 )
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig2"
@@ -75,18 +78,23 @@ def _plot_root_age(ax, posterior_log_file, color, label, prior_log_file=None):
 
 def plot_root_age(output_name="fig2a_root_age"):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=(4, 2.5))
+        height = 1.5
+        fig, ax = plt.subplots(
+            figsize=(FIG2_WIDTH, height),
+            layout="none",
+            gridspec_kw=fig2_gridspec(height),
+        )
 
         _plot_root_age(ax, SPEECH_LOG_FILE, FIG2_COLOR_SPEECH, "Root age")
 
-        ax.set_xlabel("Age (ka BP)")
-        ax.set_ylabel("Density")
-        ax.legend(fontsize=7, loc="upper left", frameon=False)
-        ax.invert_xaxis()
+        ax.set_xlabel("Age (ka BP)", fontweight="bold")
+        ax.set_ylabel("Density", fontweight="bold")
+        ax.legend(loc="upper left", frameon=False)
+        ax.set_xlim(FIG2_XMAX, 0.0)
         sns.despine(ax=ax)
 
         for ext in ("pdf", "svg"):
-            fig.savefig(f"{IMG_DIR}/{output_name}.{ext}", bbox_inches="tight")
+            fig.savefig(f"{IMG_DIR}/{output_name}.{ext}")
         print(f"Saved figure to {IMG_DIR}/{output_name}.{{pdf,svg}}")
         plt.show()
 
@@ -110,9 +118,9 @@ def plot_root_age_overlaid(output_name="figS5a_root_age"):
             COGNATE_PRIOR_LOG,
         )
 
-        ax.set_ylabel("Density", fontsize=8)
-        ax.set_xlabel("Root age (ka BP)", fontsize=8)
-        ax.legend(fontsize=7, loc="upper left", frameon=False)
+        ax.set_ylabel("Density", fontweight="bold")
+        ax.set_xlabel("Root age (ka BP)", fontweight="bold")
+        ax.legend(loc="upper left", frameon=False)
         ax.spines[["top", "right"]].set_visible(False)
         ax.invert_xaxis()
 

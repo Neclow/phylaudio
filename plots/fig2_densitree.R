@@ -18,14 +18,20 @@ TREE_DIR <- file.path(
 TREES_FILE <- file.path(TREE_DIR, "input_v2_resampled.trees")
 MCC_FILE <- file.path(TREE_DIR, "input_v2_resampled.mcc")
 OUT_DIR <- "img_v2/fig2"
-FONT_FAMILY <- "TeX Gyre Heros"
+FONT_FAMILY <- "Arial"
 FONT_SIZE_PT <- 9
 N_SAMPLE <- 500
 EDGE_ALPHA <- 0.08
 CONSENSUS_ALPHA <- 0.6
 CONSENSUS_LWD <- 1.5
-FIG_W <- 10
-FIG_H <- 6
+CLOUD_DPI <- 300
+# Shared x-frame (inches / ka BP): keep in sync with FIG2_* in plots/_config.py
+FIG_W <- 7.2
+AX_LEFT <- 0.55
+AX_W <- 5.6
+X_MAX <- 8
+# Tall enough for 50 tip labels at FONT_SIZE_PT (~1.07 x font size per tip)
+FIG_H <- 7.8
 
 TIP_ORDER <- c(
   "Assamese",
@@ -136,6 +142,9 @@ tip_y <- setNames(seq(n_tips, 1), TIP_ORDER)
 
 heights <- sapply(trees, function(t) max(node.depth.edgelength(t)))
 max_height <- max(heights, max(node.depth.edgelength(consensus_tree)))
+if (max_height > X_MAX) {
+  cat("Note: trees up to", round(max_height, 2), "ka clipped at X_MAX =", X_MAX, "\n")
+}
 
 tree_layout <- function(tr, palette) {
   n <- Ntip(tr)
@@ -208,32 +217,74 @@ rm(trees)
 invisible(gc())
 
 # --- Plot ---
+# Draw the posterior cloud into a transparent PNG covering exactly the current
+# plot region, then place it back as a single image (keeps the SVG small).
+draw_cloud_raster <- function() {
+  usr <- par("usr")
+  pin <- par("pin")
+  vec_dev <- dev.cur()
+  tmp_png <- tempfile(fileext = ".png")
+  png(
+    tmp_png,
+    width = pin[1],
+    height = pin[2],
+    units = "in",
+    res = CLOUD_DPI,
+    type = "cairo",
+    bg = "transparent"
+  )
+  par(mai = c(0, 0, 0, 0), xaxs = "i", yaxs = "i")
+  plot.new()
+  plot.window(xlim = usr[1:2], ylim = usr[3:4])
+  segments(hx0, hy0, hx1, hy1, col = seg_col, lwd = 0.5)
+  segments(vx0, vy0, vx1, vy1, col = seg_col, lwd = 0.5)
+  dev.off()
+  dev.set(vec_dev)
+  rasterImage(png::readPNG(tmp_png), usr[1], usr[3], usr[2], usr[4])
+  unlink(tmp_png)
+}
+
 plot_fig2a <- function(outfile, fmt = "pdf") {
+  # pointsize sets every text element to FONT_SIZE_PT (no per-element cex)
   if (fmt == "pdf") {
-    cairo_pdf(outfile, width = FIG_W, height = FIG_H, family = FONT_FAMILY)
+    cairo_pdf(
+      outfile,
+      width = FIG_W,
+      height = FIG_H,
+      family = FONT_FAMILY,
+      pointsize = FONT_SIZE_PT
+    )
   } else {
-    svg(outfile, width = FIG_W, height = FIG_H, family = FONT_FAMILY)
+    svg(
+      outfile,
+      width = FIG_W,
+      height = FIG_H,
+      family = FONT_FAMILY,
+      pointsize = FONT_SIZE_PT
+    )
   }
 
-  par(family = FONT_FAMILY, mar = c(3, 0.5, 0.5, 7), cex = FONT_SIZE_PT / 12)
+  par(
+    family = FONT_FAMILY,
+    mai = c(0.5, AX_LEFT, 0.05, FIG_W - AX_LEFT - AX_W),
+    xaxs = "i"
+  )
 
-  x_max <- max(max_height, 8)
   plot(
     NULL,
-    xlim = c(max_height - x_max, max_height),
+    xlim = c(max_height - X_MAX, max_height),
     ylim = c(0.5, n_tips + 0.5),
     xlab = "",
     ylab = "",
     axes = FALSE
   )
 
-  ax_vals <- sort(unique(c(pretty(c(x_max, 0)), 8)))
+  ax_vals <- sort(unique(c(pretty(c(X_MAX, 0)), X_MAX)))
   ax_pos <- max_height - ax_vals
-  vis <- ax_pos >= (max_height - x_max) & ax_pos <= max_height
+  vis <- ax_pos >= (max_height - X_MAX) & ax_pos <= max_height
   abline(v = ax_pos[vis], col = "grey80", lty = "dashed", lwd = 0.4)
 
-  segments(hx0, hy0, hx1, hy1, col = seg_col, lwd = 0.5)
-  segments(vx0, vy0, vx1, vy1, col = seg_col, lwd = 0.5)
+  draw_cloud_raster()
 
   ce <- con_lay$edge
   segments(
@@ -258,7 +309,6 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
     tip_y,
     names(tip_y),
     pos = 4,
-    cex = FONT_SIZE_PT / 12,
     xpd = TRUE
   )
 
@@ -266,15 +316,13 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
     1,
     at = ax_pos[vis],
     labels = ax_vals[vis],
-    family = FONT_FAMILY,
-    cex.axis = FONT_SIZE_PT / 12
+    family = FONT_FAMILY
   )
   mtext(
-    "Time (kya)",
+    "Age (ka BP)",
     side = 1,
     line = 2,
-    family = FONT_FAMILY,
-    cex = FONT_SIZE_PT / 12
+    family = FONT_FAMILY
   )
 
   # --- Inset color bar (horizontal, top-left) ---
@@ -304,14 +352,12 @@ plot_fig2a <- function(outfile, fmt = "pdf") {
     tick_x,
     cb_y0 - 0.5,
     sprintf("%.1f", lr_ticks),
-    cex = FONT_SIZE_PT / 14,
     family = FONT_FAMILY
   )
   text(
     mean(c(cb_x0, cb_x1)),
     cb_y1 + 0.4,
     "Log evol. rate",
-    cex = FONT_SIZE_PT / 13,
     family = FONT_FAMILY
   )
 

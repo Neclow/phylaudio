@@ -67,7 +67,7 @@ def load_ce(nmf_dir=NMF_DIR):
 # Fig 1b
 def plot_structure(P_sorted, labels_sorted):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=(3.25, 8))
+        fig, ax = plt.subplots(figsize=(3.75, 8.25))
 
         colors = PALETTE[:K]
         n_lang = len(labels_sorted)
@@ -89,7 +89,7 @@ def plot_structure(P_sorted, labels_sorted):
         ax.set_ylim(-0.5, n_lang - 0.5)
         ax.set_xlim(0, 1)
         ax.set_yticks(y)
-        ax.set_yticklabels(labels_sorted, fontsize=7.5, alpha=0.8)
+        ax.set_yticklabels(labels_sorted)
         ax.tick_params(axis="y", length=0)
         ax.tick_params(axis="x", color=(0, 0, 0, 0.3), pad=1)
         ax.invert_yaxis()
@@ -97,12 +97,7 @@ def plot_structure(P_sorted, labels_sorted):
         # X-axis at top
         ax.xaxis.tick_top()
         ax.xaxis.set_label_position("top")
-        ax.set_xlabel(
-            "Component proportion", alpha=0.7, fontdict={"size": 8.5}, labelpad=6
-        )
-        for label in ax.get_xticklabels():
-            label.set_alpha(0.7)
-            label.set_fontsize(7.5)
+        ax.set_xlabel("Component proportion", fontweight="bold", labelpad=6)
 
         for spine in ax.spines.values():
             spine.set_visible(False)
@@ -110,10 +105,9 @@ def plot_structure(P_sorted, labels_sorted):
         leg = ax.legend(
             loc="upper center",
             bbox_to_anchor=(0.5, -0.005),
-            fontsize=7.5,
-            ncol=3,
+            ncol=2,
             title="Acoustic components",
-            title_fontproperties={"weight": "bold", "size": 8},
+            title_fontproperties={"weight": "bold"},
             columnspacing=0.6,
             handletextpad=0.3,
             labelspacing=0.15,
@@ -146,7 +140,7 @@ def plot_ce(df_ce):
         ax.set_xlabel("Number of NMF components (K)")
         ax.set_ylabel("Cross-entropy (masked)")
         # ax.set_xticks(df_ce["K"].values[::2])
-        ax.legend(fontsize=7)
+        ax.legend()
         ax.grid(axis="y", alpha=0.15)
 
         stem = f"{IMG_DIR}/figS3_nmf_ce_vs_k"
@@ -247,7 +241,7 @@ def plot_phoible_forest(feat_labels, coef, ci_lo, ci_hi, sig, r2):
         nrows = (K + ncols - 1) // ncols
 
         fig, axes = plt.subplots(
-            nrows, ncols, figsize=(8, 2.5 * nrows), sharey=True, sharex=True
+            nrows, ncols, figsize=(9, 3 * nrows), sharey=True, sharex=True
         )
 
         for j in range(K):
@@ -268,11 +262,13 @@ def plot_phoible_forest(feat_labels, coef, ci_lo, ci_hi, sig, r2):
 
             ax.axvline(0, color="black", linewidth=0.5, linestyle="--", alpha=0.5)
             ax.set_title(
-                f"Comp {j + 1}\n({NMF_COMP_LABELS[j]})", fontsize=8, linespacing=1.4
+                f"Comp {j + 1}\n({NMF_COMP_LABELS[j]})",
+                fontweight="bold",
+                linespacing=1.4,
             )
             ax.set_yticks(range(n_feat))
             if j % ncols == 0:
-                ax.set_yticklabels(sorted_names, fontsize=7)
+                ax.set_yticklabels(sorted_names)
                 row_start = (j // ncols) * ncols
                 row_end = min(row_start + ncols, K)
                 for rank, fi in enumerate(alpha_order):

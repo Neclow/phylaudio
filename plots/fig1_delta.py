@@ -11,7 +11,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from ._config import DEFAULT_IMG_DIR, DEFAULT_STYLE, NMF_COMP_ORDER, PALETTE, SPEECH_BEAST_DIR
+from ._config import (
+    DEFAULT_IMG_DIR,
+    DEFAULT_STYLE,
+    NMF_COMP_ORDER,
+    PALETTE,
+    SPEECH_BEAST_DIR,
+)
 
 IMG_DIR = f"{DEFAULT_IMG_DIR}/fig1"
 NMF_DIR = f"{SPEECH_BEAST_DIR}/nmf"
@@ -51,14 +57,17 @@ def plot(delta_df, lang_to_props):
         visible_h = (delta_df.delta.values - ymin).clip(0)
         bottom = np.full(len(delta_df), ymin)
         for j in range(K):
-            props = np.array([
-                lang_to_props.get(lang, np.zeros(K))[j]
-                for lang in delta_df.language
-            ])
+            props = np.array(
+                [lang_to_props.get(lang, np.zeros(K))[j] for lang in delta_df.language]
+            )
             heights = visible_h * props
             ax.bar(
-                x, heights, bottom=bottom, color=colors[j],
-                edgecolor="none", width=0.7,
+                x,
+                heights,
+                bottom=bottom,
+                color=colors[j],
+                edgecolor="none",
+                width=0.7,
             )
             bottom += heights
 
@@ -88,12 +97,10 @@ def plot(delta_df, lang_to_props):
             delta_df.language,
             rotation=55,
             ha="right",
-            fontsize=8,
-            alpha=0.8,
             rotation_mode="anchor",
         )
         ylabel = r"$\bar{\delta}$ (95% bootstrap CI)" if has_ci else r"$\delta$"
-        ax.set_ylabel(ylabel)
+        ax.set_ylabel(ylabel, fontweight="bold")
         ax.set_xlim(-0.5, len(delta_df) - 0.5)
         ax.set_ylim(0.25)
         ax.tick_params(axis="both", length=3, width=0.5)

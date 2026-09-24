@@ -85,5 +85,23 @@ PALETTE: Final = [
 ]
 
 FIG2_SIZE = (6.7, 2.5)
+# Rates panels (fig2b, figS5b): tall enough that the 9 pt event labels don't overlap
+FIG2_RATES_HEIGHT = 4.0
 FIG2_COLOR_SPEECH = "#414487"
 FIG2_COLOR_COGNATE = "#7ad151"
+# Shared x-frame for the Fig 2 panels (inches / ka BP): stacking the saved PDFs
+# at 100% scale aligns their x-axes. Keep in sync with plots/fig2_densitree.R.
+FIG2_WIDTH = 7.2
+FIG2_AX_LEFT = 0.55
+FIG2_AX_WIDTH = 5.6
+FIG2_XMAX = 8.0
+
+
+def fig2_gridspec(height, bottom=0.45, top=0.1):
+    """gridspec_kw placing a single axes on the shared Fig 2 x-frame."""
+    return {
+        "left": FIG2_AX_LEFT / FIG2_WIDTH,
+        "right": (FIG2_AX_LEFT + FIG2_AX_WIDTH) / FIG2_WIDTH,
+        "bottom": bottom / height,
+        "top": 1 - top / height,
+    }
