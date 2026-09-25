@@ -67,14 +67,15 @@ shapefiles (110m countries, 50m land) for map visualizations.
 
 ## Zenodo data
 
+- **Command:** `pixi run download_zenodo`
+- **Requires:** `curl`, ~28 GB of free disk space for the tarball
+- **Inputs:** N/A
+- **Outputs:** pre-computed files under `data/` (see [ZENODO.md](../ZENODO.md))
+
 Pre-computed outputs (BEAST2 posteriors, XLS-R embeddings, regression results)
-that are too large for git. Download from
-[doi:10.5281/zenodo.19187043](https://doi.org/10.5281/zenodo.19187043). See
+that are too large for git, archived at
+[doi:10.5281/zenodo.19187043](https://doi.org/10.5281/zenodo.19187043).
+Downloads `phylaudio_zenodo_v2.tar.gz` (version 2, ~28 GB), checks its MD5
+checksum and unpacks it into the repository root. The download is skipped if a
+verified copy is already present, and resumed if interrupted. See
 [ZENODO.md](../ZENODO.md) for the full manifest.
-
-```bash
-# TODO: pixi run prepare_zenodo_data
-tar -xzf phylaudio_zenodo_v2.tar.gz
-```
-
-Unpacks into `data/`.

@@ -22,11 +22,12 @@ find "$EMBEDDING_DIR" -type f >> "$FILELIST"
 
 # --- 2. Speech BEAST ---
 # Top-level v2 files (chains, logs, trees, states, permeaning, mcc, xml)
+# Excludes input_v2b* (plain-MCMC test run, not used in the paper)
 find "$SPEECH_BEAST_DIR" -maxdepth 1 -type f \( \
     -name 'input_v2*' -o \
     -name 'chain*input_v2*' -o \
     -name 'prior_v2*' \
-\) >> "$FILELIST"
+\) ! -name '*input_v2b*' >> "$FILELIST"
 echo "$SPEECH_BEAST_DIR/metadata_with_inventory.csv" >> "$FILELIST"
 
 # Subdirectories
