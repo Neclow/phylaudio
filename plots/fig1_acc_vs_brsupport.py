@@ -88,7 +88,7 @@ def load_data():
     return merged.loc[best_idx].reset_index(drop=True)
 
 
-def _plot(ax, fig, data, x_col, xlabel):
+def _plot(ax, fig, data, x_col, xlabel, xlim):
     arch_palette = dict(zip(ARCH_ORDER, sns.color_palette("viridis", len(ARCH_ORDER))))
     data = data.copy()
     data["_size"] = SIZE_FUNC(np.log10(data.nparam))
@@ -194,7 +194,7 @@ def _plot(ax, fig, data, x_col, xlabel):
 
     ax.set_xlabel(xlabel, fontweight="bold")
     ax.set_ylabel("Mean bootstrap support", fontweight="bold")
-    ax.set_xlim(60, 100)
+    ax.set_xlim(xlim)
     ax.set_ylim(bottom=65)
     ax.yaxis.set_major_locator(MultipleLocator(5))
     clear_axes(ax)
@@ -206,7 +206,12 @@ def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
     with plt.style.context(DEFAULT_STYLE):
         fig, ax = plt.subplots(figsize=(4, 3))
         legends = _plot(
-            ax, fig, data, "test_accuracy", "Language identification accuracy (%)"
+            ax,
+            fig,
+            data,
+            "test_accuracy",
+            "Language identification accuracy (%)",
+            (60, 100),
         )
         for ext in ("pdf", "svg"):
             fig.savefig(
@@ -221,8 +226,8 @@ def plot_acc_vs_brsupport(data, output_name="fig1a_acc_vs_brsupport"):
 
 def plot_f1_vs_brsupport(data, output_name="figS1_f1_vs_brsupport"):
     with plt.style.context(DEFAULT_STYLE):
-        fig, ax = plt.subplots(figsize=(4, 3.5))
-        legends = _plot(ax, fig, data, "test_f1", "Macro F1 score (%)")
+        fig, ax = plt.subplots(figsize=(4, 3))
+        legends = _plot(ax, fig, data, "test_f1", "Macro F1 score (%)", (10, 100))
         for ext in ("pdf", "svg"):
             fig.savefig(
                 f"{IMG_DIR}/{output_name}.{ext}",
