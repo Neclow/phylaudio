@@ -65,6 +65,19 @@ and renames leaves to FLEURS keys. IE-CoR posteriors and logs are written to
 Downloads language-area polygons from the Glottography project and Natural Earth
 shapefiles (110m countries, 50m land) for map visualizations.
 
+## Reference papers
+
+- **Command:** `pixi run download_papers`
+- **Requires:** internet access
+- **Inputs:** N/A
+- **Outputs:** `data/resources/{2111.09296,mls,vl107,voxpopuli}.pdf`
+
+Downloads the four source papers whose training-hours tables
+`plots/supplementary_v2.ipynb` parses (XLS-R, MLS, VoxLingua107, VoxPopuli) from
+arXiv and the ACL Anthology. The PDFs are not committed to the repository
+(copyright); the script fetches the exact versions the parsing code expects and
+verifies each MD5 checksum. Already-present verified copies are skipped.
+
 ## Zenodo data
 
 - **Command:** `pixi run download_zenodo`
