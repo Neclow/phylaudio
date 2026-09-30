@@ -249,3 +249,6 @@ src/tasks/phylo/additive_phylo_gp
 revision/
 papers/
 manuscript/
+
+# Reference papers
+data/resources/*.pdf
