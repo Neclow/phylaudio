@@ -175,7 +175,8 @@ if ! $SKIP_MCC; then
 
     echo ""
     echo "=== Running TreeAnnotator (MCC) ==="
-    pixi run treeannotator "$TREES_IN" "$MCC_FILE"
+    # Burn-in already removed by LogCombiner; TreeAnnotator defaults to 10%
+    pixi run treeannotator -burnin 0 "$TREES_IN" "$MCC_FILE"
     echo "MCC tree written to: $MCC_FILE"
 fi
 

@@ -205,9 +205,11 @@ def load_rates(trees_file):
             if line.strip().lower().startswith("tree "):
                 n_total += 1
 
-    keep = _select_tree_indices(n_total, BURNIN_FRAC, MAX_TREES)
+    # No burn-in required for combined/resampled runs
+    burnin_frac = 0.0 if "resampled" in trees_file else BURNIN_FRAC
+    keep = _select_tree_indices(n_total, burnin_frac, MAX_TREES)
     print(
-        f"  {n_total} trees, selecting {len(keep)} (burn-in {int(n_total * BURNIN_FRAC)})"
+        f"  {n_total} trees, selecting {len(keep)} (burn-in {int(n_total * burnin_frac)})"
     )
 
     # Pass 2: extract preamble + selected tree strings

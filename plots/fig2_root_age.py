@@ -9,6 +9,7 @@ archaeological/cultural horizon date ranges.
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -44,13 +45,21 @@ def _load_root_age(log_file):
     return sub_df
 
 
+def _hpd(samples, prob=0.95):
+    # Shortest interval containing `prob` of the samples (as in TreeAnnotator)
+    x = np.sort(samples)
+    k = int(round(prob * len(x)))
+    i = np.argmin(x[k - 1 :] - x[: len(x) - k + 1])
+    return x[i], x[i + k - 1]
+
+
 def _plot_root_age(ax, posterior_log_file, color, label, prior_log_file=None):
     ages = _load_root_age(posterior_log_file)
     sns.kdeplot(
         ages, ax=ax, fill=True, color=color, alpha=0.35, label=f"{label} (posterior)"
     )
     median = ages.median()
-    hpd_lo, hpd_hi = ages.quantile(0.025), ages.quantile(0.975)
+    hpd_lo, hpd_hi = _hpd(ages)
     ax.axvspan(
         hpd_lo,
         hpd_hi,
